@@ -8,3 +8,5 @@
 out/
 
 target/
+
+src/main/dafny_compiler/
