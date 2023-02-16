@@ -5,6 +5,9 @@ import AST.Statements.RandomStatementGenerator;
 import AST.Statements.StatementGenerator;
 import AST.Statements.StatementType;
 import AST.StringUtils.IndentationLevelException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -32,8 +35,13 @@ public class DafnyProgram {
             addStatementToMethod(type, randomStatementGenerator, main);
         }
         try {
-            System.out.println(main.generateCode());
-        } catch (IndentationLevelException e) {
+
+            String program = main.generateCode();
+//            BufferedWriter writer = new BufferedWriter(new FileWriter("test.dfy"));
+//            writer.append(program);
+//            writer.close();
+            System.out.println(program);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -44,7 +52,8 @@ public class DafnyProgram {
                 method.addStatement(statementGenerator.generateBoolStatement(method.getSymbolTable()));
                 break;
             case INT_ASSIGNMENT:
-                method.addStatement(statementGenerator.generateIntStatement(method.getSymbolTable()));
+                method.addStatement(statementGenerator.generateBoolStatement(method.getSymbolTable()));
+//                method.addStatement(statementGenerator.generateIntStatement(method.getSymbolTable()));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + type);

@@ -14,7 +14,7 @@ public class IndentedStringBuilder {
 
     public void append(String s) {
         if (!s.isEmpty()) {
-            stringBuilder.append(String.join("", Collections.nCopies(indentationLevel, "\t")));
+            stringBuilder.append(String.join("", Collections.nCopies(indentationLevel, "  ")));
             stringBuilder.append(s);
         }
     }

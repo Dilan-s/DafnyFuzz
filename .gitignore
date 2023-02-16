@@ -10,3 +10,19 @@ out/
 target/
 
 src/main/dafny_compiler/
+
+test.dfy
+test-go
+test-go-run
+test-java
+test.cpp
+test.h
+test.cs
+test-py
+test.js
+outputs
+package-lock.json
+DafnyRuntime.h
+errors
+
+node_modules
