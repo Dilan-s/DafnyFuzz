@@ -1,4 +1,4 @@
-package AST.Statements.Expressions.BoolExpression;
+package AST.Statements.Expressions.IntExpression;
 
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class BoolLiteralExpression extends Expression<Boolean> {
+public class IntLiteralExpression extends Expression<Integer> {
 
-    private final boolean value;
+    private final int value;
 
-    public BoolLiteralExpression(Random random, Map<String, Statement> symbolTable) {
-        this.value = ValueGenerator.generateBoolValue(random);
+    public IntLiteralExpression(Random random, Map<String, Statement> symbolTable) {
+        this.value = ValueGenerator.generateIntValue(random);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class BoolLiteralExpression extends Expression<Boolean> {
     }
 
     @Override
-    public Boolean getValue() {
+    public Integer getValue() {
         return value;
     }
 

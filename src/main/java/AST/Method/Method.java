@@ -65,7 +65,6 @@ public class Method {
         code.indent();
         body.forEach(statement -> {
             code.append(statement.generateCode());
-            code.append(statement.printResult());
         });
         code.unindent();
         code.append(Constants.CLOSING_SCOPE);

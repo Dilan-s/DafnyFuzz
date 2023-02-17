@@ -6,9 +6,7 @@ import java.util.Random;
 
 public interface Statement {
 
-    public String generateCode();
-
-    public String printResult();
+    public List<String> generateCode();
 
     public List<Statement> generateValue(Map<String, Statement> symbolTable);
 

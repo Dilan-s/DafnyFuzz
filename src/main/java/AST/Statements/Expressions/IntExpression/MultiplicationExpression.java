@@ -1,4 +1,4 @@
-package AST.Statements.Expressions.BoolExpression;
+package AST.Statements.Expressions.IntExpression;
 
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class ReverseImpliesExpression extends Expression<Boolean> {
+public class MultiplicationExpression extends Expression<Integer> {
+    //Avoid underflow/overflow
 
-    public static final String REVERSE_IMPLIES = " <== ";
-    private final Expression<Boolean> lhs;
-    private final Expression<Boolean> rhs;
+    public static final String TIMES = " * ";
+    private final Expression<Integer> lhs;
+    private final Expression<Integer> rhs;
 
-    public ReverseImpliesExpression(Random random, Map<String, Statement> symbolTable) {
-        this.lhs = ValueGenerator.generateBoolExpressionValue(random, symbolTable);
-        this.rhs = ValueGenerator.generateBoolExpressionValue(random, symbolTable);
+    public MultiplicationExpression(Random random, Map<String, Statement> symbolTable) {
+        this.lhs = ValueGenerator.generateIntExpressionValue(random, symbolTable);
+        this.rhs = ValueGenerator.generateIntExpressionValue(random, symbolTable);
     }
 
     @Override
@@ -29,8 +30,8 @@ public class ReverseImpliesExpression extends Expression<Boolean> {
     }
 
     @Override
-    public Boolean getValue() {
-        return !rhs.getValue() || lhs.getValue();
+    public Integer getValue() {
+        return lhs.getValue() * rhs.getValue();
     }
 
     @Override
@@ -38,9 +39,11 @@ public class ReverseImpliesExpression extends Expression<Boolean> {
         StringBuilder representation = new StringBuilder();
         representation.append(Constants.OPENING_ARGS);
         representation.append(lhs);
-        representation.append(REVERSE_IMPLIES);
+        representation.append(TIMES);
         representation.append(rhs);
         representation.append(Constants.CLOSING_ARGS);
         return representation.toString();
     }
+
+
 }

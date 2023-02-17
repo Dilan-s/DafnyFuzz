@@ -1,7 +1,7 @@
 package AST.Statements.Expressions.BoolExpression;
 
+import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
-import AST.Statements.Type.Type;
 import AST.Statements.Type.ValueGenerator;
 import AST.StringUtils.Constants;
 import java.util.ArrayList;
@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class IfAndOnlyIfExpression extends BoolExpression {
+public class IfAndOnlyIfExpression extends Expression<Boolean> {
 
     public static final String IFF = " <==> ";
-    private final BoolExpression lhs;
-    private final BoolExpression rhs;
+    private final Expression<Boolean> lhs;
+    private final Expression<Boolean> rhs;
 
     public IfAndOnlyIfExpression(Random random, Map<String, Statement> symbolTable) {
         this.lhs = ValueGenerator.generateBoolExpressionValue(random, symbolTable);
@@ -29,6 +29,11 @@ public class IfAndOnlyIfExpression extends BoolExpression {
     }
 
     @Override
+    public Boolean getValue() {
+        return (rhs.getValue() && rhs.getValue()) || (!rhs.getValue() && !rhs.getValue());
+    }
+
+    @Override
     public String toString() {
         StringBuilder representation = new StringBuilder();
         representation.append(Constants.OPENING_ARGS);
@@ -37,9 +42,5 @@ public class IfAndOnlyIfExpression extends BoolExpression {
         representation.append(rhs);
         representation.append(Constants.CLOSING_ARGS);
         return representation.toString();
-    }
-
-    public static BoolExpression create(Random random, Map<String, Statement> symbolTable) {
-        return new IfAndOnlyIfExpression(random, symbolTable);
     }
 }

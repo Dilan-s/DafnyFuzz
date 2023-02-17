@@ -49,11 +49,12 @@ public class DafnyProgram {
     private void addStatementToMethod(StatementType type, StatementGenerator statementGenerator, Method method) {
         switch (type) {
             case BOOL_ASSIGNMENT:
+//                method.addStatement(statementGenerator.generateIntStatement(method.getSymbolTable()));
                 method.addStatement(statementGenerator.generateBoolStatement(method.getSymbolTable()));
                 break;
             case INT_ASSIGNMENT:
-                method.addStatement(statementGenerator.generateBoolStatement(method.getSymbolTable()));
-//                method.addStatement(statementGenerator.generateIntStatement(method.getSymbolTable()));
+//                method.addStatement(statementGenerator.generateBoolStatement(method.getSymbolTable()));
+                method.addStatement(statementGenerator.generateIntStatement(method.getSymbolTable()));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + type);

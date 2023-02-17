@@ -1,6 +1,7 @@
 package AST.StringUtils;
 
 import java.util.Collections;
+import java.util.List;
 
 public class IndentedStringBuilder {
 
@@ -16,6 +17,11 @@ public class IndentedStringBuilder {
         if (!s.isEmpty()) {
             stringBuilder.append(String.join("", Collections.nCopies(indentationLevel, "  ")));
             stringBuilder.append(s);
+        }
+    }
+    public void append(List<String> ss) {
+        for (String s : ss) {
+            append(s);
         }
     }
 

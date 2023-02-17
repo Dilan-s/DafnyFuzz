@@ -1,12 +1,12 @@
 package AST.Statements.Expressions.BoolExpression;
 
+import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
-import AST.Statements.Type.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class EqualityExpression extends BoolExpression {
+public class EqualityExpression extends Expression<Boolean> {
 
     public EqualityExpression(Random random, Map<String, Statement> symbolTable) {
 
@@ -17,7 +17,8 @@ public class EqualityExpression extends BoolExpression {
         return null;
     }
 
-    public static BoolExpression create(Random random, Map<String, Statement> symbolTable) {
-        return new EqualityExpression(random, symbolTable);
+    @Override
+    public Boolean getValue() {
+        return null;
     }
 }

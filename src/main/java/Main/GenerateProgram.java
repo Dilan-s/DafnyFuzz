@@ -9,7 +9,6 @@ public class GenerateProgram {
     public static void main(String[] args) {
         DafnyProgram dafnyProgram = new DafnyProgram();
         dafnyProgram.generateProgram();
-
     }
 
 }
