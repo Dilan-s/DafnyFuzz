@@ -12,9 +12,14 @@ import java.util.Random;
 public class ValueGenerator {
 
     private static final double PROB_LITERAL = 0.4;
+    public static final int MAX_INT_VALUE = Integer.MAX_VALUE >> 1;
 
     public static Integer generateIntValue(Random random) {
-        return random.nextInt();
+        int i = random.nextInt(MAX_INT_VALUE);
+        if (random.nextDouble() < 0.5) {
+            i *= -1;
+        }
+        return i;
     }
 
     public static boolean generateBoolValue(Random random) {
