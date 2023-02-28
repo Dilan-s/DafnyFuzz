@@ -26,16 +26,36 @@ mkdir tests || true
 x=1
 while [ $x -le 100 ]; do
 
+  rm -rf test-go test-go-run || true
+  rm -rf test-java || true
+  rm -rf test.cpp test.h DafnyRuntime.h test.h.gch DafnyRuntime.h.gch a.out || true
+  rm -rf test.cs || true
+  rm -rf test-py || true
+  rm -rf test.js || true
+  rm -rf test.a || true
+  rm -rf tmp.txt || true
   rm -rf outputs/* || true
   echo "Test number $x"
 
-  java -cp out/ Main.GenerateProgram $x > test.dfy
+  timeout 100 java -cp out/ Main.GenerateProgram $x > test.dfy
+  if [ $? -eq 124 ]
+  then
+    echo "Failed to create dafny file in 100 seconds"
+    x=$(( $x + 1 ))
+    continue;
+  fi
   #  cp test.dfy tests/"test$x.dfy"
   # css
   #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
 
   # GO
-  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  if [ $? -eq 124 ]
+  then
+    echo "Failed to convert to GO in 100 seconds"
+    x=$(( $x + 1 ))
+    continue;
+  fi
   echo "Created Go files"
   mkdir test-go-run
   cp -R test-go/* test-go-run/
@@ -52,12 +72,24 @@ while [ $x -le 100 ]; do
 
 
   # js
-  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  if [ $? -eq 124 ]
+  then
+    echo "Failed to convert to JS in 100 seconds"
+    x=$(( $x + 1 ))
+    continue;
+  fi
   echo "Created JS files"
   node test.js > outputs/output-js.txt
 
   # java
-  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  if [ $? -eq 124 ]
+  then
+    echo "Failed to convert to Java in 100 seconds"
+    x=$(( $x + 1 ))
+    continue;
+  fi
   echo "Created Java files"
   javac -cp src/main/dafny_compiler/dafny/Binaries/DafnyRuntime.jar test-java/test.java test-java/*/*.java > tmp.txt 2>&1
   cd test-java
@@ -65,7 +97,13 @@ while [ $x -le 100 ]; do
   cd ..
 
   # py
-  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /spillTargetCode:3 test.dfy > tmp.txt  2>&1
+  timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /spillTargetCode:3 test.dfy > tmp.txt  2>&1
+  if [ $? -eq 124 ]
+  then
+    echo "Failed to convert to Python in 100 seconds"
+    x=$(( $x + 1 ))
+    continue;
+  fi
   echo "Created Python files"
   python3 test-py/test.py > outputs/output-py.txt
 
@@ -83,6 +121,7 @@ while [ $x -le 100 ]; do
   rm -rf test.js || true
   rm -rf test.a || true
   rm -rf tmp.txt || true
+  rm -rf outputs/* || true
 
   java -cp out/ Main.CompareOutputs $x
   x=$(( $x + 1 ))
