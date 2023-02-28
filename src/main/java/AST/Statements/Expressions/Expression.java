@@ -1,11 +1,26 @@
 package AST.Statements.Expressions;
 
-import AST.Statements.Statement;
+import AST.Errors.SemanticException;
+import AST.SymbolTable.Method;
+import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.Type;
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Expression<T> {
+public interface Expression {
 
-    public abstract List<Statement> getStatements();
+    List<Type> getTypes();
 
-    public abstract T getValue();
+    void semanticCheck(Method method) throws SemanticException;
+
+    void setSymbolTable(SymbolTable symbolTable);
+
+    default boolean isValidReturn() {
+        return true;
+    }
+
+    default List<String> toCode() {
+        return new ArrayList<>();
+    }
+
 }

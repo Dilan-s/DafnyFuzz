@@ -26,3 +26,5 @@ DafnyRuntime.h
 errors
 
 node_modules
+
+tmp.txt

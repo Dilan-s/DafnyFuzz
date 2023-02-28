@@ -11,21 +11,26 @@ rm -rf outputs || true
 rm -rf test.a || true
 rm -rf errors || true
 rm -rf tmp.txt || true
+rm -rf out || true
+rm -rf tests || true
 
 npm install bignumber.js
 
+javac -cp src/main/java/ -d ./out/ src/main/java/Main/GenerateProgram.java src/main/java/Main/CompareOutputs.java
 
 
 mkdir outputs || true
 mkdir errors || true
+mkdir tests || true
 
 x=1
-while [ $x -le 2 ]; do
+while [ $x -le 100 ]; do
 
+  rm -rf outputs/* || true
   echo "Test number $x"
 
-  java -javaagent:/home/dilan/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/212.5457.46/lib/idea_rt.jar=46671:/home/dilan/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/212.5457.46/bin -Dfile.encoding=UTF-8 -classpath /home/dilan/dafny-verifier/target/classes Main.GenerateProgram > test.dfy
-
+  java -cp out/ Main.GenerateProgram $x > test.dfy
+  #  cp test.dfy tests/"test$x.dfy"
   # css
   #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
 
@@ -36,8 +41,10 @@ while [ $x -le 2 ]; do
   cp -R test-go/* test-go-run/
   cd test-go-run/src
   go mod init src  > tmp.txt 2>&1
-  find . \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_System "System_"/_System "src\/System_"/g'  > tmp.txt 2>&1
-  find . \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_dafny "dafny"/_dafny "src\/dafny"/g'  > tmp.txt 2>&1
+  cd ..
+  find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_System "System_"/_System "src\/System_"/g'  > tmp.txt 2>&1
+  find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_dafny "dafny"/_dafny "src\/dafny"/g'  > tmp.txt 2>&1
+  cd src
   go build test.go  > tmp.txt 2>&1
   cd ../..
   ./test-go-run/src/test > outputs/output-go.txt
@@ -63,10 +70,10 @@ while [ $x -le 2 ]; do
   python3 test-py/test.py > outputs/output-py.txt
 
   # cpp
-  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cpp /spillTargetCode:3 test.dfy > tmp.txt 2>&1
-  echo "Created C++ files"
-  g++ test.cpp test.h DafnyRuntime.h  > tmp.txt 2>&1
-  ./a.out > outputs/output-cpp.txt
+#  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cpp /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+#  echo "Created C++ files"
+#  g++ test.cpp test.h DafnyRuntime.h  > tmp.txt 2>&1
+#  ./a.out > outputs/output-cpp.txt
 
   rm -rf test-go test-go-run || true
   rm -rf test-java || true
@@ -77,10 +84,9 @@ while [ $x -le 2 ]; do
   rm -rf test.a || true
   rm -rf tmp.txt || true
 
-  java -javaagent:/home/dilan/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/212.5457.46/lib/idea_rt.jar=40973:/home/dilan/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/212.5457.46/bin -Dfile.encoding=UTF-8 -classpath /home/dilan/dafny-verifier/target/classes Main.CompareOutputs $x
-
-  rm -rf outputs/*
-
+  java -cp out/ Main.CompareOutputs $x
   x=$(( $x + 1 ))
 
 done
+
+rm -rf out || true

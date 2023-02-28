@@ -1,12 +1,12 @@
 package ErrorDetector;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +40,7 @@ public class ReadOutput {
             String st;
             while ((st = bufferedReader.readLine()) != null) {
                 sb.append(st);
+                sb.append("\n");
             }
             List<String> files = outputs.getOrDefault(sb.toString(), new ArrayList<>());
             files.add(file.getName());
@@ -51,5 +52,30 @@ public class ReadOutput {
 
     public boolean containsDifference() {
         return outputs.keySet().size() > 1;
+    }
+
+    public void copyFiles(String dir) {
+        File output = new File(dir);
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                BufferedReader bufferedReader = null;
+                try {
+                    bufferedReader = new BufferedReader(new FileReader(file));
+                    StringBuilder sb = new StringBuilder();
+                    String st;
+                    while ((st = bufferedReader.readLine()) != null) {
+                        sb.append(st);
+                        sb.append("\n");
+                    }
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(dir + "/" + file.getName(), true));
+                    writer.append(sb);
+                    writer.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

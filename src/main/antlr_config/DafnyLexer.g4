@@ -1,21 +1,34 @@
+lexer grammar DafnyLexer;
 
-fragment letter: 'a'..'z' | 'a'..'z' ;
+LABEL: 'label' ;
+COLON: ':' ;
 
-fragment digit: '0'..'9' ;
-fragment hexdigit: '0'..'9' | 'a'..'f' | 'a'..'f' ;
+SEMICOLON: ';' ;
+OPEN_SCOPE: '{' ;
+CLOSE_SCOPE: '}' ;
 
-fragment underscore: '_'
-fragment digits: digit (underscore? digit)*
-fragment hexdigits: '0x' hexdigit (underscore? hexdigit)*
-fragment decimaldigits: digits '.' digits
+COMMA: ',' ;
+ASSIGN: ':=' ;
+RETURN: 'return' ;
+VAR: 'var' ;
+IF: 'if' ;
+CASE: "case"
+RIGHT_ARROW: "=>"
+WHILE: "while"
 
-fragment escape_char: escape_backslash (escape_zero | escape_backspace | escape_tab | escape_newline | escape_formfeed
-| escape_carriagereturn | double_quote | single_quote | escape_backslash | 'u' hexdigit hexdigit hexdigit hexdigit | 'U{' hexdigit hexdigit*) '}') ;
-fragment escape_zero : '0' ;
-fragment escape_backspace : 'b' ;
-fragment escape_tab : 't' ;
-fragment escape_newline : 'n' ;
-fragment escape_formfeed : 'f' ;
-fragment escape_carriagereturn : 'r' ;
-fragment escape_backslash : '\\' ;
+IDENT: (LOWERCASE | UPPERCASE) (UNDERSCORE | LOWERCASE | UPPERCASE | DIGIT)* ;
+fragment LOWERCASE : 'a'..'z' ;
+fragment UPPERCASE : 'A'..'Z' ;
+fragment UNDERSCORE: '_' ;
+fragment DIGIT: '0'..'9' ;
 
+framgent LETTER = LOWERCASE | UPPERCASE ;
+
+
+
+fragment BIN_DIGIT: '0' | '1' ;
+fragment OCT_DIGIT: '0'..'7' ;
+fragment HEX_DIGIT: '0'..'9' | 'A'..'F' ;
+
+
+UNUSED: .* ;

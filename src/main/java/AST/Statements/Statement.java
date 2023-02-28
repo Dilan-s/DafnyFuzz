@@ -1,14 +1,16 @@
 package AST.Statements;
 
+import AST.Errors.SemanticException;
+import AST.SymbolTable.Method;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public interface Statement {
 
-    public List<String> generateCode();
+    void semanticCheck(Method method) throws SemanticException;
 
-    public List<Statement> generateValue(Map<String, Statement> symbolTable);
+    List<String> toCode();
 
-
+    default boolean isReturn() {
+        return false;
+    }
 }
