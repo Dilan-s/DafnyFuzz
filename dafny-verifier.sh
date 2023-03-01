@@ -49,6 +49,7 @@ while [ true ]; do
   #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
 
   # GO
+  touch outputs/output-go.txt
   timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
   if [ $? -eq 124 ]
   then
@@ -72,6 +73,7 @@ while [ true ]; do
 
 
   # js
+  touch outputs/output-js.txt
   timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /spillTargetCode:3 test.dfy > tmp.txt 2>&1
   if [ $? -eq 124 ]
   then
@@ -83,6 +85,7 @@ while [ true ]; do
   node test.js > outputs/output-js.txt
 
   # java
+  touch outputs/output-java.txt
   timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /spillTargetCode:3 test.dfy > tmp.txt 2>&1
   if [ $? -eq 124 ]
   then
@@ -97,6 +100,7 @@ while [ true ]; do
   cd ..
 
   # py
+  touch outputs/output-py.txt
   timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /spillTargetCode:3 test.dfy > tmp.txt  2>&1
   if [ $? -eq 124 ]
   then
