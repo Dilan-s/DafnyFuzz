@@ -14,7 +14,7 @@ import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Int;
 import AST.SymbolTable.PrimitiveTypes.Void;
-import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Variable;
 import java.util.Random;
 

@@ -6,7 +6,7 @@ import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;

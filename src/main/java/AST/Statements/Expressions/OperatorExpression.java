@@ -5,7 +5,7 @@ import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Operator.NumericOperator;
 import AST.Statements.Expressions.Operator.Operator;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.ArrayList;
 import java.util.List;

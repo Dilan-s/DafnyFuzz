@@ -6,7 +6,7 @@ import AST.StringUtils;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
-import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.ArrayList;
 import java.util.List;

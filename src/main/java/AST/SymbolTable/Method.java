@@ -3,6 +3,7 @@ package AST.SymbolTable;
 import AST.Statements.Statement;
 import AST.StringUtils;
 import AST.SymbolTable.PrimitiveTypes.Void;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,11 +78,17 @@ public class Method implements Identifier {
     }
 
     public List<String> toCode() {
-        List<String> code = new ArrayList<>();
-        List<Method> allMethods = symbolTable.getAllMethods();
+        return toCode(true);
+    }
 
-        for (Method m : allMethods) {
-            code.addAll(m.toCode());
+    public List<String> toCode(boolean printMethods) {
+        List<String> code = new ArrayList<>();
+
+        if (printMethods) {
+            List<Method> allMethods = symbolTable.getAllMethods();
+            for (Method m : allMethods) {
+                code.addAll(m.toCode(false));
+            }
         }
 
         code.add(declarationLine());
@@ -108,7 +115,7 @@ public class Method implements Identifier {
 
     @Override
     public String toString() {
-        List<String> code = toCode();
+        List<String> code = toCode(true);
         return code.stream().collect(Collectors.joining(""));
     }
 }

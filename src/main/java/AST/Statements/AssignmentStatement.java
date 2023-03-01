@@ -4,7 +4,7 @@ import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;

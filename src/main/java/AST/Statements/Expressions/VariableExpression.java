@@ -2,10 +2,9 @@ package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class VariableExpression implements Expression {

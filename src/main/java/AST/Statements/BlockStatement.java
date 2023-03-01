@@ -1,9 +1,8 @@
 package AST.Statements;
 
 import AST.Errors.SemanticException;
-import AST.StringUtils;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +12,7 @@ public class BlockStatement implements Statement {
     private final List<Statement> body;
 
     public BlockStatement(SymbolTable symbolTable) {
-        this.symbolTable = new SymbolTable();
-        this.symbolTable.setEnclosingSymbolTable(symbolTable);
+        this.symbolTable = new SymbolTable(symbolTable);
         this.body = new ArrayList<>();
     }
 

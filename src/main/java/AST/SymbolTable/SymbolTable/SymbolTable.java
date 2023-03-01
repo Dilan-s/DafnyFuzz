@@ -1,9 +1,11 @@
-package AST.SymbolTable;
+package AST.SymbolTable.SymbolTable;
 
+import AST.SymbolTable.Method;
+import AST.SymbolTable.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class SymbolTable {
@@ -12,9 +14,12 @@ public class SymbolTable {
     private final HashMap<String, Method> methods;
     private SymbolTable enclosingSymbolTable;
 
+    SymbolTable(boolean global) {
+        this(null);
+    }
 
     public SymbolTable() {
-        this(null);
+        this(GlobalSymbolTable.getGlobalSymbolTable());
     }
 
     public SymbolTable(SymbolTable enclosingSymbolTable) {
@@ -70,5 +75,24 @@ public class SymbolTable {
         }
 
         return vars;
+    }
+
+    public List<Method> getMethodWithTypes(List<Type> returnTypes) {
+        return getAllMethods().stream().filter(m -> sameReturnType(m.getReturnTypes(), returnTypes)).collect(Collectors.toList());
+    }
+
+    private boolean sameReturnType(List<Type> methodReturnTypes, List<Type> wantedReturnTypes) {
+        if (methodReturnTypes.size() != wantedReturnTypes.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < methodReturnTypes.size(); i++) {
+            Type rt = methodReturnTypes.get(i);
+            Type wt = wantedReturnTypes.get(i);
+            if (!rt.isSameType(wt)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

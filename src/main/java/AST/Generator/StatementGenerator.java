@@ -1,7 +1,9 @@
 package AST.Generator;
 
+import AST.Errors.InvalidArgumentException;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.BlockStatement;
+import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
 import AST.Statements.Expressions.Operator.BoolOperator;
@@ -17,7 +19,7 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.PrimitiveTypes.Char;
 import AST.SymbolTable.PrimitiveTypes.Int;
-import AST.SymbolTable.SymbolTable;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
@@ -38,15 +40,18 @@ public class StatementGenerator {
     public static final double PROB_IF_ELSE_EXPRESSION = PROB_CALL_EXPRESSION + 0.05;
     public static final double PROB_OPERATOR_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.3;
     private static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.15;
+
+    public static final double PROB_REUSE_METHOD = 0.75;
+    public static final int MAX_METHOD_DEPTH = 5;
+
     private final Random random;
 
-    private int statementDepth;
-    private int expressionDepth;
+    private static int statementDepth = 0;
+    private static int expressionDepth = 0;
+    private static int methodDepth = 0;
 
     public StatementGenerator(Random random) {
         this.random = random;
-        this.statementDepth = 0;
-        this.expressionDepth = 0;
     }
 
     public Statement generateBody(Method method) {
@@ -78,31 +83,34 @@ public class StatementGenerator {
                 int noOfReturns = random.nextInt(5) + 1;
                 List<Type> returnTypes = generateTypes(noOfReturns);
 
-//                double probCallMethod = random.nextDouble();
-//                if (probCallMethod < PROB_METHOD_ASSIGN) {
-//                    //Create method
-//                    Method m = generateMethod(method, returnTypes);
-//                    CallExpression expression = new CallExpression(m);
-//                    List<Type> argTypes = m.getArgTypes();
-//                    int i = 0;
-//                    while (i < argTypes.size()) {
-//                        Type t = argTypes.get(i);
-//                        try {
-//                            expression.addArg(generateExpression(t, symbolTable));
-//                            i++;
-//                        } catch (InvalidArgumentException e) {
-//                            System.err.println("Could not generate argument");
-//                        }
-//                    }
-//                    statement.addAssignment(expression);
-//                } else {
-                //Explicit values
-                for (Type t : returnTypes) {
-                    expressionDepth++;
-                    Expression expression = generateExpression(t, symbolTable);
-                    expressionDepth--;
+                double probCallMethod = random.nextDouble();
+                if (probCallMethod < PROB_METHOD_ASSIGN && methodDepth < MAX_METHOD_DEPTH && statementDepth < MAX_METHOD_DEPTH) {
+                    //Create method
+                    methodDepth++;
+                    Method m = generateMethod(method, returnTypes, symbolTable);
+                    methodDepth--;
+                    CallExpression expression = new CallExpression(m);
+                    expression.setSymbolTable(symbolTable);
+                    List<Type> argTypes = m.getArgTypes();
+                    int i = 0;
+                    while (i < argTypes.size()) {
+                        Type t = argTypes.get(i);
+                        try {
+                            expression.addArg(generateExpression(t, symbolTable));
+                            i++;
+                        } catch (InvalidArgumentException e) {
+                            System.err.println("Could not generate argument");
+                        }
+                    }
                     statement.addAssignment(expression);
-//                    }
+                } else {
+                    //Explicit values
+                    for (Type t : returnTypes) {
+                        expressionDepth++;
+                        Expression expression = generateExpression(t, symbolTable);
+                        expressionDepth--;
+                        statement.addAssignment(expression);
+                    }
                 }
 
                 statement.addAssignmentsToSymbolTable();
@@ -117,7 +125,6 @@ public class StatementGenerator {
                 Expression test = generateExpression(new Bool(), symbolTable);
                 statement.setTest(test);
                 expressionDepth--;
-
 
                 statementDepth++;
                 Statement ifStat = generateBody(method);
@@ -167,9 +174,16 @@ public class StatementGenerator {
 
     }
 
-    private Method generateMethod(Method method, List<Type> returnTypes) {
+    private Method generateMethod(Method method, List<Type> returnTypes, SymbolTable symbolTable) {
+        List<Method> methodWithSameType = symbolTable.getMethodWithTypes(returnTypes);
+
+        if (!methodWithSameType.isEmpty() && random.nextDouble() < PROB_REUSE_METHOD) {
+            int i = random.nextInt(methodWithSameType.size());
+            return methodWithSameType.get(i);
+        }
+
         Method m = new Method(returnTypes, VariableNameGenerator.generateMethodName());
-        method.addMethod(m);
+        symbolTable.addMethod(m);
 
         StatementGenerator mStatGen = new StatementGenerator(random);
 
