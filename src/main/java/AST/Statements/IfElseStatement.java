@@ -40,7 +40,7 @@ public class IfElseStatement implements Statement {
 
     @Override
     public boolean isReturn() {
-        return ifStat.isReturn() && (elseStat.isEmpty() || elseStat.get().isReturn());
+        return ifStat.isReturn() && elseStat.isPresent() && elseStat.get().isReturn();
     }
 
     @Override
