@@ -66,12 +66,21 @@ public class SymbolTable {
         return ms;
     }
 
+    public List<Variable> getAllVariablesInCurrentScope() {
+        return new ArrayList<>(variables.values());
+    }
+
     public List<Variable> getAllVariables(Type t) {
+        return getAllVariables(t, true);
+    }
+    public List<Variable> getAllVariables(Type t, boolean enclosing) {
         List<Variable> vars = variables.values().stream()
             .filter(x -> x.getType().isSameType(t)).collect(Collectors.toList());
 
-        if (enclosingSymbolTable != null) {
-            vars.addAll(enclosingSymbolTable.getAllVariables(t));
+        if (enclosing) {
+            if (enclosingSymbolTable != null) {
+                vars.addAll(enclosingSymbolTable.getAllVariables(t));
+            }
         }
 
         return vars;

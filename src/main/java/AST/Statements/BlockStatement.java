@@ -35,6 +35,11 @@ public class BlockStatement implements Statement {
     }
 
     @Override
+    public boolean isReturn() {
+        return body.stream().anyMatch(Statement::isReturn);
+    }
+
+    @Override
     public List<String> toCode() {
         List<String> code = new ArrayList<>();
         for (Statement s : body) {

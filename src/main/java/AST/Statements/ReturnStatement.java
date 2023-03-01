@@ -2,9 +2,12 @@ package AST.Statements;
 
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.VariableExpression;
+import AST.Statements.util.PrintAll;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -74,6 +77,9 @@ public class ReturnStatement implements Statement {
         String returnValues = values.stream()
             .map(Expression::toString)
             .collect(Collectors.joining(", "));
+
+        PrintAll printAll = new PrintAll(symbolTable);
+        code.addAll(printAll.toCode());
 
         code.add(String.format("return %s;\n", returnValues));
         return code;

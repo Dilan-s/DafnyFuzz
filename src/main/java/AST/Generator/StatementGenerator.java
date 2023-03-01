@@ -15,6 +15,7 @@ import AST.Statements.IfElseStatement;
 import AST.Statements.PrintStatement;
 import AST.Statements.ReturnStatement;
 import AST.Statements.Statement;
+import AST.Statements.util.PrintAll;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.PrimitiveTypes.Char;
@@ -59,15 +60,21 @@ public class StatementGenerator {
 
         double probContinue = random.nextDouble();
         boolean hasReturn = method.hasReturn();
+        Statement statement = null;
         while (probContinue < 0.9 || hasReturn) {
             statementDepth++;
-            Statement statement = generateStatement(method, body.getSymbolTable());
+            statement = generateStatement(method, body.getSymbolTable());
             statementDepth--;
             body.addStatement(statement);
             if (statement.isReturn()) {
                 break;
             }
             probContinue = random.nextDouble();
+        }
+
+        if (statement != null && !statement.isReturn()) {
+            PrintAll printAll = new PrintAll(body.getSymbolTable());
+            body.addStatement(printAll);
         }
 
         return body;

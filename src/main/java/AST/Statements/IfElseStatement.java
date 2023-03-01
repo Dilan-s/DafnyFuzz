@@ -2,6 +2,7 @@ package AST.Statements;
 
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.util.PrintAll;
 import AST.StringUtils;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Method;
@@ -37,7 +38,10 @@ public class IfElseStatement implements Statement {
         this.elseStat = Optional.of(elseStat);
     }
 
-
+    @Override
+    public boolean isReturn() {
+        return ifStat.isReturn() && (elseStat.isEmpty() || elseStat.get().isReturn());
+    }
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {
@@ -53,7 +57,7 @@ public class IfElseStatement implements Statement {
 
         if (!testType.isSameType(new Bool())) {
             throw new SemanticException(String.format(
-                "Test condition expected to be a bool but actually is %s",testType.getName()));
+                "Test condition expected to be a bool but actually is %s", testType.getName()));
         }
         test.semanticCheck(method);
         ifStat.semanticCheck(method);

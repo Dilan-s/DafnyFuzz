@@ -24,7 +24,7 @@ mkdir errors || true
 mkdir tests || true
 
 x=1
-while [ $x -le 100 ]; do
+while [ true ]; do
 
   rm -rf test-go test-go-run || true
   rm -rf test-java || true
@@ -44,7 +44,7 @@ while [ $x -le 100 ]; do
     x=$(( $x + 1 ))
     continue;
   fi
-  #  cp test.dfy tests/"test$x.dfy"
+#  cp test.dfy tests/"test$x.dfy"
   # css
   #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
 

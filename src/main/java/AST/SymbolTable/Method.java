@@ -16,7 +16,8 @@ public class Method implements Identifier {
     private final SymbolTable symbolTable;
     private List<Statement> body;
 
-    public Method(List<Type> returnTypes, String name, SymbolTable symbolTable, List<Variable> args) {
+    public Method(List<Type> returnTypes, String name, SymbolTable symbolTable,
+        List<Variable> args) {
         this.returnTypes = returnTypes;
         this.name = name;
         this.symbolTable = symbolTable;
@@ -39,6 +40,7 @@ public class Method implements Identifier {
     public Method(List<Type> returnTypes, String name) {
         this(returnTypes, name, new SymbolTable());
     }
+
     public void addArgument(String name, Type type) {
         addArgument(new Variable(name, type));
     }
