@@ -34,9 +34,11 @@ public class DafnyProgram {
         Method main = new Method(new Void(), "Main");
 
         Method safe_division = safe_division();
+        System.out.println(safe_division);
         main.addMethod(safe_division);
 
         Method safe_modulus = safe_modulus();
+        System.out.println(safe_modulus);
         main.addMethod(safe_modulus);
 
         StatementGenerator statementGenerator = new StatementGenerator(random);

@@ -45,6 +45,12 @@ public class Method implements Identifier {
         addArgument(new Variable(name, type));
     }
 
+    public void addArgument(List<Variable> vars) {
+        for (Variable v : vars) {
+            addArgument(v);
+        }
+    }
+
     public void addArgument(Variable argument) {
         args.add(argument);
         symbolTable.addVariable(argument);
@@ -55,7 +61,8 @@ public class Method implements Identifier {
     }
 
     public boolean hasReturn() {
-        return (returnTypes.size() == 1 && !returnTypes.get(0).isSameType(new Void())) || returnTypes.size() > 1;
+        return (returnTypes.size() == 1 && !returnTypes.get(0).isSameType(new Void()))
+            || returnTypes.size() > 1;
     }
 
     public SymbolTable getSymbolTable() {
@@ -117,7 +124,11 @@ public class Method implements Identifier {
 
     @Override
     public String toString() {
-        List<String> code = toCode(true);
+        List<String> code = toCode(false);
         return code.stream().collect(Collectors.joining(""));
+    }
+
+    public Method getSimpleMethod() {
+        return new Method(returnTypes, name, getSymbolTable(), args);
     }
 }
