@@ -6,79 +6,52 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.PrimitiveTypes.Char;
 import AST.SymbolTable.PrimitiveTypes.Int;
+import AST.SymbolTable.PrimitiveTypes.Real;
 import AST.SymbolTable.Type;
 import java.util.List;
 
 public enum BoolOperator implements Operator {
-    Equivalence("<==>", 2),
-    Implies("==>", 2),
-    ReverseImplies("<==", 2),
-    And("&&", 2),
-    Or("||", 2),
-    Equals("==", 2) {
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int(), new Bool(), new Char());
-        }
-    },
-    Not_Equals("!=", 2) {
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int(), new Bool(), new Char());
-        }
-    },
-    Less_Than("<", 2) {
+    Equivalence("<==>", 2, List.of(new Bool())),
+    Implies("==>", 2, List.of(new Bool())),
+    ReverseImplies("<==", 2, List.of(new Bool())),
+    And("&&", 2, List.of(new Bool())),
+    Or("||", 2, List.of(new Bool())),
+    Equals("==", 2, List.of(new Int(), new Bool(), new Char())),
+    Not_Equals("!=", 2, List.of(new Int(), new Bool(), new Char())),
+    Less_Than("<", 2, List.of(new Int(), new Char(), new Real())) {
         @Override
         public void typeCheck(Expression lhs, Expression rhs) throws SemanticException {
             Operator.numericTypeCheck(lhs, rhs, "<");
         }
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int(), new Char());
-        }
     },
-    Less_Than_Or_Equal("<=", 2) {
+    Less_Than_Or_Equal("<=", 2, List.of(new Int(), new Char(), new Real())) {
         @Override
         public void typeCheck(Expression lhs, Expression rhs) throws SemanticException {
             Operator.numericTypeCheck(lhs, rhs, "<=");
         }
-
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int(), new Char());
-        }
     },
-    Greater_Than(">", 2) {
+    Greater_Than(">", 2, List.of(new Int(), new Char(), new Real())) {
         @Override
         public void typeCheck(Expression lhs, Expression rhs) throws SemanticException {
             Operator.numericTypeCheck(lhs, rhs, ">");
         }
-
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int(), new Char());
-        }
     },
-    Greater_Than_Or_Equal(">=", 2) {
+    Greater_Than_Or_Equal(">=", 2, List.of(new Int(), new Char(), new Real())) {
         @Override
         public void typeCheck(Expression lhs, Expression rhs) throws SemanticException {
             Operator.numericTypeCheck(lhs, rhs, ">=");
-        }
-
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int(), new Char());
         }
     };
 
     private final String operator;
     private final int numberOfArgs;
+    private final List<Type> typeArgs;
 
-    BoolOperator(String operator, int numberOfArgs) {
+    BoolOperator(String operator, int numberOfArgs, List<Type> typeArgs) {
         this.operator = operator;
         this.numberOfArgs = numberOfArgs;
+        this.typeArgs = typeArgs;
     }
-
 
 
     @Override
@@ -87,18 +60,19 @@ public enum BoolOperator implements Operator {
     }
 
     @Override
-    public Type getType() {
-        return new Bool();
+    public List<Type> getTypes() {
+        return List.of(new Bool());
     }
 
     @Override
-    public void semanticCheck(Method method, Expression lhs, Expression rhs) throws SemanticException {
+    public void semanticCheck(Method method, Expression lhs, Expression rhs)
+        throws SemanticException {
         typeCheck(lhs, rhs);
     }
 
     @Override
     public List<Type> getTypeArgs() {
-        return List.of(new Bool());
+        return typeArgs;
     }
 
     public void typeCheck(Expression lhs, Expression rhs) throws SemanticException {

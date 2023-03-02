@@ -13,11 +13,15 @@ public interface Operator {
 
     String formExpression(Expression lhs, Expression rhs);
 
-    Type getType();
+    List<Type> getTypes();
 
     void semanticCheck(Method method, Expression lhs, Expression rhs) throws SemanticException;
 
     List<Type> getTypeArgs();
+
+    default boolean returnType(Type type) {
+        return getTypes().stream().anyMatch(t -> t.isSameType(type));
+    }
 
     public static void numericTypeCheck(Expression lhs, Expression rhs, String operator)
         throws SemanticException {
@@ -38,7 +42,7 @@ public interface Operator {
         }
         Type leftType = leftTypes.get(0);
         Type rightType = rightTypes.get(0);
-        if (!(leftType.isSameType(new Int()) && rightType.isSameType(new Int()))) {
+        if (!(leftType.isSameType(rightType))) {
             throw new SemanticException(
                 String.format("Expected arguments to %s to be (Num, Num) but actually got (%s, %s)",
                     operator, leftType.getName(), rightType.getName()));

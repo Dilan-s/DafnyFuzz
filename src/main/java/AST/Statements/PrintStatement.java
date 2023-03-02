@@ -3,6 +3,7 @@ package AST.Statements;
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Method;
+import AST.SymbolTable.PrimitiveTypes.Real;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +42,7 @@ public class PrintStatement implements Statement {
             .collect(Collectors.toList()));
 
         String printValues = values.stream()
+            .filter(x -> !x.getTypes().get(0).isSameType(new Real()))
             .map(Expression::toString)
             .collect(Collectors.joining(", ' ', "));
 

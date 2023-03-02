@@ -4,7 +4,7 @@ import AST.Generator.StatementGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
-import AST.Statements.Expressions.NumericLiteral;
+import AST.Statements.Expressions.IntLiteral;
 import AST.Statements.Expressions.Operator.BoolOperator;
 import AST.Statements.Expressions.Operator.NumericOperator;
 import AST.Statements.Expressions.OperatorExpression;
@@ -60,7 +60,7 @@ public class DafnyProgram {
         safe_div.setBody(statement);
 
         Expression test = new OperatorExpression(BoolOperator.Not_Equals, new VariableExpression(p2Var),
-            new NumericLiteral(0));
+            new IntLiteral(0));
         test.setSymbolTable(safe_div_symbolTable);
         Expression ifDiv = new OperatorExpression(NumericOperator.Divide,
             new VariableExpression(p1Var), new VariableExpression(p2Var), false);
@@ -88,7 +88,7 @@ public class DafnyProgram {
         safe_mod.setBody(statement);
 
         Expression test = new OperatorExpression(BoolOperator.Not_Equals, new VariableExpression(p2Var),
-            new NumericLiteral(0));
+            new IntLiteral(0));
         test.setSymbolTable(safe_mod_symbolTable);
         Expression ifDiv = new OperatorExpression(NumericOperator.Modulus,
             new VariableExpression(p1Var), new VariableExpression(p2Var), false);

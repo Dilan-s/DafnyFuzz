@@ -20,12 +20,15 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.PrimitiveTypes.Char;
 import AST.SymbolTable.PrimitiveTypes.Int;
+import AST.SymbolTable.PrimitiveTypes.Real;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class StatementGenerator {
 
@@ -103,7 +106,8 @@ public class StatementGenerator {
                     while (i < argTypes.size()) {
                         Type t = argTypes.get(i);
                         try {
-                            expression.addArg(generateExpression(t, symbolTable));
+                            Expression exp = generateExpression(t, symbolTable);
+                            expression.addArg(exp);
                             i++;
                         } catch (InvalidArgumentException e) {
                             System.err.println("Could not generate argument");
@@ -207,16 +211,10 @@ public class StatementGenerator {
 
     private List<Type> generateTypes(int noOfTypes) {
         List<Type> types = new ArrayList<>();
-
+        List<Type> option = List.of(new Int(), new Bool(), new Char(), new Real());
         for (int i = 0; i < noOfTypes; i++) {
-            double probType = random.nextDouble();
-            if (probType < 0.33) {
-                types.add(new Int());
-            } else if (probType < 0.66) {
-                types.add(new Bool());
-            } else if (probType < PROB_RETURN_STAT) {
-                types.add(new Char());
-            }
+            int randType = random.nextInt(option.size());
+            types.add(option.get(randType));
         }
 
         return types;
@@ -253,6 +251,9 @@ public class StatementGenerator {
             } else if (probTypeOfExpression < PROB_OPERATOR_EXPRESSION && type.operatorExists()) {
                 //Operator
                 Operator operator = generateOperator(type);
+                if (operator == null) {
+                    continue;
+                }
                 List<Type> typeArgs = operator.getTypeArgs();
                 int randType = random.nextInt(typeArgs.size());
                 Type t = typeArgs.get(randType);
@@ -283,16 +284,16 @@ public class StatementGenerator {
     }
 
     private Operator generateOperator(Type type) {
-        if (type.isSameType(new Bool())) {
-            BoolOperator[] values = BoolOperator.values();
-            int randOp = random.nextInt(values.length);
-            return values[randOp];
-        } else if (type.isSameType(new Int())) {
-            NumericOperator[] values = NumericOperator.values();
-            int randOp = random.nextInt(values.length);
-            return values[randOp];
-        } else if (type.isSameType(new Char())) {
+        List<Operator> ops = Arrays.stream(BoolOperator.values()).collect(Collectors.toList());
+        ops.addAll(Arrays.stream(NumericOperator.values()).collect(Collectors.toList()));
 
+        List<Operator> validOperators = ops.stream()
+            .filter(x -> x.returnType(type))
+            .collect(Collectors.toList());
+
+        if (validOperators.size() > 0) {
+            int randOp = random.nextInt(validOperators.size());
+            return validOperators.get(randOp);
         }
         return null;
     }

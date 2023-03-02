@@ -12,24 +12,9 @@ import java.util.List;
 public enum NumericOperator implements Operator {
     Plus("+", 2),
     Minus("-", 2),
-    Times("*", 2) {
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int());
-        }
-    },
-    Divide("/", 2) {
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int());
-        }
-    },
-    Modulus("%", 2) {
-        @Override
-        public List<Type> getTypeArgs() {
-            return List.of(new Int());
-        }
-    },
+    Times("*", 2),
+    Divide("/", 2),
+    Modulus("%", 2),
     ;
 
     private final String operator;
@@ -40,20 +25,19 @@ public enum NumericOperator implements Operator {
         this.numberOfArgs = numberOfArgs;
     }
 
-
-
     @Override
     public String formExpression(Expression lhs, Expression rhs) {
         return String.format("(%s %s %s)", lhs, operator, rhs);
     }
 
     @Override
-    public Type getType() {
-        return new Bool();
+    public List<Type> getTypes() {
+        return List.of(new Int());
     }
 
     @Override
-    public void semanticCheck(Method method, Expression lhs, Expression rhs) throws SemanticException {
+    public void semanticCheck(Method method, Expression lhs, Expression rhs)
+        throws SemanticException {
         typeCheck(lhs, rhs);
     }
 

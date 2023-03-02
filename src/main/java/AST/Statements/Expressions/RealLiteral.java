@@ -3,23 +3,23 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Int;
+import AST.SymbolTable.PrimitiveTypes.Real;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.List;
 
-public class NumericLiteral implements Expression {
+public class RealLiteral implements Expression {
 
-    private final int value;
+    private final double value;
     private SymbolTable symbolTable;
 
-    public NumericLiteral(int value) {
+    public RealLiteral(double value) {
         this.value = value;
     }
 
-
     @Override
     public List<Type> getTypes() {
-        return List.of(new Int());
+        return List.of(new Real());
     }
 
     @Override
@@ -33,6 +33,6 @@ public class NumericLiteral implements Expression {
 
     @Override
     public String toString() {
-        return String.valueOf(value);
+        return String.format("%.2f", value);
     }
 }

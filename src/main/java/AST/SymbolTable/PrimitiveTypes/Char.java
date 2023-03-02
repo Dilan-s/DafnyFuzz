@@ -29,6 +29,6 @@ public class Char implements Type {
 
     @Override
     public boolean operatorExists() {
-        return false;
+        return true;
     }
 }
