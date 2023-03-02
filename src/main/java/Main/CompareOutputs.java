@@ -37,7 +37,7 @@ public class CompareOutputs {
             }
             String dir = "errors/" + arg;
             new File(dir).mkdir();
-            BufferedWriter writer = new BufferedWriter(new FileWriter(dir + "/testCase" + arg, true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(dir + "/testCase" + arg + ".dfy", true));
             readOutput.copyFiles(dir);
             writer.append(sb);
             writer.close();
