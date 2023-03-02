@@ -40,13 +40,15 @@ public class StatementGenerator {
     public static final double PROB_METHOD_ASSIGN = 0.05;
 
     public static final double PROB_LITERAL_EXPRESSION = 0.4;
-    public static final double PROB_CALL_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.1;
+    public static final double PROB_CALL_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.05;
     public static final double PROB_IF_ELSE_EXPRESSION = PROB_CALL_EXPRESSION + 0.05;
-    public static final double PROB_OPERATOR_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.3;
+    public static final double PROB_OPERATOR_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.35;
     private static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.15;
 
-    public static final double PROB_REUSE_METHOD = 0.75;
+    public static final double PROB_REUSE_METHOD = 0.5;
     public static final int MAX_METHOD_DEPTH = 5;
+    public static final int MAX_STATEMENT_DEPTH = 10;
+    public static final int MAX_EXPRESSION_DEPTH = 10;
 
     private final Random random;
 
@@ -87,7 +89,7 @@ public class StatementGenerator {
 
         while (true) {
             double probTypeOfStatement = random.nextDouble();
-            if (statementDepth > 10 || probTypeOfStatement < PROB_ASSIGN_STAT) {
+            if (statementDepth > MAX_STATEMENT_DEPTH || probTypeOfStatement < PROB_ASSIGN_STAT) {
                 //Assign
                 AssignmentStatement statement = new AssignmentStatement(symbolTable);
                 int noOfReturns = random.nextInt(5) + 1;
@@ -97,7 +99,7 @@ public class StatementGenerator {
                 if (probCallMethod < PROB_METHOD_ASSIGN && methodDepth < MAX_METHOD_DEPTH && statementDepth < MAX_METHOD_DEPTH) {
                     //Create method
                     methodDepth++;
-                    Method m = generateMethod(method, returnTypes, symbolTable);
+                    Method m = generateMethod(returnTypes, symbolTable);
                     methodDepth--;
                     CallExpression expression = new CallExpression(m);
                     expression.setSymbolTable(symbolTable);
@@ -106,7 +108,9 @@ public class StatementGenerator {
                     while (i < argTypes.size()) {
                         Type t = argTypes.get(i);
                         try {
+                            expressionDepth++;
                             Expression exp = generateExpression(t, symbolTable);
+                            expressionDepth--;
                             expression.addArg(exp);
                             i++;
                         } catch (InvalidArgumentException e) {
@@ -185,7 +189,7 @@ public class StatementGenerator {
 
     }
 
-    private Method generateMethod(Method method, List<Type> returnTypes, SymbolTable symbolTable) {
+    private Method generateMethod(List<Type> returnTypes, SymbolTable symbolTable) {
         List<Method> methodWithSameType = symbolTable.getMethodWithTypes(returnTypes);
 
         if (!methodWithSameType.isEmpty() && random.nextDouble() < PROB_REUSE_METHOD) {
@@ -223,13 +227,31 @@ public class StatementGenerator {
     private Expression generateExpression(Type type, SymbolTable symbolTable) {
         while (true) {
             double probTypeOfExpression = random.nextDouble();
-            if (expressionDepth > 10 || probTypeOfExpression < PROB_LITERAL_EXPRESSION) {
+            if (expressionDepth > MAX_EXPRESSION_DEPTH || probTypeOfExpression < PROB_LITERAL_EXPRESSION) {
                 Expression expression = type.generateLiteral(random);
                 expression.setSymbolTable(symbolTable);
                 return expression;
-            } else if (probTypeOfExpression < PROB_CALL_EXPRESSION) {
-                //Call
-
+            } else if (probTypeOfExpression < PROB_CALL_EXPRESSION && methodDepth < MAX_METHOD_DEPTH) {
+                methodDepth++;
+                Method m = generateMethod(List.of(type), symbolTable);
+                methodDepth--;
+                CallExpression expression = new CallExpression(m);
+                expression.setSymbolTable(symbolTable);
+                List<Type> argTypes = m.getArgTypes();
+                int i = 0;
+                while (i < argTypes.size()) {
+                    Type t = argTypes.get(i);
+                    try {
+                        expressionDepth++;
+                        Expression exp = generateExpression(t, symbolTable);
+                        expressionDepth--;
+                        expression.addArg(exp);
+                        i++;
+                    } catch (InvalidArgumentException e) {
+                        System.err.println("Could not generate argument");
+                    }
+                }
+                return expression;
             } else if (probTypeOfExpression < PROB_IF_ELSE_EXPRESSION) {
                 //ifElse
                 expressionDepth++;

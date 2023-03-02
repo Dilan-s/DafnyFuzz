@@ -20,13 +20,13 @@ public class CallExpression implements Expression {
     private final Method method;
     private final List<Variable> variables;
     private final List<Statement> assignments;
-    private final List<VariableExpression> createdVariables;
+    private List<Variable> assignedVariables;
 
     public CallExpression(Method method) {
         this.method = method;
-        this.createdVariables = new ArrayList<>();
         this.variables = new ArrayList<>();
         this.assignments = new ArrayList<>();
+        this.assignedVariables = new ArrayList<>();
     }
 
     public void addArg(Expression expression) throws InvalidArgumentException {
@@ -79,16 +79,16 @@ public class CallExpression implements Expression {
     @Override
     public List<String> toCode() {
         AssignmentStatement stat = new AssignmentStatement(symbolTable);
-        List<Variable> assignedVariables = new ArrayList<>();
+        assignedVariables = new ArrayList<>();
         for (Type returnType : method.getReturnTypes()) {
             String var = VariableNameGenerator.generateVariableValueName(returnType);
             Variable variable = new Variable(var, returnType);
             assignedVariables.add(variable);
-            createdVariables.add(new VariableExpression(variable));
             symbolTable.addVariable(variable);
         }
 
-        stat.addAssignment(assignedVariables, new CallMethodExpression(method, variables));
+        CallMethodExpression callMethodExpression = new CallMethodExpression(method, variables);
+        stat.addAssignment(assignedVariables, callMethodExpression);
 
         assignments.add(stat);
 
@@ -110,8 +110,8 @@ public class CallExpression implements Expression {
 
     @Override
     public String toString() {
-        return createdVariables.stream()
-            .map(VariableExpression::toString)
+        return assignedVariables.stream()
+            .map(Variable::getName)
             .collect(Collectors.joining(", "));
     }
 
