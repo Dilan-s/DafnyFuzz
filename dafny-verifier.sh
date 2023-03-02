@@ -128,6 +128,8 @@ while [ true ]; do
 #  echo "Created C++ files"
 #  g++ test.cpp test.h DafnyRuntime.h  > tmp.txt 2>&1
 #  ./a.out > outputs/output-cpp.txt
+  java -cp out/ Main.CompareOutputs $x
+  x=$(( $x + 1 ))
 
   rm -rf test-go test-go-run || true
   rm -rf test-java || true
@@ -139,8 +141,7 @@ while [ true ]; do
   rm -rf tmp.txt || true
   rm -rf outputs/* || true
 
-  java -cp out/ Main.CompareOutputs $x
-  x=$(( $x + 1 ))
+
 
 done
 

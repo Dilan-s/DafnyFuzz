@@ -13,3 +13,4 @@ rm -rf out || true
 rm -rf outputs || true
 rm -rf tests || true
 rm -rf test.dfy || true
+rm -rf go.mod || true

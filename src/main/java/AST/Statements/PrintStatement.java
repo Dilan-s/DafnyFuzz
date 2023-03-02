@@ -45,8 +45,9 @@ public class PrintStatement implements Statement {
             .filter(x -> !x.getTypes().get(0).isSameType(new Real()))
             .map(Expression::toString)
             .collect(Collectors.joining(", ' ', "));
-
-        code.add(String.format("print %s, \"\\n\";\n", printValues));
+        if (!printValues.isEmpty()) {
+            code.add(String.format("print %s, \"\\n\";\n", printValues));
+        }
         return code;
     }
 }
