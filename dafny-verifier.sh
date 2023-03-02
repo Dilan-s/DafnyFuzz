@@ -67,6 +67,12 @@ while [ true ]; do
   find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_dafny "dafny"/_dafny "src\/dafny"/g'  > tmp.txt 2>&1
   cd src
   go build test.go  > tmp.txt 2>&1
+  if [ $? -ne 0 ]
+  then
+    echo "Failed to generate Go program"
+    x=$(( $x + 1 ))
+    continue;
+  fi
   cd ../..
   ./test-go-run/src/test > outputs/output-go.txt
   rm -rf test-go-run || true
@@ -95,6 +101,12 @@ while [ true ]; do
   fi
   echo "Created Java files"
   javac -cp src/main/dafny_compiler/dafny/Binaries/DafnyRuntime.jar test-java/test.java test-java/*/*.java > tmp.txt 2>&1
+  if [ $? -ne 0 ]
+  then
+    echo "Failed to generate Java program"
+    x=$(( $x + 1 ))
+    continue;
+  fi
   cd test-java
   java -cp ../src/main/dafny_compiler/dafny/Binaries/DafnyRuntime.jar:. test > ../outputs/output-java.txt
   cd ..
