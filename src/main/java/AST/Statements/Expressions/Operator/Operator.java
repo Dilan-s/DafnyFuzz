@@ -13,7 +13,7 @@ public interface Operator {
 
     String formExpression(List<Expression> args);
 
-    List<Type> getTypes();
+    Type getType();
 
     void semanticCheck(Method method, List<Expression> expressions) throws SemanticException;
 
@@ -22,7 +22,7 @@ public interface Operator {
     int getNumberOfArgs();
 
     default boolean returnType(Type type) {
-        return getTypes().stream().anyMatch(t -> t.isSameType(type));
+        return getType().isSameType(type);
     }
 
     static void numericTypeCheck(Expression lhs, Expression rhs, String operator)

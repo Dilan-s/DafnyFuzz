@@ -49,7 +49,7 @@ public class OperatorExpression implements Expression {
     @Override
     public List<Type> getTypes() {
         if (type == null) {
-            return operator.getTypes();
+            return List.of(operator.getType());
         }
         return List.of(type);
     }

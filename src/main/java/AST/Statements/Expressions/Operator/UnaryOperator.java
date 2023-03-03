@@ -12,29 +12,29 @@ import AST.SymbolTable.Type;
 import java.util.List;
 
 public enum UnaryOperator implements Operator {
-    Equivalence("<==>", List.of(new Bool()), List.of(new Bool())),
-    Implies("==>", List.of(new Bool()), List.of(new Bool())),
-    ReverseImplies("<==", List.of(new Bool()), List.of(new Bool())),
-    And("&&", List.of(new Bool()), List.of(new Bool())),
-    Or("||", List.of(new Bool()), List.of(new Bool())),
-    Equals("==", List.of(new Int(), new Bool(), new Char()), List.of(new Bool())),
-    Not_Equals("!=", List.of(new Int(), new Bool(), new Char(), new DSet()), List.of(new Bool())),
-    Less_Than("<", List.of(new Int(), new Char(), new Real(), new DSet()), List.of(new Bool())),
-    Less_Than_Or_Equal("<=", List.of(new Int(), new Char(), new Real(), new DSet()), List.of(new Bool())),
-    Greater_Than(">", List.of(new Int(), new Char(), new Real(), new DSet()), List.of(new Bool())),
-    Greater_Than_Or_Equal(">=", List.of(new Int(), new Char(), new Real(), new DSet()), List.of(new Bool())),
-    Plus("+", List.of(new Int()), List.of(new Int())),
-    Minus("-", List.of(new Int()), List.of(new Int())),
-    Times("*", List.of(new Int()), List.of(new Int())),
-    Divide("/", List.of(new Int()), List.of(new Int())),
-    Modulus("%", List.of(new Int()), List.of(new Int())),
+//    Equivalence("<==>", List.of(new Bool()), List.of(new Bool())),
+//    Implies("==>", List.of(new Bool()), List.of(new Bool())),
+//    ReverseImplies("<==", List.of(new Bool()), List.of(new Bool())),
+//    And("&&", List.of(new Bool()), List.of(new Bool())),
+//    Or("||", List.of(new Bool()), List.of(new Bool())),
+//    Equals("==", List.of(new Int(), new Bool(), new Char()), List.of(new Bool())),
+//    Not_Equals("!=", List.of(new Int(), new Bool(), new Char(), new DSet()), List.of(new Bool())),
+//    Less_Than("<", List.of(new Int(), new Char(), new Real(), new DSet()), List.of(new Bool())),
+//    Less_Than_Or_Equal("<=", List.of(new Int(), new Char(), new Real(), new DSet()), List.of(new Bool())),
+//    Greater_Than(">", List.of(new Int(), new Char(), new Real(), new DSet()), List.of(new Bool())),
+//    Greater_Than_Or_Equal(">=", List.of(new Int(), new Char(), new Real(), new DSet()), List.of(new Bool())),
+//    Plus("+", List.of(new Int()), List.of(new Int())),
+//    Minus("-", List.of(new Int()), List.of(new Int())),
+//    Times("*", List.of(new Int()), List.of(new Int())),
+//    Divide("/", List.of(new Int()), List.of(new Int())),
+//    Modulus("%", List.of(new Int()), List.of(new Int())),
     ;
 
     private final String operator;
     private final List<Type> typeArgs;
-    private final List<Type> retTypes;
+    private final Type retTypes;
 
-    UnaryOperator(String operator, List<Type> typeArgs, List<Type> retTypes) {
+    UnaryOperator(String operator, List<Type> typeArgs, Type retTypes) {
         this.operator = operator;
         this.typeArgs = typeArgs;
         this.retTypes = retTypes;
@@ -53,7 +53,7 @@ public enum UnaryOperator implements Operator {
     }
 
     @Override
-    public List<Type> getTypes() {
+    public Type getType() {
         return retTypes;
     }
 

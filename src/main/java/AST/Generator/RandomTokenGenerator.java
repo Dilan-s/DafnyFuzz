@@ -26,6 +26,7 @@ import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -230,11 +231,11 @@ public class RandomTokenGenerator {
         return msimple;
     }
 
-    private List<Type> generateNonCollectionType(int noOfTypes, SymbolTable symbolTable) {
+    private Type generateNonCollectionType(int noOfTypes, SymbolTable symbolTable) {
         typeDepth += MAX_TYPE_DEPTH;
         List<Type> types = generateTypes(noOfTypes, symbolTable);
         typeDepth -= MAX_TYPE_DEPTH;
-        return types;
+        return types.get(0);
     }
 
     public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
@@ -314,8 +315,10 @@ public class RandomTokenGenerator {
         int randType = random.nextInt(typeArgs.size());
         Type t = typeArgs.get(randType);
 
-        if (t.isCollection()) {
-            t = t.setInnerType(generateNonCollectionType(1, symbolTable).get(0));
+        if (operator.getType().isCollection()) {
+            t = type;
+        } else if (t.isCollection()) {
+            t = new DSet(generateNonCollectionType(1, symbolTable));
         }
 
         for (int i = 0; i < operator.getNumberOfArgs(); i++) {
