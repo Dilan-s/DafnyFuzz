@@ -34,11 +34,12 @@ import java.util.stream.Collectors;
 public class RandomTokenGenerator {
 
     public static final double PROB_RETURN_STAT = 0.2;
-    public static final double PROB_ASSIGN_STAT = PROB_RETURN_STAT + 0.5;
-    public static final double PROB_IF_ELSE_STAT = PROB_ASSIGN_STAT + 0.1;
-    public static final double PROB_PRINT_STAT = PROB_IF_ELSE_STAT + 0.2;
+    public static final double PROB_ASSIGN_STAT = PROB_RETURN_STAT + 0.4;
+    public static final double PROB_PRINT_STAT = PROB_ASSIGN_STAT + 0.3;
+    public static final double PROB_IF_ELSE_STAT = PROB_PRINT_STAT + 0.1;
 
     public static final double PROB_METHOD_ASSIGN = 0.025;
+    public static final double PROB_ELSE_STAT = 0.5;
 
     public static final double PROB_LITERAL_EXPRESSION = 0.4;
     public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.35;
@@ -51,6 +52,7 @@ public class RandomTokenGenerator {
     public static final int MAX_STATEMENT_DEPTH = 5;
     public static final int MAX_EXPRESSION_DEPTH = 5;
     public static final int MAX_TYPE_DEPTH = 2;
+    public static final double DECAY_FACTOR = 0.95;
 
     private final Random random;
 
@@ -90,7 +92,7 @@ public class RandomTokenGenerator {
         statementDepth++;
         Statement ret = null;
         while (ret == null) {
-            double probTypeOfStatement = random.nextDouble();
+            double probTypeOfStatement = random.nextDouble() * Math.pow(DECAY_FACTOR, statementDepth - 1);
             if ((statementDepth > MAX_STATEMENT_DEPTH || probTypeOfStatement < PROB_RETURN_STAT)
                 && method.hasReturn()) {
                 //return
@@ -101,13 +103,13 @@ public class RandomTokenGenerator {
                 //Assign
                 ret = generateAssignmentStatement(symbolTable);
 
+            } else if (probTypeOfStatement < PROB_PRINT_STAT) {
+                //Print
+                ret = generatePrintStatement(symbolTable);
             } else if (probTypeOfStatement < PROB_IF_ELSE_STAT) {
                 //IfElse
                 ret = generateIfElseStatement(method, symbolTable);
 
-            } else if (probTypeOfStatement < PROB_PRINT_STAT) {
-                //Print
-                ret = generatePrintStatement(symbolTable);
             }
         }
         statementDepth--;
@@ -145,7 +147,7 @@ public class RandomTokenGenerator {
         statement.setTest(test);
         Statement ifStat = generateBody(method);
         statement.setIfStat(ifStat);
-        if (random.nextDouble() < PROB_IF_ELSE_STAT) {
+        if (random.nextDouble() < PROB_ELSE_STAT) {
             Statement elseStat = generateBody(method);
             statement.setElseStat(elseStat);
         }
@@ -158,7 +160,7 @@ public class RandomTokenGenerator {
         int noOfReturns = random.nextInt(5) + 1;
         List<Type> returnTypes = generateTypes(noOfReturns, symbolTable);
 
-        double probCallMethod = random.nextDouble();
+        double probCallMethod = random.nextDouble()  * Math.pow(DECAY_FACTOR, methodDepth - 1);
         if (probCallMethod < PROB_METHOD_ASSIGN && methodDepth < MAX_METHOD_DEPTH
             && statementDepth < MAX_METHOD_DEPTH) {
             //Create method
@@ -261,7 +263,7 @@ public class RandomTokenGenerator {
         Expression ret = null;
         expressionDepth++;
         while (ret == null) {
-            double probTypeOfExpression = random.nextDouble();
+            double probTypeOfExpression = random.nextDouble() * Math.pow(DECAY_FACTOR, expressionDepth - 1);
             if (expressionDepth > MAX_EXPRESSION_DEPTH
                 || probTypeOfExpression < PROB_LITERAL_EXPRESSION) {
                 //literal
