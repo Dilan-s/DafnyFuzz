@@ -11,19 +11,21 @@ import java.util.stream.Collectors;
 
 public interface Operator {
 
-    String formExpression(Expression lhs, Expression rhs);
+    String formExpression(List<Expression> args);
 
     List<Type> getTypes();
 
-    void semanticCheck(Method method, Expression lhs, Expression rhs) throws SemanticException;
+    void semanticCheck(Method method, List<Expression> expressions) throws SemanticException;
 
     List<Type> getTypeArgs();
+
+    int getNumberOfArgs();
 
     default boolean returnType(Type type) {
         return getTypes().stream().anyMatch(t -> t.isSameType(type));
     }
 
-    public static void numericTypeCheck(Expression lhs, Expression rhs, String operator)
+    static void numericTypeCheck(Expression lhs, Expression rhs, String operator)
         throws SemanticException {
         List<Type> leftTypes = lhs.getTypes();
         List<Type> rightTypes = rhs.getTypes();
@@ -49,7 +51,7 @@ public interface Operator {
         }
     }
 
-    public static void boolTypeCheck(Expression lhs, Expression rhs, String operator)
+    static void boolTypeCheck(Expression lhs, Expression rhs, String operator)
         throws SemanticException {
         List<Type> leftTypes = lhs.getTypes();
         List<Type> rightTypes = rhs.getTypes();

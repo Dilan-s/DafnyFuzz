@@ -29,6 +29,12 @@ public class CallExpression implements Expression {
         this.assignedVariables = new ArrayList<>();
     }
 
+    public void addArg(List<Expression> expressions) throws InvalidArgumentException {
+        for (Expression e : expressions) {
+            addArg(e);
+        }
+    }
+
     public void addArg(Expression expression) throws InvalidArgumentException {
 
         if (expression.getTypes().size() != 1) {

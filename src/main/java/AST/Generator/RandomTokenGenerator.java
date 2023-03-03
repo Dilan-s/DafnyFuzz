@@ -6,8 +6,7 @@ import AST.Statements.BlockStatement;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
-import AST.Statements.Expressions.Operator.BoolOperator;
-import AST.Statements.Expressions.Operator.NumericOperator;
+import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
 import AST.Statements.Expressions.OperatorExpression;
 import AST.Statements.Expressions.VariableExpression;
@@ -38,7 +37,7 @@ public class RandomTokenGenerator {
     public static final double PROB_IF_ELSE_STAT = PROB_ASSIGN_STAT + 0.1;
     public static final double PROB_PRINT_STAT = PROB_IF_ELSE_STAT + 0.2;
 
-    public static final double PROB_METHOD_ASSIGN = 0.05;
+    public static final double PROB_METHOD_ASSIGN = 0.025;
 
     public static final double PROB_LITERAL_EXPRESSION = 0.4;
     public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.35;
@@ -46,7 +45,7 @@ public class RandomTokenGenerator {
     public static final double PROB_IF_ELSE_EXPRESSION = PROB_VARIABLE_EXPRESSION + 0.05;
     public static final double PROB_CALL_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.05;
 
-    public static final double PROB_REUSE_METHOD = 0.5;
+    public static final double PROB_REUSE_METHOD = 0.75;
     public static final int MAX_METHOD_DEPTH = 5;
     public static final int MAX_STATEMENT_DEPTH = 5;
     public static final int MAX_EXPRESSION_DEPTH = 5;
@@ -231,7 +230,14 @@ public class RandomTokenGenerator {
         return msimple;
     }
 
-    private List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
+    private List<Type> generateNonCollectionType(int noOfTypes, SymbolTable symbolTable) {
+        typeDepth += MAX_TYPE_DEPTH;
+        List<Type> types = generateTypes(noOfTypes, symbolTable);
+        typeDepth -= MAX_TYPE_DEPTH;
+        return types;
+    }
+
+    public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
         typeDepth++;
         List<Type> types = new ArrayList<>();
         List<Type> option = new ArrayList<>(List.of(new Int(), new Bool(), new Char(), new Real()));
@@ -302,15 +308,23 @@ public class RandomTokenGenerator {
         if (operator == null) {
             return null;
         }
-        List<Type> typeArgs = operator.getTypeArgs();
+        OperatorExpression expression = new OperatorExpression(operator);
+
+         List<Type> typeArgs = operator.getTypeArgs();
         int randType = random.nextInt(typeArgs.size());
         Type t = typeArgs.get(randType);
 
-        Expression lhs = generateExpression(t, symbolTable);
-        Expression rhs = generateExpression(t, symbolTable);
-        OperatorExpression expression = new OperatorExpression(operator, lhs, rhs);
+        if (t.isCollection()) {
+            t = t.setInnerType(generateNonCollectionType(1, symbolTable).get(0));
+        }
+
+        for (int i = 0; i < operator.getNumberOfArgs(); i++) {
+            Expression arg = generateExpression(t, symbolTable);
+            expression.addArgument(arg);
+        }
         expression.setType(type);
         expression.setSymbolTable(symbolTable);
+
         return expression;
     }
 
@@ -330,12 +344,14 @@ public class RandomTokenGenerator {
     }
 
     private Operator generateOperator(Type type) {
-        List<Operator> ops = Arrays.stream(BoolOperator.values()).collect(Collectors.toList());
-        ops.addAll(Arrays.stream(NumericOperator.values()).collect(Collectors.toList()));
+        List<Operator> ops = Arrays.stream(BinaryOperator.values()).collect(Collectors.toList());
 
-        List<Operator> validOperators = ops.stream()
-            .filter(x -> x.returnType(type))
-            .collect(Collectors.toList());
+        List<Operator> validOperators = new ArrayList<>();
+        for (Operator x : ops) {
+            if (x.returnType(type)) {
+                validOperators.add(x);
+            }
+        }
 
         if (validOperators.size() > 0) {
             int randOp = random.nextInt(validOperators.size());

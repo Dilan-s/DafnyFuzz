@@ -10,7 +10,7 @@ import java.util.Random;
 public class DSet implements Type {
 
     public static final int MAX_SIZE_OF_SET = 10;
-    private final Type type;
+    private Type type;
 
     public DSet(Type type) {
         this.type = type;
@@ -31,6 +31,11 @@ public class DSet implements Type {
     }
 
     @Override
+    public Type setInnerType(Type type) {
+        return new DSet(type);
+    }
+
+    @Override
     public boolean isSameType(Type other) {
         if (!(other instanceof DSet)) {
             return false;
@@ -47,9 +52,10 @@ public class DSet implements Type {
 
     @Override
     public Expression generateLiteral(Random random, SymbolTable symbolTable) {
+        RandomTokenGenerator tokenGenerator = new RandomTokenGenerator(random);
+
         int noOfElems = random.nextInt(MAX_SIZE_OF_SET) + 1;
         DSetLiteral expression = new DSetLiteral(type);
-        RandomTokenGenerator tokenGenerator = new RandomTokenGenerator(random);
         for (int i = 0; i < noOfElems; i++) {
             expression.addValue(tokenGenerator.generateExpression(type, symbolTable));
         }
@@ -58,11 +64,16 @@ public class DSet implements Type {
 
     @Override
     public boolean operatorExists() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isPrintable() {
         return false;
+    }
+
+    @Override
+    public boolean isCollection() {
+        return true;
     }
 }

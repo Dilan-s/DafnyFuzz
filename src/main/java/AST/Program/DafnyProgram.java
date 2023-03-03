@@ -5,8 +5,7 @@ import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
 import AST.Statements.Expressions.IntLiteral;
-import AST.Statements.Expressions.Operator.BoolOperator;
-import AST.Statements.Expressions.Operator.NumericOperator;
+import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.OperatorExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.ReturnStatement;
@@ -61,17 +60,36 @@ public class DafnyProgram {
         ReturnStatement statement = new ReturnStatement(safe_div_symbolTable);
         safe_div.setBody(statement);
 
-        Expression test = new OperatorExpression(BoolOperator.Not_Equals, new VariableExpression(p2Var),
-            new IntLiteral(0));
+        OperatorExpression test = new OperatorExpression(BinaryOperator.Not_Equals);
         test.setSymbolTable(safe_div_symbolTable);
-        Expression ifDiv = new OperatorExpression(NumericOperator.Divide,
-            new VariableExpression(p1Var), new VariableExpression(p2Var), false);
+
+        VariableExpression lhsTest = new VariableExpression(p2Var);
+        lhsTest.setSymbolTable(safe_div_symbolTable);
+        test.addArgument(lhsTest);
+
+        IntLiteral rhsTest = new IntLiteral(0);
+        rhsTest.setSymbolTable(safe_div_symbolTable);
+        test.addArgument(rhsTest);
+
+
+        OperatorExpression ifDiv = new OperatorExpression(BinaryOperator.Divide, false);
         ifDiv.setSymbolTable(safe_div_symbolTable);
+
+        VariableExpression lhsIf = new VariableExpression(p1Var);
+        lhsIf.setSymbolTable(safe_div_symbolTable);
+        ifDiv.addArgument(lhsIf);
+
+        VariableExpression rhsIf = new VariableExpression(p2Var);
+        rhsIf.setSymbolTable(safe_div_symbolTable);
+        ifDiv.addArgument(rhsIf);
+
         Expression elseDiv = new VariableExpression(p1Var);
         elseDiv.setSymbolTable(safe_div_symbolTable);
+
         IfElseExpression expression = new IfElseExpression(test, ifDiv, elseDiv);
         expression.setSymbolTable(safe_div_symbolTable);
         statement.addValue(expression);
+
         return safe_div;
     }
 
@@ -89,14 +107,32 @@ public class DafnyProgram {
         ReturnStatement statement = new ReturnStatement(safe_mod_symbolTable);
         safe_mod.setBody(statement);
 
-        Expression test = new OperatorExpression(BoolOperator.Not_Equals, new VariableExpression(p2Var),
-            new IntLiteral(0));
+        OperatorExpression test = new OperatorExpression(BinaryOperator.Not_Equals);
         test.setSymbolTable(safe_mod_symbolTable);
-        Expression ifDiv = new OperatorExpression(NumericOperator.Modulus,
-            new VariableExpression(p1Var), new VariableExpression(p2Var), false);
+
+        VariableExpression lhsTest = new VariableExpression(p2Var);
+        lhsTest.setSymbolTable(safe_mod_symbolTable);
+        test.addArgument(lhsTest);
+
+        IntLiteral rhsTest = new IntLiteral(0);
+        rhsTest.setSymbolTable(safe_mod_symbolTable);
+        test.addArgument(rhsTest);
+
+
+        OperatorExpression ifDiv = new OperatorExpression(BinaryOperator.Modulus, false);
         ifDiv.setSymbolTable(safe_mod_symbolTable);
+
+        VariableExpression lhsIf = new VariableExpression(p1Var);
+        lhsIf.setSymbolTable(safe_mod_symbolTable);
+        ifDiv.addArgument(lhsIf);
+
+        VariableExpression rhsIf = new VariableExpression(p2Var);
+        rhsIf.setSymbolTable(safe_mod_symbolTable);
+        ifDiv.addArgument(rhsIf);
+
         Expression elseDiv = new VariableExpression(p1Var);
         elseDiv.setSymbolTable(safe_mod_symbolTable);
+
         IfElseExpression expression = new IfElseExpression(test, ifDiv, elseDiv);
         expression.setSymbolTable(safe_mod_symbolTable);
         statement.addValue(expression);

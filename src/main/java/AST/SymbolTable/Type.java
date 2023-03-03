@@ -25,4 +25,12 @@ public interface Type extends Identifier {
     default boolean isPrintable() {
         return true;
     }
+
+    default boolean isCollection() {
+        return false;
+    }
+
+    default Type setInnerType(Type type) {
+        return null;
+    }
 }
