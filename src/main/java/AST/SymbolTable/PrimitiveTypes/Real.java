@@ -2,6 +2,7 @@ package AST.SymbolTable.PrimitiveTypes;
 
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.RealLiteral;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.Random;
 
@@ -21,7 +22,8 @@ public class Real implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random) {
+    public Expression generateLiteral(Random random,
+        SymbolTable symbolTable) {
         double value = random.nextDouble() * MAX_DOUBLE;
         value *= random.nextDouble() < PROB_NEGATION ? -1 : 1;
         return new RealLiteral(value);
@@ -32,4 +34,8 @@ public class Real implements Type {
         return true;
     }
 
+    @Override
+    public boolean isPrintable() {
+        return false;
+    }
 }

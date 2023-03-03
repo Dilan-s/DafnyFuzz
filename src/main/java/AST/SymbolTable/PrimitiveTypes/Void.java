@@ -1,6 +1,7 @@
 package AST.SymbolTable.PrimitiveTypes;
 
 import AST.Statements.Expressions.Expression;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.Random;
 
@@ -17,7 +18,8 @@ public class Void implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random) {
+    public Expression generateLiteral(Random random,
+        SymbolTable symbolTable) {
         return null;
     }
 

@@ -2,6 +2,7 @@ package AST.SymbolTable.PrimitiveTypes;
 
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IntLiteral;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.Random;
 
@@ -21,7 +22,8 @@ public class Int implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random) {
+    public Expression generateLiteral(Random random,
+        SymbolTable symbolTable) {
         int value = random.nextInt(MAX_INT);
         value *= random.nextDouble() < PROB_NEGATION ? -1 : 1;
         return new IntLiteral(value, value > 0 &&  random.nextBoolean());

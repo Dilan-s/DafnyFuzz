@@ -24,18 +24,31 @@ public class PrintAll implements Statement {
     public void semanticCheck(Method method) throws SemanticException {
 
     }
-
+//
+//    @Override
+//    public List<String> toCode() {
+//        List<String> code = new ArrayList<>();
+//        List<Variable> allVariablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope();
+//        for (Variable v : allVariablesInCurrentScope) {
+//            PrintStatement statement = new PrintStatement(symbolTable);
+//            VariableExpression expression = new VariableExpression(v);
+//            expression.setSymbolTable(symbolTable);
+//            statement.addValue(expression);
+//            code.addAll(statement.toCode());
+//        }
+//        return code;
+//    }
     @Override
     public List<String> toCode() {
         List<String> code = new ArrayList<>();
         List<Variable> allVariablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope();
+        PrintStatement statement = new PrintStatement(symbolTable);
         for (Variable v : allVariablesInCurrentScope) {
-            PrintStatement statement = new PrintStatement(symbolTable);
             VariableExpression expression = new VariableExpression(v);
             expression.setSymbolTable(symbolTable);
             statement.addValue(expression);
-            code.addAll(statement.toCode());
         }
+        code.addAll(statement.toCode());
         return code;
     }
 }

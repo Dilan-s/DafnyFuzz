@@ -1,6 +1,6 @@
 package AST.Program;
 
-import AST.Generator.StatementGenerator;
+import AST.Generator.RandomTokenGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
@@ -41,8 +41,8 @@ public class DafnyProgram {
         System.out.println(safe_modulus);
         main.addMethod(safe_modulus);
 
-        StatementGenerator statementGenerator = new StatementGenerator(random);
-        Statement statement = statementGenerator.generateBody(main);
+        RandomTokenGenerator randomTokenGenerator = new RandomTokenGenerator(random);
+        Statement statement = randomTokenGenerator.generateBody(main);
         main.setBody(statement);
         System.out.println(main);
     }

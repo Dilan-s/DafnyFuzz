@@ -5,6 +5,7 @@ import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Real;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +43,7 @@ public class PrintStatement implements Statement {
             .collect(Collectors.toList()));
 
         String printValues = values.stream()
-            .filter(x -> !x.getTypes().get(0).isSameType(new Real()))
+            .filter(x -> x.getTypes().stream().allMatch(Type::isPrintable))
             .map(Expression::toString)
             .collect(Collectors.joining(", ' ', "));
         if (!printValues.isEmpty()) {

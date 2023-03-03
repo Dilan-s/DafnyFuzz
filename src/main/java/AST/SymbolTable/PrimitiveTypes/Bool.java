@@ -2,6 +2,7 @@ package AST.SymbolTable.PrimitiveTypes;
 
 import AST.Statements.Expressions.BoolLiteral;
 import AST.Statements.Expressions.Expression;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.Random;
 
@@ -18,7 +19,8 @@ public class Bool implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random) {
+    public Expression generateLiteral(Random random,
+        SymbolTable symbolTable) {
         return new BoolLiteral(random.nextBoolean());
     }
 
