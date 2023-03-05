@@ -8,6 +8,7 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
+import AST.Statements.Expressions.Operator.UnaryOperator;
 import AST.Statements.Expressions.OperatorExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.IfElseStatement;
@@ -21,12 +22,12 @@ import AST.SymbolTable.PrimitiveTypes.Char;
 import AST.SymbolTable.PrimitiveTypes.DSet;
 import AST.SymbolTable.PrimitiveTypes.Int;
 import AST.SymbolTable.PrimitiveTypes.Real;
+import AST.SymbolTable.PrimitiveTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EventListener;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -38,19 +39,19 @@ public class RandomTokenGenerator {
     public static final double PROB_PRINT_STAT = PROB_ASSIGN_STAT + 0.3;
     public static final double PROB_IF_ELSE_STAT = PROB_PRINT_STAT + 0.1;
 
-    public static final double PROB_METHOD_ASSIGN = 0.025;
+    public static final double PROB_METHOD_ASSIGN = 0.05;
     public static final double PROB_ELSE_STAT = 0.5;
 
-    public static final double PROB_LITERAL_EXPRESSION = 0.4;
-    public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.35;
+    public static final double PROB_LITERAL_EXPRESSION = 0.3;
+    public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.45;
     public static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.15;
     public static final double PROB_IF_ELSE_EXPRESSION = PROB_VARIABLE_EXPRESSION + 0.05;
     public static final double PROB_CALL_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.05;
 
     public static final double PROB_REUSE_METHOD = 0.75;
     public static final int MAX_METHOD_DEPTH = 5;
-    public static final int MAX_STATEMENT_DEPTH = 5;
-    public static final int MAX_EXPRESSION_DEPTH = 5;
+    public static final int MAX_STATEMENT_DEPTH = 7;
+    public static final int MAX_EXPRESSION_DEPTH = 7;
     public static final int MAX_TYPE_DEPTH = 2;
     public static final double DECAY_FACTOR = 0.95;
 
@@ -92,7 +93,8 @@ public class RandomTokenGenerator {
         statementDepth++;
         Statement ret = null;
         while (ret == null) {
-            double probTypeOfStatement = random.nextDouble() * Math.pow(DECAY_FACTOR, statementDepth - 1);
+            double probTypeOfStatement =
+                random.nextDouble() * Math.pow(DECAY_FACTOR, statementDepth - 1);
             if ((statementDepth > MAX_STATEMENT_DEPTH || probTypeOfStatement < PROB_RETURN_STAT)
                 && method.hasReturn()) {
                 //return
@@ -160,7 +162,7 @@ public class RandomTokenGenerator {
         int noOfReturns = random.nextInt(5) + 1;
         List<Type> returnTypes = generateTypes(noOfReturns, symbolTable);
 
-        double probCallMethod = random.nextDouble()  * Math.pow(DECAY_FACTOR, methodDepth - 1);
+        double probCallMethod = random.nextDouble() * Math.pow(DECAY_FACTOR, methodDepth - 1);
         if (probCallMethod < PROB_METHOD_ASSIGN && methodDepth < MAX_METHOD_DEPTH
             && statementDepth < MAX_METHOD_DEPTH) {
             //Create method
@@ -233,7 +235,7 @@ public class RandomTokenGenerator {
         return msimple;
     }
 
-    private Type generateNonCollectionType(int noOfTypes, SymbolTable symbolTable) {
+    public Type generateNonCollectionType(int noOfTypes, SymbolTable symbolTable) {
         typeDepth += MAX_TYPE_DEPTH;
         List<Type> types = generateTypes(noOfTypes, symbolTable);
         typeDepth -= MAX_TYPE_DEPTH;
@@ -246,9 +248,10 @@ public class RandomTokenGenerator {
         List<Type> option = new ArrayList<>(List.of(new Int(), new Bool(), new Char(), new Real()));
 
         if (typeDepth < MAX_TYPE_DEPTH) {
-            List<Type> sets = new ArrayList<>();
-            sets.addAll(option.stream().map(DSet::new).collect(Collectors.toList()));
-            option.addAll(sets);
+            List<Type> collections = new ArrayList<>();
+            collections.addAll(option.stream().map(DSet::new).collect(Collectors.toList()));
+            collections.addAll(option.stream().map(Seq::new).collect(Collectors.toList()));
+            option.addAll(collections);
         }
         for (int i = 0; i < noOfTypes; i++) {
             int randType = random.nextInt(option.size());
@@ -263,7 +266,8 @@ public class RandomTokenGenerator {
         Expression ret = null;
         expressionDepth++;
         while (ret == null) {
-            double probTypeOfExpression = random.nextDouble() * Math.pow(DECAY_FACTOR, expressionDepth - 1);
+            double probTypeOfExpression =
+                random.nextDouble() * Math.pow(DECAY_FACTOR, expressionDepth - 1);
             if (expressionDepth > MAX_EXPRESSION_DEPTH
                 || probTypeOfExpression < PROB_LITERAL_EXPRESSION) {
                 //literal
@@ -313,20 +317,17 @@ public class RandomTokenGenerator {
         }
         OperatorExpression expression = new OperatorExpression(operator);
 
-         List<Type> typeArgs = operator.getTypeArgs();
+        List<List<Type>> typeArgs = operator.getTypeArgs();
         int randType = random.nextInt(typeArgs.size());
-        Type t = typeArgs.get(randType);
+        List<Type> types = typeArgs.get(randType);
 
-        if (operator.getType().isCollection()) {
-            t = type;
-        } else if (t.isCollection()) {
-            t = new DSet(generateNonCollectionType(1, symbolTable));
-        }
+        types = operator.concreteType(random, types, symbolTable, type);
 
-        for (int i = 0; i < operator.getNumberOfArgs(); i++) {
+        for (Type t : types) {
             Expression arg = generateExpression(t, symbolTable);
             expression.addArgument(arg);
         }
+
         expression.setType(type);
         expression.setSymbolTable(symbolTable);
 
@@ -350,6 +351,7 @@ public class RandomTokenGenerator {
 
     private Operator generateOperator(Type type) {
         List<Operator> ops = Arrays.stream(BinaryOperator.values()).collect(Collectors.toList());
+        ops.addAll(Arrays.stream(UnaryOperator.values()).collect(Collectors.toList()));
 
         List<Operator> validOperators = new ArrayList<>();
         for (Operator x : ops) {

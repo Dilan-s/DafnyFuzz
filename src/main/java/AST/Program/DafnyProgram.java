@@ -46,6 +46,8 @@ public class DafnyProgram {
         System.out.println(main);
     }
 
+//    private Method safe
+
     private Method safe_division() {
         Method safe_div = new Method(new Int(), "safe_division");
 
@@ -70,7 +72,6 @@ public class DafnyProgram {
         IntLiteral rhsTest = new IntLiteral(0);
         rhsTest.setSymbolTable(safe_div_symbolTable);
         test.addArgument(rhsTest);
-
 
         OperatorExpression ifDiv = new OperatorExpression(BinaryOperator.Divide, false);
         ifDiv.setSymbolTable(safe_div_symbolTable);
@@ -117,7 +118,6 @@ public class DafnyProgram {
         IntLiteral rhsTest = new IntLiteral(0);
         rhsTest.setSymbolTable(safe_mod_symbolTable);
         test.addArgument(rhsTest);
-
 
         OperatorExpression ifDiv = new OperatorExpression(BinaryOperator.Modulus, false);
         ifDiv.setSymbolTable(safe_mod_symbolTable);

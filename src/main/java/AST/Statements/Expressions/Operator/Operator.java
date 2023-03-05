@@ -1,28 +1,31 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
+import AST.Generator.RandomTokenGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
-import AST.SymbolTable.PrimitiveTypes.Int;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public interface Operator {
 
     String formExpression(List<Expression> args);
 
-    Type getType();
+    List<Type> getType();
 
     void semanticCheck(Method method, List<Expression> expressions) throws SemanticException;
 
-    List<Type> getTypeArgs();
+    List<List<Type>> getTypeArgs();
 
     int getNumberOfArgs();
 
     default boolean returnType(Type type) {
-        return getType().isSameType(type);
+        return getType().stream().anyMatch(t -> t.isSameType(type));
     }
 
     static void numericTypeCheck(Expression lhs, Expression rhs, String operator)
@@ -76,5 +79,20 @@ public interface Operator {
                 leftType.getName(), rightType.getName()));
         }
     }
+
+    default List<Type> concreteType(Random random, List<Type> types, SymbolTable symbolTable, Type expected) {
+        RandomTokenGenerator tokenGenerator = new RandomTokenGenerator(random);
+        Type t = tokenGenerator.generateNonCollectionType(1, symbolTable);
+        List<Type> ret = new ArrayList<>();
+        for (Type type: types) {
+            if (type.isCollection()) {
+                ret.add(type.setInnerType(t));
+            } else {
+                ret.add(type);
+            }
+        }
+        return ret;
+    }
+
 
 }
