@@ -6,12 +6,14 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
 import AST.Statements.Expressions.IntLiteral;
 import AST.Statements.Expressions.Operator.BinaryOperator;
+import AST.Statements.Expressions.Operator.UnaryOperator;
 import AST.Statements.Expressions.OperatorExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.ReturnStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Int;
+import AST.SymbolTable.PrimitiveTypes.Seq;
 import AST.SymbolTable.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Variable;
@@ -40,13 +42,62 @@ public class DafnyProgram {
         System.out.println(safe_modulus);
         main.addMethod(safe_modulus);
 
+        Method safe_index_seq = safe_index_seq();
+        System.out.println(safe_index_seq);
+        main.addMethod(safe_index_seq);
+
         RandomTokenGenerator randomTokenGenerator = new RandomTokenGenerator(random);
         Statement statement = randomTokenGenerator.generateBody(main);
         main.setBody(statement);
         System.out.println(main);
     }
 
-//    private Method safe
+    private Method safe_index_seq() {
+        Method safe_index_seq = new Method(new Int(), "safe_index_seq");
+
+        String p1 = VariableNameGenerator.generateArgumentName(safe_index_seq);
+        Variable p1Var = new Variable(p1, new Seq());
+        safe_index_seq.addArgument(p1Var);
+
+        String p2 = VariableNameGenerator.generateArgumentName(safe_index_seq);
+        Variable p2Var = new Variable(p2, new Int());
+        safe_index_seq.addArgument(p2Var);
+
+        SymbolTable symbolTable = safe_index_seq.getSymbolTable();
+        ReturnStatement statement = new ReturnStatement(symbolTable);
+        safe_index_seq.setBody(statement);
+
+        VariableExpression p1VarExp = new VariableExpression(p1Var);
+        p1VarExp.setSymbolTable(symbolTable);
+
+        VariableExpression p2VarExp = new VariableExpression(p2Var);
+        p2VarExp.setSymbolTable(symbolTable);
+
+        OperatorExpression size = new OperatorExpression(UnaryOperator.Cardinality);
+        size.setSymbolTable(symbolTable);
+        size.addArgument(p1VarExp);
+
+        OperatorExpression ltSize = new OperatorExpression(BinaryOperator.Less_Than);
+        ltSize.setSymbolTable(symbolTable);
+        ltSize.addArgument(p2VarExp);
+        ltSize.addArgument(size);
+
+        OperatorExpression gtZero = new OperatorExpression(BinaryOperator.Less_Than_Or_Equal);
+        gtZero.setSymbolTable(symbolTable);
+        gtZero.addArgument(new IntLiteral(0));
+        gtZero.addArgument(p2VarExp);
+
+        OperatorExpression test = new OperatorExpression(BinaryOperator.And);
+        test.setSymbolTable(symbolTable);
+        test.addArgument(ltSize);
+        test.addArgument(gtZero);
+
+        IfElseExpression ifElseExpression = new IfElseExpression(test, p2VarExp, new IntLiteral(0));
+        ifElseExpression.setSymbolTable(symbolTable);
+        statement.addValue(ifElseExpression);
+
+        return safe_index_seq;
+    }
 
     private Method safe_division() {
         Method safe_div = new Method(new Int(), "safe_division");

@@ -6,10 +6,12 @@ import AST.Statements.BlockStatement;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
+import AST.Statements.Expressions.IntLiteral;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
 import AST.Statements.Expressions.Operator.UnaryOperator;
 import AST.Statements.Expressions.OperatorExpression;
+import AST.Statements.Expressions.SeqIndexExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.IfElseStatement;
 import AST.Statements.PrintStatement;
@@ -43,9 +45,10 @@ public class RandomTokenGenerator {
     public static final double PROB_ELSE_STAT = 0.5;
 
     public static final double PROB_LITERAL_EXPRESSION = 0.3;
-    public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.45;
+    public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.4;
     public static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.15;
-    public static final double PROB_IF_ELSE_EXPRESSION = PROB_VARIABLE_EXPRESSION + 0.05;
+    public static final double PROB_SEQ_INDEX_EXPRESSION = PROB_VARIABLE_EXPRESSION + 0.05;
+    public static final double PROB_IF_ELSE_EXPRESSION = PROB_SEQ_INDEX_EXPRESSION + 0.05;
     public static final double PROB_CALL_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.05;
 
     public static final double PROB_REUSE_METHOD = 0.75;
@@ -285,6 +288,8 @@ public class RandomTokenGenerator {
                 if (expression != null) {
                     ret = expression;
                 }
+            } else if (probTypeOfExpression < PROB_SEQ_INDEX_EXPRESSION && !type.isCollection()) {
+                ret = generateSeqIndexExpression(type, symbolTable);
             } else if (probTypeOfExpression < PROB_IF_ELSE_EXPRESSION) {
                 //ifElse
                 ret = generateIfElseExpression(type, symbolTable);
@@ -297,6 +302,17 @@ public class RandomTokenGenerator {
         }
         expressionDepth--;
         return ret;
+    }
+
+    private SeqIndexExpression generateSeqIndexExpression(Type type, SymbolTable symbolTable) {
+        Seq t = new Seq(type);
+        Expression seq = t.generateLiteral(random, symbolTable);
+        IntLiteral ind = new IntLiteral(random.nextInt(t.getLength()));
+        SeqIndexExpression expression = new SeqIndexExpression();
+        expression.setSymbolTable(symbolTable);
+        expression.setSeqAndInd(seq, ind);
+        expression.setSymbolTable(symbolTable);
+        return expression;
     }
 
     private VariableExpression generateVariableExpression(Type type, SymbolTable symbolTable) {

@@ -24,7 +24,7 @@ public class SeqLiteral implements Expression {
 
     @Override
     public List<Type> getTypes() {
-        return List.of(new Seq(type));
+        return List.of(type);
     }
 
     public void addValue(Expression expression) {

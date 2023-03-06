@@ -46,6 +46,11 @@ public class Seq implements Type {
     }
 
     @Override
+    public Type getInnerType() {
+        return type;
+    }
+
+    @Override
     public boolean isSameType(Type other) {
         if (!(other instanceof Seq)) {
             return false;
@@ -65,7 +70,7 @@ public class Seq implements Type {
         RandomTokenGenerator tokenGenerator = new RandomTokenGenerator(random);
 
         length = random.nextInt(MAX_SIZE_OF_SET) + 1;
-        SeqLiteral expression = new SeqLiteral(type);
+        SeqLiteral expression = new SeqLiteral(this);
         for (int i = 0; i < length; i++) {
             expression.addValue(tokenGenerator.generateExpression(type, symbolTable));
         }
@@ -79,7 +84,7 @@ public class Seq implements Type {
 
     @Override
     public boolean isPrintable() {
-        return type.isPrintable();
+        return type != null && type.isPrintable();
     }
 
     @Override

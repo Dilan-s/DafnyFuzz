@@ -33,4 +33,8 @@ public interface Type extends Identifier {
     default Type setInnerType(Type type) {
         return null;
     }
+
+    default Type getInnerType() {
+        return null;
+    }
 }
