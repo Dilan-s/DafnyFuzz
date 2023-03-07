@@ -9,7 +9,16 @@ import java.util.Random;
 public class Int implements Type {
 
     private static final int MAX_INT = 30;
-    public static final double PROB_NEGATION = 0.5;
+    private int max;
+    public static final double PROB_NEGATION = 0.1;
+
+    public Int(int max) {
+        this.max = max;
+    }
+
+    public Int() {
+        this.max = MAX_INT;
+    }
 
     @Override
     public String getName() {
@@ -24,7 +33,7 @@ public class Int implements Type {
     @Override
     public Expression generateLiteral(Random random,
         SymbolTable symbolTable) {
-        int value = random.nextInt(MAX_INT);
+        int value = random.nextInt(max);
         value *= random.nextDouble() < PROB_NEGATION ? -1 : 1;
         return new IntLiteral(value, value > 0 &&  random.nextBoolean());
     }
