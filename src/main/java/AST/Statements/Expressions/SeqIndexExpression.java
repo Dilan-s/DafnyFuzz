@@ -37,6 +37,7 @@ public class SeqIndexExpression implements Expression {
 
         asStatSeq = new AssignmentStatement(symbolTable);
         asStatSeq.addAssignment(List.of(seqVar), seq);
+        asStatSeq.addAssignmentsToSymbolTable();
 
 
         this.index = index;
@@ -53,6 +54,7 @@ public class SeqIndexExpression implements Expression {
             e.printStackTrace();
         }
         asStatInd.addAssignment(List.of(indVar), callExp);
+        asStatInd.addAssignmentsToSymbolTable();
     }
 
     @Override

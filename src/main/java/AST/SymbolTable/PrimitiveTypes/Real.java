@@ -1,5 +1,6 @@
 package AST.SymbolTable.PrimitiveTypes;
 
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.RealLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -22,10 +23,9 @@ public class Real implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random,
-        SymbolTable symbolTable) {
-        double value = random.nextDouble() * MAX_DOUBLE;
-        value *= random.nextDouble() < PROB_NEGATION ? -1 : 1;
+    public Expression generateLiteral(SymbolTable symbolTable) {
+        double value = GeneratorConfig.getRandom().nextDouble() * MAX_DOUBLE;
+        value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
         return new RealLiteral(value);
     }
 

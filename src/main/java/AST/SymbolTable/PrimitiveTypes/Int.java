@@ -1,5 +1,6 @@
 package AST.SymbolTable.PrimitiveTypes;
 
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IntLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -31,11 +32,10 @@ public class Int implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random,
-        SymbolTable symbolTable) {
-        int value = random.nextInt(max);
-        value *= random.nextDouble() < PROB_NEGATION ? -1 : 1;
-        return new IntLiteral(value, value > 0 &&  random.nextBoolean());
+    public Expression generateLiteral(SymbolTable symbolTable) {
+        int value = GeneratorConfig.getRandom().nextInt(max);
+        value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
+        return new IntLiteral(value, value > 0 &&  GeneratorConfig.getRandom().nextBoolean());
     }
 
     @Override

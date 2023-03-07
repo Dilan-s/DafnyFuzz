@@ -9,7 +9,7 @@ public interface Type extends Identifier {
 
     boolean isSameType(Type other);
 
-    Expression generateLiteral(Random random, SymbolTable symbolTable);
+    Expression generateLiteral(SymbolTable symbolTable);
 
     default String getTypeIndicatorString() {
         return String.format(": %s", getName());

@@ -1,14 +1,11 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
-import AST.Generator.RandomTokenGenerator;
+import AST.Generator.RandomStatementGenerator;
+import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.PrimitiveTypes.Bool;
-import AST.SymbolTable.PrimitiveTypes.Char;
-import AST.SymbolTable.PrimitiveTypes.DSet;
 import AST.SymbolTable.PrimitiveTypes.Int;
-import AST.SymbolTable.PrimitiveTypes.Real;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.ArrayList;
@@ -24,10 +21,10 @@ public enum UnaryOperator implements Operator {
         }
 
         @Override
-        public List<Type> concreteType(Random random, List<Type> types, SymbolTable symbolTable,
+        public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
-            RandomTokenGenerator tokenGenerator = new RandomTokenGenerator(random);
-            Type t = tokenGenerator.generateNonCollectionType(1, symbolTable);
+            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+            Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
             List<Type> ret = new ArrayList<>();
             ret.add(types.get(0).setInnerType(t));
             return ret;

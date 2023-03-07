@@ -1,7 +1,8 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
-import AST.Generator.RandomTokenGenerator;
+import AST.Generator.RandomStatementGenerator;
+import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
@@ -80,9 +81,9 @@ public interface Operator {
         }
     }
 
-    default List<Type> concreteType(Random random, List<Type> types, SymbolTable symbolTable, Type expected) {
-        RandomTokenGenerator tokenGenerator = new RandomTokenGenerator(random);
-        Type t = tokenGenerator.generateNonCollectionType(1, symbolTable);
+    default List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
+        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+        Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
         List<Type> ret = new ArrayList<>();
         for (Type type: types) {
             if (type.isCollection()) {

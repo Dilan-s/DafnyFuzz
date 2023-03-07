@@ -1,5 +1,6 @@
 package AST.SymbolTable.PrimitiveTypes;
 
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.CharLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -22,10 +23,9 @@ public class Char implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random,
-        SymbolTable symbolTable) {
-        char c = (char) ('a' + random.nextInt(26));
-        c += random.nextDouble() < PROB_UPPERCASE ? LOWER_TO_UPPER_SHIFT : 0;
+    public Expression generateLiteral(SymbolTable symbolTable) {
+        char c = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
+        c += GeneratorConfig.getRandom().nextDouble() < PROB_UPPERCASE ? LOWER_TO_UPPER_SHIFT : 0;
         return new CharLiteral(c);
     }
 

@@ -18,8 +18,7 @@ public class Void implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random,
-        SymbolTable symbolTable) {
+    public Expression generateLiteral(SymbolTable symbolTable) {
         return null;
     }
 

@@ -1,5 +1,6 @@
 package AST.SymbolTable.PrimitiveTypes;
 
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.BoolLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -19,9 +20,8 @@ public class Bool implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random,
-        SymbolTable symbolTable) {
-        return new BoolLiteral(random.nextBoolean());
+    public Expression generateLiteral(SymbolTable symbolTable) {
+        return new BoolLiteral(GeneratorConfig.getRandom().nextBoolean());
     }
 
     @Override

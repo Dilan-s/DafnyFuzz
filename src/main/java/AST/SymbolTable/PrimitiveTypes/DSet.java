@@ -1,6 +1,8 @@
 package AST.SymbolTable.PrimitiveTypes;
 
-import AST.Generator.RandomTokenGenerator;
+import AST.Generator.GeneratorConfig;
+import AST.Generator.RandomExpressionGenerator;
+import AST.Generator.RandomStatementGenerator;
 import AST.Statements.Expressions.DSetLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -51,13 +53,13 @@ public class DSet implements Type {
     }
 
     @Override
-    public Expression generateLiteral(Random random, SymbolTable symbolTable) {
-        RandomTokenGenerator tokenGenerator = new RandomTokenGenerator(random);
+    public Expression generateLiteral(SymbolTable symbolTable) {
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int noOfElems = random.nextInt(MAX_SIZE_OF_SET) + 1;
+        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
         DSetLiteral expression = new DSetLiteral(type);
         for (int i = 0; i < noOfElems; i++) {
-            expression.addValue(tokenGenerator.generateExpression(type, symbolTable));
+            expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
         }
         return expression;
     }
