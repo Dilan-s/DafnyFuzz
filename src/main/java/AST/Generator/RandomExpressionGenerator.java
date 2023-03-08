@@ -9,6 +9,7 @@ import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
 import AST.Statements.Expressions.Operator.UnaryOperator;
 import AST.Statements.Expressions.OperatorExpression;
+import AST.Statements.Expressions.ReassignSeqExpression;
 import AST.Statements.Expressions.SeqIndexExpression;
 import AST.Statements.Expressions.SubsequenceExpression;
 import AST.Statements.Expressions.VariableExpression;
@@ -27,13 +28,14 @@ public class RandomExpressionGenerator {
 
     public static final double PROB_LITERAL_EXPRESSION = 0.3;
     public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.4;
-    public static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.15;
-    public static final double PROB_SEQ_INDEX_EXPRESSION = PROB_VARIABLE_EXPRESSION + 0.025;
-    public static final double PROB_SUBSEQUENCE_EXPRESSION = PROB_SEQ_INDEX_EXPRESSION + 0.025;
-    public static final double PROB_IF_ELSE_EXPRESSION = PROB_SUBSEQUENCE_EXPRESSION + 0.05;
+    public static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.1;
+    public static final double PROB_SEQ_INDEX_EXPRESSION = PROB_VARIABLE_EXPRESSION + 0.03;
+    public static final double PROB_SUBSEQUENCE_EXPRESSION = PROB_SEQ_INDEX_EXPRESSION + 0.03;
+    public static final double PROB_REASSIGN_SEQ_EXPRESSION = PROB_SUBSEQUENCE_EXPRESSION + 0.03;
+    public static final double PROB_IF_ELSE_EXPRESSION = PROB_REASSIGN_SEQ_EXPRESSION + 0.05;
     public static final double PROB_CALL_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.05;
 
-    public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.5;
+    public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.7;
     public static final int MAX_EXPRESSION_DEPTH = 7;
 
     private static int expressionDepth = 0;
@@ -65,6 +67,8 @@ public class RandomExpressionGenerator {
                 ret = generateSeqIndexExpression(type, symbolTable);
             } else if (probTypeOfExpression < PROB_SUBSEQUENCE_EXPRESSION && type.isSameType(new Seq())) {
                 ret = generateSubsequenceExpression(type, symbolTable);
+            } else if (probTypeOfExpression < PROB_REASSIGN_SEQ_EXPRESSION && type.isSameType(new Seq())) {
+                ret = generateReassignSeqExpression(type, symbolTable);
             } else if (probTypeOfExpression < PROB_IF_ELSE_EXPRESSION) {
                 //ifElse
                 ret = generateIfElseExpression(type, symbolTable);
@@ -76,6 +80,17 @@ public class RandomExpressionGenerator {
         }
         expressionDepth--;
         return ret;
+    }
+
+    private Expression generateReassignSeqExpression(Type type, SymbolTable symbolTable) {
+        Seq t = (Seq) type;
+
+        Expression seq = t.generateLiteral(symbolTable);
+        IntLiteral ind = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
+        Expression exp = generateExpression(t.getInnerType(), symbolTable);
+
+        ReassignSeqExpression expression = new ReassignSeqExpression(symbolTable, seq, ind, exp);
+        return expression;
     }
 
     private Expression generateSubsequenceExpression(Type type, SymbolTable symbolTable) {

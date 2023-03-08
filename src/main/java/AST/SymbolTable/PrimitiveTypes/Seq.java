@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Seq implements Type {
 
-    public static final int MAX_SIZE_OF_SET = 20;
+    public static final int MAX_SIZE_OF_SET = 10;
     private Type type;
 
     public int getLength() {
