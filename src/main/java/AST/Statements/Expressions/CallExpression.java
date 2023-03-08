@@ -22,7 +22,8 @@ public class CallExpression implements Expression {
     private final List<Statement> assignments;
     private List<Variable> assignedVariables;
 
-    public CallExpression(Method method) {
+    public CallExpression(SymbolTable symbolTable, Method method) {
+        this.symbolTable = symbolTable;
         this.method = method;
         this.variables = new ArrayList<>();
         this.assignments = new ArrayList<>();
@@ -105,11 +106,6 @@ public class CallExpression implements Expression {
     }
 
     @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
-    }
-
-    @Override
     public boolean isValidReturn() {
         return false;
     }
@@ -140,10 +136,6 @@ public class CallExpression implements Expression {
         @Override
         public void semanticCheck(Method method) throws SemanticException {
 
-        }
-
-        @Override
-        public void setSymbolTable(SymbolTable symbolTable) {
         }
 
         @Override

@@ -21,7 +21,7 @@ public class Bool implements Type {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        return new BoolLiteral(GeneratorConfig.getRandom().nextBoolean());
+        return new BoolLiteral(symbolTable, GeneratorConfig.getRandom().nextBoolean());
     }
 
     @Override

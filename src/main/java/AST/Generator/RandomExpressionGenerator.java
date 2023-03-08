@@ -82,14 +82,12 @@ public class RandomExpressionGenerator {
         Seq t = (Seq) type;
 
         Expression seq = t.generateLiteral(symbolTable);
-        seq.setSymbolTable(symbolTable);
 
-        IntLiteral i = new IntLiteral(GeneratorConfig.getRandom().nextInt(t.getLength()));
+        IntLiteral i = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
 
-        SubsequenceExpression expression = new SubsequenceExpression(seq);
-        expression.setSymbolTable(symbolTable);
+        SubsequenceExpression expression = new SubsequenceExpression(symbolTable, seq);
         if (GeneratorConfig.getRandom().nextDouble() < PROB_HI_AND_LO_SUBSEQUENCE) {
-            IntLiteral j = new IntLiteral(GeneratorConfig.getRandom().nextInt(t.getLength()));
+            IntLiteral j = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
             expression.addIndexes(i, j);
         } else {
             expression.addIndexes(i);
@@ -102,13 +100,10 @@ public class RandomExpressionGenerator {
     private SeqIndexExpression generateSeqIndexExpression(Type type, SymbolTable symbolTable) {
         Seq t = new Seq(type);
         Expression seq = t.generateLiteral(symbolTable);
-        seq.setSymbolTable(symbolTable);
 
-        IntLiteral ind = new IntLiteral(GeneratorConfig.getRandom().nextInt(t.getLength()));
-        ind.setSymbolTable(symbolTable);
+        IntLiteral ind = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
 
-        SeqIndexExpression expression = new SeqIndexExpression();
-        expression.setSymbolTable(symbolTable);
+        SeqIndexExpression expression = new SeqIndexExpression(symbolTable);
         expression.setSeqAndInd(seq, ind);
         return expression;
     }
@@ -117,8 +112,7 @@ public class RandomExpressionGenerator {
         List<Variable> variables = symbolTable.getAllVariables(type);
         if (!variables.isEmpty()) {
             int index = GeneratorConfig.getRandom().nextInt(variables.size());
-            VariableExpression expression = new VariableExpression(variables.get(index));
-            expression.setSymbolTable(symbolTable);
+            VariableExpression expression = new VariableExpression(symbolTable, variables.get(index));
             return expression;
         }
         return null;
@@ -129,7 +123,7 @@ public class RandomExpressionGenerator {
         if (operator == null) {
             return null;
         }
-        OperatorExpression expression = new OperatorExpression(operator);
+        OperatorExpression expression = new OperatorExpression(symbolTable, operator);
 
         List<List<Type>> typeArgs = operator.getTypeArgs();
         int randType = GeneratorConfig.getRandom().nextInt(typeArgs.size());
@@ -143,7 +137,6 @@ public class RandomExpressionGenerator {
         }
 
         expression.setType(type);
-        expression.setSymbolTable(symbolTable);
 
         return expression;
     }
@@ -152,14 +145,12 @@ public class RandomExpressionGenerator {
         Expression test = generateExpression(new Bool(), symbolTable);
         Expression ifExp = generateExpression(type, symbolTable);
         Expression elseExp = generateExpression(type, symbolTable);
-        IfElseExpression expression = new IfElseExpression(test, ifExp, elseExp);
-        expression.setSymbolTable(symbolTable);
+        IfElseExpression expression = new IfElseExpression(symbolTable, test, ifExp, elseExp);
         return expression;
     }
 
     private Expression generateLiteral(Type type, SymbolTable symbolTable) {
         Expression expression = type.generateLiteral(symbolTable);
-        expression.setSymbolTable(symbolTable);
         return expression;
     }
 
@@ -189,8 +180,7 @@ public class RandomExpressionGenerator {
             return null;
         }
 
-        CallExpression expression = new CallExpression(m);
-        expression.setSymbolTable(symbolTable);
+        CallExpression expression = new CallExpression(symbolTable, m);
         List<Type> argTypes = m.getArgTypes();
         int i = 0;
         while (i < argTypes.size()) {

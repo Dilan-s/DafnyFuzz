@@ -26,7 +26,7 @@ public class Char implements Type {
     public Expression generateLiteral(SymbolTable symbolTable) {
         char c = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
         c += GeneratorConfig.getRandom().nextDouble() < PROB_UPPERCASE ? LOWER_TO_UPPER_SHIFT : 0;
-        return new CharLiteral(c);
+        return new CharLiteral(symbolTable, c);
     }
 
     @Override

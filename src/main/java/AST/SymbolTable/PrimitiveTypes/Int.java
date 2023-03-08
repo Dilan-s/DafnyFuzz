@@ -10,8 +10,9 @@ import java.util.Random;
 public class Int implements Type {
 
     private static final int MAX_INT = 30;
-    private int max;
+    private static final double PROB_HEX = 0.2;
     public static final double PROB_NEGATION = 0.1;
+    private int max;
 
     public Int(int max) {
         this.max = max;
@@ -35,7 +36,7 @@ public class Int implements Type {
     public Expression generateLiteral(SymbolTable symbolTable) {
         int value = GeneratorConfig.getRandom().nextInt(max);
         value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
-        return new IntLiteral(value, value > 0 &&  GeneratorConfig.getRandom().nextBoolean());
+        return new IntLiteral(symbolTable, value, value > 0 &&  GeneratorConfig.getRandom().nextDouble() < PROB_HEX);
     }
 
     @Override

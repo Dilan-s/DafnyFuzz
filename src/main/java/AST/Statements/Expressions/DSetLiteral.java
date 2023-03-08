@@ -17,7 +17,8 @@ public class DSetLiteral implements Expression {
     private final List<Expression> values;
     private SymbolTable symbolTable;
 
-    public DSetLiteral(Type type) {
+    public DSetLiteral(SymbolTable symbolTable, Type type) {
+        this.symbolTable = symbolTable;
         this.type = type;
         this.values = new ArrayList<>();
     }
@@ -41,11 +42,6 @@ public class DSetLiteral implements Expression {
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

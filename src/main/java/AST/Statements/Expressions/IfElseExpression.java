@@ -17,7 +17,8 @@ public class IfElseExpression implements Expression {
     private final Expression elseExp;
     private SymbolTable symbolTable;
 
-    public IfElseExpression(Expression test, Expression ifExp, Expression elseExp) {
+    public IfElseExpression(SymbolTable symbolTable, Expression test, Expression ifExp, Expression elseExp) {
+        this.symbolTable = symbolTable;
         this.test = test;
         this.ifExp = ifExp;
         this.elseExp = elseExp;
@@ -67,11 +68,6 @@ public class IfElseExpression implements Expression {
 
         ifExp.semanticCheck(method);
         elseExp.semanticCheck(method);
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

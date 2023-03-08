@@ -2,32 +2,30 @@ package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.PrimitiveTypes.Char;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.List;
 
-public class CharLiteral implements Expression {
+public class ReassignSeqExpression implements Expression {
 
-    private final char value;
     private SymbolTable symbolTable;
 
-    public CharLiteral(SymbolTable symbolTable, char value) {
+    public ReassignSeqExpression(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
-        this.value = value;
     }
 
     @Override
     public List<Type> getTypes() {
-        return List.of(new Char());
+        return null;
     }
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {
+
     }
 
     @Override
-    public String toString() {
-        return String.format("'%c'", value);
+    public List<String> toCode() {
+        return Expression.super.toCode();
     }
 }

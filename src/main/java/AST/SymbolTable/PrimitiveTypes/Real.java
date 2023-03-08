@@ -26,7 +26,7 @@ public class Real implements Type {
     public Expression generateLiteral(SymbolTable symbolTable) {
         double value = GeneratorConfig.getRandom().nextDouble() * MAX_DOUBLE;
         value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
-        return new RealLiteral(value);
+        return new RealLiteral(symbolTable, value);
     }
 
     @Override

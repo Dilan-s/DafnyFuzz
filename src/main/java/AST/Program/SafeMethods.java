@@ -29,20 +29,17 @@ public class SafeMethods {
 
         String p1 = VariableNameGenerator.generateArgumentName(safe_subsequence);
         Variable p1Var = new Variable(p1, new Seq());
-        VariableExpression p1VarExp = new VariableExpression(p1Var);
-        p1VarExp.setSymbolTable(symbolTable);
+        VariableExpression p1VarExp = new VariableExpression(symbolTable,p1Var);
         safe_subsequence.addArgument(p1Var);
 
         String p2 = VariableNameGenerator.generateArgumentName(safe_subsequence);
         Variable p2Var = new Variable(p2, new Int());
-        VariableExpression p2VarExp = new VariableExpression(p2Var);
-        p2VarExp.setSymbolTable(symbolTable);
+        VariableExpression p2VarExp = new VariableExpression(symbolTable,p2Var);
         safe_subsequence.addArgument(p2Var);
 
         String p3 = VariableNameGenerator.generateArgumentName(safe_subsequence);
         Variable p3Var = new Variable(p3, new Int());
-        VariableExpression p3VarExp = new VariableExpression(p3Var);
-        p3VarExp.setSymbolTable(symbolTable);
+        VariableExpression p3VarExp = new VariableExpression(symbolTable,p3Var);
         safe_subsequence.addArgument(p3Var);
 
 
@@ -51,11 +48,9 @@ public class SafeMethods {
 
         String i = VariableNameGenerator.generateVariableValueName(new Int());
         Variable iVar = new Variable(i, new Int());
-        VariableExpression iVarExp = new VariableExpression(iVar);
-        iVarExp.setSymbolTable(symbolTable);
+        VariableExpression iVarExp = new VariableExpression(symbolTable,iVar);
 
-        CallExpression iSafeIndex = new CallExpression(symbolTable.getMethod("safe_index_seq"));
-        iSafeIndex.setSymbolTable(symbolTable);
+        CallExpression iSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"));
         try {
             iSafeIndex.addArg(p1VarExp);
             iSafeIndex.addArg(p2VarExp);
@@ -70,11 +65,9 @@ public class SafeMethods {
 
         String j = VariableNameGenerator.generateVariableValueName(new Int());
         Variable jVar = new Variable(j, new Int());
-        VariableExpression jVarExp = new VariableExpression(jVar);
-        jVarExp.setSymbolTable(symbolTable);
+        VariableExpression jVarExp = new VariableExpression(symbolTable,jVar);
 
-        CallExpression jSafeIndex = new CallExpression(symbolTable.getMethod("safe_index_seq"));
-        jSafeIndex.setSymbolTable(symbolTable);
+        CallExpression jSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"));
         try {
             jSafeIndex.addArg(p1VarExp);
             jSafeIndex.addArg(p3VarExp);
@@ -89,8 +82,7 @@ public class SafeMethods {
         IfElseStatement ifElseStatement = new IfElseStatement(symbolTable);
         statement.addStatement(ifElseStatement);
 
-        OperatorExpression test = new OperatorExpression(BinaryOperator.Less_Than);
-        test.setSymbolTable(symbolTable);
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Less_Than);
         test.addArgument(iVarExp);
         test.addArgument(jVarExp);
         ifElseStatement.setTest(test);
@@ -124,33 +116,26 @@ public class SafeMethods {
         ReturnStatement statement = new ReturnStatement(symbolTable);
         safe_index_seq.setBody(statement);
 
-        VariableExpression p1VarExp = new VariableExpression(p1Var);
-        p1VarExp.setSymbolTable(symbolTable);
+        VariableExpression p1VarExp = new VariableExpression(symbolTable,p1Var);
 
-        VariableExpression p2VarExp = new VariableExpression(p2Var);
-        p2VarExp.setSymbolTable(symbolTable);
+        VariableExpression p2VarExp = new VariableExpression(symbolTable,p2Var);
 
-        OperatorExpression size = new OperatorExpression(UnaryOperator.Cardinality);
-        size.setSymbolTable(symbolTable);
+        OperatorExpression size = new OperatorExpression(symbolTable, UnaryOperator.Cardinality);
         size.addArgument(p1VarExp);
 
-        OperatorExpression ltSize = new OperatorExpression(BinaryOperator.Less_Than);
-        ltSize.setSymbolTable(symbolTable);
+        OperatorExpression ltSize = new OperatorExpression(symbolTable, BinaryOperator.Less_Than);
         ltSize.addArgument(p2VarExp);
         ltSize.addArgument(size);
 
-        OperatorExpression gtZero = new OperatorExpression(BinaryOperator.Less_Than_Or_Equal);
-        gtZero.setSymbolTable(symbolTable);
-        gtZero.addArgument(new IntLiteral(0));
+        OperatorExpression gtZero = new OperatorExpression(symbolTable, BinaryOperator.Less_Than_Or_Equal);
+        gtZero.addArgument(new IntLiteral(symbolTable, 0));
         gtZero.addArgument(p2VarExp);
 
-        OperatorExpression test = new OperatorExpression(BinaryOperator.And);
-        test.setSymbolTable(symbolTable);
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.And);
         test.addArgument(ltSize);
         test.addArgument(gtZero);
 
-        IfElseExpression ifElseExpression = new IfElseExpression(test, p2VarExp, new IntLiteral(0));
-        ifElseExpression.setSymbolTable(symbolTable);
+        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, test, p2VarExp, new IntLiteral(symbolTable, 0));
         statement.addValue(ifElseExpression);
 
         System.out.println(safe_index_seq);
@@ -167,37 +152,29 @@ public class SafeMethods {
         Variable p2Var = new Variable(p2, new Int());
         safe_div.addArgument(p2Var);
 
-        SymbolTable safe_div_symbolTable = safe_div.getSymbolTable();
-        ReturnStatement statement = new ReturnStatement(safe_div_symbolTable);
+        SymbolTable symbolTable = safe_div.getSymbolTable();
+        ReturnStatement statement = new ReturnStatement(symbolTable);
         safe_div.setBody(statement);
 
-        OperatorExpression test = new OperatorExpression(BinaryOperator.Not_Equals);
-        test.setSymbolTable(safe_div_symbolTable);
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals);
 
-        VariableExpression lhsTest = new VariableExpression(p2Var);
-        lhsTest.setSymbolTable(safe_div_symbolTable);
+        VariableExpression lhsTest = new VariableExpression(symbolTable,p2Var);
         test.addArgument(lhsTest);
 
-        IntLiteral rhsTest = new IntLiteral(0);
-        rhsTest.setSymbolTable(safe_div_symbolTable);
+        IntLiteral rhsTest = new IntLiteral(symbolTable, 0);
         test.addArgument(rhsTest);
 
-        OperatorExpression ifDiv = new OperatorExpression(BinaryOperator.Divide, false);
-        ifDiv.setSymbolTable(safe_div_symbolTable);
+        OperatorExpression ifDiv = new OperatorExpression(symbolTable, BinaryOperator.Divide, false);
 
-        VariableExpression lhsIf = new VariableExpression(p1Var);
-        lhsIf.setSymbolTable(safe_div_symbolTable);
+        VariableExpression lhsIf = new VariableExpression(symbolTable,p1Var);
         ifDiv.addArgument(lhsIf);
 
-        VariableExpression rhsIf = new VariableExpression(p2Var);
-        rhsIf.setSymbolTable(safe_div_symbolTable);
+        VariableExpression rhsIf = new VariableExpression(symbolTable,p2Var);
         ifDiv.addArgument(rhsIf);
 
-        Expression elseDiv = new VariableExpression(p1Var);
-        elseDiv.setSymbolTable(safe_div_symbolTable);
+        Expression elseDiv = new VariableExpression(symbolTable,p1Var);
 
-        IfElseExpression expression = new IfElseExpression(test, ifDiv, elseDiv);
-        expression.setSymbolTable(safe_div_symbolTable);
+        IfElseExpression expression = new IfElseExpression(symbolTable, test, ifDiv, elseDiv);
         statement.addValue(expression);
 
         System.out.println(safe_div);
@@ -214,37 +191,29 @@ public class SafeMethods {
         Variable p2Var = new Variable(p2, new Int());
         safe_mod.addArgument(p2Var);
 
-        SymbolTable safe_mod_symbolTable = safe_mod.getSymbolTable();
-        ReturnStatement statement = new ReturnStatement(safe_mod_symbolTable);
+        SymbolTable symbolTable = safe_mod.getSymbolTable();
+        ReturnStatement statement = new ReturnStatement(symbolTable);
         safe_mod.setBody(statement);
 
-        OperatorExpression test = new OperatorExpression(BinaryOperator.Not_Equals);
-        test.setSymbolTable(safe_mod_symbolTable);
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals);
 
-        VariableExpression lhsTest = new VariableExpression(p2Var);
-        lhsTest.setSymbolTable(safe_mod_symbolTable);
+        VariableExpression lhsTest = new VariableExpression(symbolTable,p2Var);
         test.addArgument(lhsTest);
 
-        IntLiteral rhsTest = new IntLiteral(0);
-        rhsTest.setSymbolTable(safe_mod_symbolTable);
+        IntLiteral rhsTest = new IntLiteral(symbolTable, 0);
         test.addArgument(rhsTest);
 
-        OperatorExpression ifDiv = new OperatorExpression(BinaryOperator.Modulus, false);
-        ifDiv.setSymbolTable(safe_mod_symbolTable);
+        OperatorExpression ifDiv = new OperatorExpression(symbolTable, BinaryOperator.Modulus, false);
 
-        VariableExpression lhsIf = new VariableExpression(p1Var);
-        lhsIf.setSymbolTable(safe_mod_symbolTable);
+        VariableExpression lhsIf = new VariableExpression(symbolTable,p1Var);
         ifDiv.addArgument(lhsIf);
 
-        VariableExpression rhsIf = new VariableExpression(p2Var);
-        rhsIf.setSymbolTable(safe_mod_symbolTable);
+        VariableExpression rhsIf = new VariableExpression(symbolTable,p2Var);
         ifDiv.addArgument(rhsIf);
 
-        Expression elseDiv = new VariableExpression(p1Var);
-        elseDiv.setSymbolTable(safe_mod_symbolTable);
+        Expression elseDiv = new VariableExpression(symbolTable,p1Var);
 
-        IfElseExpression expression = new IfElseExpression(test, ifDiv, elseDiv);
-        expression.setSymbolTable(safe_mod_symbolTable);
+        IfElseExpression expression = new IfElseExpression(symbolTable, test, ifDiv, elseDiv);
         statement.addValue(expression);
 
         System.out.println(safe_mod);

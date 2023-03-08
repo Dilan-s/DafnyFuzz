@@ -17,7 +17,8 @@ public class SeqLiteral implements Expression {
     private final List<Expression> values;
     private SymbolTable symbolTable;
 
-    public SeqLiteral(Type type) {
+    public SeqLiteral(SymbolTable symbolTable, Type type) {
+        this.symbolTable = symbolTable;
         this.type = type;
         this.values = new ArrayList<>();
     }
@@ -41,11 +42,6 @@ public class SeqLiteral implements Expression {
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

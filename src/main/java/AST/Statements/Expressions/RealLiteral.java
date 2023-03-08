@@ -13,7 +13,7 @@ public class RealLiteral implements Expression {
     private final double value;
     private SymbolTable symbolTable;
 
-    public RealLiteral(double value) {
+    public RealLiteral(SymbolTable symbolTable, double value) {
         this.value = value;
     }
 
@@ -24,11 +24,6 @@ public class RealLiteral implements Expression {
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

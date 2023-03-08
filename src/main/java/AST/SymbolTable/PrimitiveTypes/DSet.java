@@ -57,7 +57,7 @@ public class DSet implements Type {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
-        DSetLiteral expression = new DSetLiteral(type);
+        DSetLiteral expression = new DSetLiteral(symbolTable, type);
         for (int i = 0; i < noOfElems; i++) {
             expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
         }

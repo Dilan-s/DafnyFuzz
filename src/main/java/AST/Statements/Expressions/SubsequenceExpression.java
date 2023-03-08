@@ -24,19 +24,19 @@ public class SubsequenceExpression implements Expression {
     private Variable loVar;
     private Variable hiVar;
 
-    public SubsequenceExpression(Expression seq) {
+    public SubsequenceExpression(SymbolTable symbolTable, Expression seq) {
+        this.symbolTable = symbolTable;
         this.seq = seq;
     }
 
     public void addIndexes(Expression i) {
-        addIndexes(i, new IntLiteral(0));
+        addIndexes(i, new IntLiteral(symbolTable, 0));
     }
 
     public void addIndexes(Expression i, Expression j) {
         Type seqType = seq.getTypes().get(0);
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqType), seqType);
-        VariableExpression seqVarExp = new VariableExpression(seqVar);
-        seqVarExp.setSymbolTable(symbolTable);
+        VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
 
         statSeq = new AssignmentStatement(symbolTable);
         statSeq.addAssignment(List.of(seqVar), seq);
@@ -45,8 +45,7 @@ public class SubsequenceExpression implements Expression {
         this.loVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
         this.hiVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
 
-        CallExpression expr = new CallExpression(symbolTable.getMethod("safe_subsequence"));
-        expr.setSymbolTable(symbolTable);
+        CallExpression expr = new CallExpression(symbolTable, symbolTable.getMethod("safe_subsequence"));
         try {
             expr.addArg(seqVarExp);
             expr.addArg(i);
@@ -68,11 +67,6 @@ public class SubsequenceExpression implements Expression {
     @Override
     public void semanticCheck(Method method) throws SemanticException {
 
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

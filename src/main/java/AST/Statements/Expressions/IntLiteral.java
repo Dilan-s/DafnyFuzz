@@ -13,13 +13,14 @@ public class IntLiteral implements Expression {
     private final boolean asHex;
     private SymbolTable symbolTable;
 
-    public IntLiteral(int value, boolean asHex) {
+    public IntLiteral(SymbolTable symbolTable, int value, boolean asHex) {
+        this.symbolTable = symbolTable;
         this.value = value;
         this.asHex = asHex;
     }
 
-    public IntLiteral(int value) {
-        this(value, false);
+    public IntLiteral(SymbolTable symbolTable, int value) {
+        this(symbolTable, value, false);
     }
 
 
@@ -30,11 +31,6 @@ public class IntLiteral implements Expression {
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

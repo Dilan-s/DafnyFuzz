@@ -12,7 +12,8 @@ public class VariableExpression implements Expression {
     private Variable variable;
     private SymbolTable symbolTable;
 
-    public VariableExpression(Variable variable) {
+    public VariableExpression(SymbolTable symbolTable, Variable variable) {
+        this.symbolTable = symbolTable;
         this.variable = variable;
     }
 
@@ -28,11 +29,6 @@ public class VariableExpression implements Expression {
             throw new SemanticException(
                 String.format("Variable with name %s does not exist", variable.getName()));
         }
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

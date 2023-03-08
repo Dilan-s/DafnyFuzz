@@ -13,8 +13,6 @@ public interface Expression {
 
     void semanticCheck(Method method) throws SemanticException;
 
-    void setSymbolTable(SymbolTable symbolTable);
-
     default boolean isValidReturn() {
         return true;
     }

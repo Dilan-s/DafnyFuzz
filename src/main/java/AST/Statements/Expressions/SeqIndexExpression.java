@@ -23,30 +23,27 @@ public class SeqIndexExpression implements Expression {
     private Expression seq;
     private Variable seqVar;
 
-    private Expression index;
     private Variable indVar;
 
+    public SeqIndexExpression(SymbolTable symbolTable) {
+        this.symbolTable = symbolTable;
+    }
 
     public void setSeqAndInd(Expression seq, Expression index) {
         this.seq = seq;
         Type type = seq.getTypes().get(0);
 
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(type), type);
-        VariableExpression seqVarExp = new VariableExpression(seqVar);
-        seqVarExp.setSymbolTable(symbolTable);
+        VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
 
         asStatSeq = new AssignmentStatement(symbolTable);
         asStatSeq.addAssignment(List.of(seqVar), seq);
         asStatSeq.addAssignmentsToSymbolTable();
 
-
-        this.index = index;
-
         indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
 
         asStatInd = new AssignmentStatement(symbolTable);
-        CallExpression callExp = new CallExpression(symbolTable.getMethod("safe_index_seq"));
-        callExp.setSymbolTable(symbolTable);
+        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"));
         try {
             callExp.addArg(seqVarExp);
             callExp.addArg(index);
@@ -68,11 +65,6 @@ public class SeqIndexExpression implements Expression {
     @Override
     public void semanticCheck(Method method) throws SemanticException {
 
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

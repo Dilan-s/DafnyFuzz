@@ -12,7 +12,8 @@ public class BoolLiteral implements Expression {
     private final boolean value;
     private SymbolTable symbolTable;
 
-    public BoolLiteral(boolean value) {
+    public BoolLiteral(SymbolTable symbolTable, boolean value) {
+        this.symbolTable = symbolTable;
         this.value = value;
     }
 
@@ -23,11 +24,6 @@ public class BoolLiteral implements Expression {
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {
-    }
-
-    @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
     }
 
     @Override

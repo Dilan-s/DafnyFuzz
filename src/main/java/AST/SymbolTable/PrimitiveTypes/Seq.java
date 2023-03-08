@@ -71,7 +71,7 @@ public class Seq implements Type {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
-        SeqLiteral expression = new SeqLiteral(this);
+        SeqLiteral expression = new SeqLiteral(symbolTable,this);
         for (int i = 0; i < length; i++) {
             expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
         }

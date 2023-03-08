@@ -24,7 +24,6 @@ public class ReturnStatement implements Statement {
     }
 
     public void addValue(Expression expression) {
-        expression.setSymbolTable(symbolTable);
         values.add(expression);
     }
 

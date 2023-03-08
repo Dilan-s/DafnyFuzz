@@ -24,7 +24,8 @@ public class OperatorExpression implements Expression {
     private Optional<Expression> replacementExpression;
     private SymbolTable symbolTable;
 
-    public OperatorExpression(Operator operator) {
+    public OperatorExpression(SymbolTable symbolTable, Operator operator) {
+        this.symbolTable = symbolTable;
         this.replacementExpression = Optional.empty();
         this.operator = operator;
         this.convertToCall = true;
@@ -32,9 +33,8 @@ public class OperatorExpression implements Expression {
         this.args = new ArrayList<>();
     }
 
-    public OperatorExpression(Operator operator,
-        boolean convertToCall) {
-        this(operator);
+    public OperatorExpression(SymbolTable symbolTable, Operator operator, boolean convertToCall) {
+        this(symbolTable, operator);
         this.convertToCall = convertToCall;
     }
 
@@ -60,11 +60,6 @@ public class OperatorExpression implements Expression {
     }
 
     @Override
-    public void setSymbolTable(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
-    }
-
-    @Override
     public String toString() {
         if (replacementExpression.isPresent()) {
             return replacementExpression.get().toString();
@@ -77,9 +72,7 @@ public class OperatorExpression implements Expression {
         List<String> code = new ArrayList<>();
 
         if (convertToCall && operator.equals(BinaryOperator.Divide)) {
-            CallExpression safe_division = new CallExpression(
-                symbolTable.getMethod("safe_division"));
-            safe_division.setSymbolTable(symbolTable);
+            CallExpression safe_division = new CallExpression(symbolTable, symbolTable.getMethod("safe_division"));
             try {
                 safe_division.addArg(args);
             } catch (InvalidArgumentException e) {
@@ -88,8 +81,7 @@ public class OperatorExpression implements Expression {
             replacementExpression = Optional.of(safe_division);
             return safe_division.toCode();
         } else if (convertToCall && operator.equals(BinaryOperator.Modulus)) {
-            CallExpression safe_modulus = new CallExpression(symbolTable.getMethod("safe_modulus"));
-            safe_modulus.setSymbolTable(symbolTable);
+            CallExpression safe_modulus = new CallExpression(symbolTable, symbolTable.getMethod("safe_modulus"));
             try {
                 safe_modulus.addArg(args);
             } catch (InvalidArgumentException e) {
