@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 public enum UnaryOperator implements Operator {
-    Cardinality("|%s|", List.of(Args.SEQ, Args.DSET), new Int()) {
+    Cardinality("|%s|", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Int()) {
         @Override
         public String formExpression(List<Expression> args) {
             String res = args.get(0).toString();

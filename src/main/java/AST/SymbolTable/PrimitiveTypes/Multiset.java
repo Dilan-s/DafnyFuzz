@@ -2,49 +2,49 @@ package AST.SymbolTable.PrimitiveTypes;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
-import AST.Generator.RandomStatementGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Statements.Expressions.DSetLiteral;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.MultisetLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
-import java.util.Random;
 
-public class DSet implements Type {
+public class Multiset implements Type {
 
-    public static final int MAX_SIZE_OF_SET = 10;
+    public static final int MAX_SIZE_OF_MULTISET = 10;
+    public static final double PROB_USE_DSET = 0.3;
+    public static final double PROB_USE_SEQ = PROB_USE_DSET + 0.3;
     private Type type;
 
-    public DSet(Type type) {
+    public Multiset(Type type) {
         this.type = type;
     }
 
-    public DSet() {
+    public Multiset() {
         this(null);
     }
 
     @Override
     public String getName() {
-        return String.format("set");
+        return String.format("multiset");
     }
 
     @Override
     public String getTypeIndicatorString() {
-        return String.format(": set<%s>", type.getName());
+        return String.format(": multiset<%s>", type.getName());
     }
 
     @Override
     public Type setInnerType(Type type) {
-        return new DSet(type);
+        return new Multiset(type);
     }
 
     @Override
     public boolean isSameType(Type other) {
-        if (!(other instanceof DSet)) {
+        if (!(other instanceof Multiset)) {
             return false;
         }
 
-        DSet dsetOther = (DSet) other;
+        Multiset dsetOther = (Multiset) other;
 
         if (type == null || dsetOther.type == null) {
             return true;
@@ -59,12 +59,20 @@ public class DSet implements Type {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
             type = typeGenerator.generateNonCollectionType(1, symbolTable);
         }
+        MultisetLiteral expression = new MultisetLiteral(symbolTable, this);
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
-
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
-        DSetLiteral expression = new DSetLiteral(symbolTable, type);
-        for (int i = 0; i < noOfElems; i++) {
-            expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
+        double probType = GeneratorConfig.getRandom().nextDouble();
+        if (probType < PROB_USE_DSET) {
+            Expression exp = expressionGenerator.generateExpression(new DSet(type), symbolTable);
+            expression.setCollection(exp);
+        } else if (probType < PROB_USE_SEQ) {
+            Expression exp = expressionGenerator.generateExpression(new Seq(type), symbolTable);
+            expression.setCollection(exp);
+        } else {
+            int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET) + 1;
+            for (int i = 0; i < noOfElems; i++) {
+                expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
+            }
         }
         return expression;
     }

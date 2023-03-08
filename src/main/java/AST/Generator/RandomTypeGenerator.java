@@ -4,6 +4,7 @@ import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.PrimitiveTypes.Char;
 import AST.SymbolTable.PrimitiveTypes.DSet;
 import AST.SymbolTable.PrimitiveTypes.Int;
+import AST.SymbolTable.PrimitiveTypes.Multiset;
 import AST.SymbolTable.PrimitiveTypes.Real;
 import AST.SymbolTable.PrimitiveTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -33,6 +34,7 @@ public class RandomTypeGenerator {
             List<Type> collections = new ArrayList<>();
             collections.addAll(option.stream().map(DSet::new).collect(Collectors.toList()));
             collections.addAll(option.stream().map(Seq::new).collect(Collectors.toList()));
+            collections.addAll(option.stream().map(Multiset::new).collect(Collectors.toList()));
             option.addAll(collections);
         }
         for (int i = 0; i < noOfTypes; i++) {

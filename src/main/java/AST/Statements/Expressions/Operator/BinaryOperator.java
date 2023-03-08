@@ -8,6 +8,7 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.PrimitiveTypes.DSet;
 import AST.SymbolTable.PrimitiveTypes.Int;
+import AST.SymbolTable.PrimitiveTypes.Multiset;
 import AST.SymbolTable.PrimitiveTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
@@ -21,19 +22,19 @@ public enum BinaryOperator implements Operator {
     ReverseImplies("<==", List.of(Args.BOOL_BOOL), new Bool()),
     And("&&", List.of(Args.BOOL_BOOL), new Bool()),
     Or("||", List.of(Args.BOOL_BOOL), new Bool()),
-    Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.SEQ_SEQ), new Bool()),
-    Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.SEQ_SEQ), new Bool()),
-    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.SEQ_SEQ), new Bool()),
-    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.SEQ_SEQ), new Bool()),
-    Greater_Than(">", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET), new Bool()),
-    Greater_Than_Or_Equal(">=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET), new Bool()),
+    Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()),
+    Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()),
+    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()),
+    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()),
+    Greater_Than(">", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()),
+    Greater_Than_Or_Equal(">=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()),
     Plus("+", List.of(Args.INT_INT), new Int()),
     Minus("-", List.of(Args.INT_INT), new Int()),
     Times("*", List.of(Args.INT_INT), new Int()),
     Divide("/", List.of(Args.INT_INT), new Int()),
     Modulus("%", List.of(Args.INT_INT), new Int()),
-    Disjoint("!!", List.of(Args.DSET_DSET), new Bool()),
-    Union("+", List.of(Args.DSET_DSET), List.of(new DSet(), new Seq())) {
+    Disjoint("!!", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()),
+    Union("+", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Seq(), new Multiset())) {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
@@ -44,7 +45,7 @@ public enum BinaryOperator implements Operator {
             return ret;
         }
     },
-    Difference("-", List.of(Args.DSET_DSET), new DSet()) {
+    Difference("-", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
@@ -55,7 +56,7 @@ public enum BinaryOperator implements Operator {
             return ret;
         }
     },
-    Intersection("*", List.of(Args.DSET_DSET), new DSet()) {
+    Intersection("*", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
@@ -66,7 +67,7 @@ public enum BinaryOperator implements Operator {
             return ret;
         }
     },
-    Membership("in", List.of(Args.SEQ, Args.DSET), new Bool()) {
+    Membership("in", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Bool()) {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
@@ -78,7 +79,7 @@ public enum BinaryOperator implements Operator {
             return ret;
         }
     },
-    NotMembership("!in", List.of(Args.SEQ, Args.DSET), new Bool()) {
+    NotMembership("!in", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Bool()) {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
