@@ -3,6 +3,7 @@ package AST.SymbolTable.PrimitiveTypes;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomStatementGenerator;
+import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.SeqLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -68,6 +69,10 @@ public class Seq implements Type {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
+        if (type == null) {
+            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+            type = typeGenerator.generateNonCollectionType(1, symbolTable);
+        }
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
