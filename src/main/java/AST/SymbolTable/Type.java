@@ -3,7 +3,6 @@ package AST.SymbolTable;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import java.util.Random;
 
 public interface Type extends Identifier {
 
@@ -36,5 +35,9 @@ public interface Type extends Identifier {
 
     default Type getInnerType() {
         return null;
+    }
+
+    default Type concrete(SymbolTable symbolTable) {
+        return this;
     }
 }

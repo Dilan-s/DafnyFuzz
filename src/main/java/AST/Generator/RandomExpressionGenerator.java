@@ -201,8 +201,8 @@ public class RandomExpressionGenerator {
         while (i < argTypes.size()) {
             Type t = argTypes.get(i);
             try {
-
-                Expression exp = generateExpression(t, symbolTable);
+                Type concrete = t.concrete(symbolTable);
+                Expression exp = generateExpression(concrete, symbolTable);
                 expression.addArg(exp);
                 i++;
             } catch (InvalidArgumentException e) {

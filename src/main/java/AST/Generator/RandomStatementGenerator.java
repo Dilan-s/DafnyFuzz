@@ -152,7 +152,8 @@ public class RandomStatementGenerator {
             }
         }
         for (Type t : returnTypes) {
-            Expression expression = expressionGenerator.generateExpression(t, symbolTable);
+            Type concrete = t.concrete(symbolTable);
+            Expression expression = expressionGenerator.generateExpression(concrete, symbolTable);
             statement.addAssignment(expression);
         }
 

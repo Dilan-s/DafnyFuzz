@@ -55,10 +55,6 @@ public class DSet implements Type {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        if (type == null) {
-            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            type = typeGenerator.generateNonCollectionType(1, symbolTable);
-        }
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
@@ -68,6 +64,17 @@ public class DSet implements Type {
         }
         return expression;
     }
+
+    @Override
+    public Type concrete(SymbolTable symbolTable) {
+        if (type == null) {
+            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+            Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
+            return new DSet(t);
+        }
+        return this;
+    }
+
 
     @Override
     public boolean operatorExists() {

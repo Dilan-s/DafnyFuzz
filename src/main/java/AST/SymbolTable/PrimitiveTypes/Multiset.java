@@ -55,10 +55,6 @@ public class Multiset implements Type {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        if (type == null) {
-            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            type = typeGenerator.generateNonCollectionType(1, symbolTable);
-        }
         MultisetLiteral expression = new MultisetLiteral(symbolTable, this);
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         double probType = GeneratorConfig.getRandom().nextDouble();
@@ -76,6 +72,17 @@ public class Multiset implements Type {
         }
         return expression;
     }
+
+    @Override
+    public Type concrete(SymbolTable symbolTable) {
+        if (type == null) {
+            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+            Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
+            return new Multiset(t);
+        }
+        return this;
+    }
+
 
     @Override
     public boolean operatorExists() {
