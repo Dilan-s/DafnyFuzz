@@ -18,14 +18,16 @@ import java.util.spi.AbstractResourceBundleProvider;
 
 public class RandomStatementGenerator {
 
-    public static final double PROB_RETURN_STAT = 0.35;
-    public static final double PROB_ASSIGN_STAT = PROB_RETURN_STAT + 0.3;
+    public static final double PROB_RETURN_STAT = 0.4;
+    public static final double PROB_ASSIGN_STAT = PROB_RETURN_STAT + 0.2;
     public static final double PROB_PRINT_STAT = PROB_ASSIGN_STAT + 0.2;
-    public static final double PROB_IF_ELSE_STAT = PROB_PRINT_STAT + 0.15;
+    public static final double PROB_IF_ELSE_STAT = PROB_PRINT_STAT + 0.2;
+
     public static final double PROB_METHOD_ASSIGN = 0.05;
     public static final double PROB_ELSE_STAT = 0.5;
 
     public static final int MAX_STATEMENT_DEPTH = 7;
+    public static final double PROB_NEXT_STAT = 0.85;
 
     private static int statementDepth = 0;
 
@@ -36,7 +38,7 @@ public class RandomStatementGenerator {
         double probContinue = GeneratorConfig.getRandom().nextDouble();
         boolean hasReturn = method.hasReturn();
         Statement statement = null;
-        while (probContinue < 0.9 || hasReturn) {
+        while (probContinue < PROB_NEXT_STAT || hasReturn) {
             statement = generateStatement(method, body.getSymbolTable());
             body.addStatement(statement);
             if (statement.isReturn()) {

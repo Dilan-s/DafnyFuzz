@@ -40,6 +40,7 @@ public class AssignmentStatement implements Statement {
     public void addAssignmentsToSymbolTable() {
         for (Variable variable : variables) {
             symbolTable.addVariable(variable);
+            variable.setDeclared();
         }
     }
 

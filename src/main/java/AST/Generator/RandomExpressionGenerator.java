@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 
 public class RandomExpressionGenerator {
 
-    public static final double PROB_LITERAL_EXPRESSION = 0.3;
-    public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.4;
-    public static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.1;
+    public static final double PROB_LITERAL_EXPRESSION = 0.2;
+    public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.3;
+    public static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.3;
     public static final double PROB_SEQ_INDEX_EXPRESSION = PROB_VARIABLE_EXPRESSION + 0.03;
     public static final double PROB_SUBSEQUENCE_EXPRESSION = PROB_SEQ_INDEX_EXPRESSION + 0.03;
     public static final double PROB_REASSIGN_SEQ_EXPRESSION = PROB_SUBSEQUENCE_EXPRESSION + 0.03;

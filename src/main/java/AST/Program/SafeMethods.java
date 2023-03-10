@@ -61,6 +61,7 @@ public class SafeMethods {
         AssignmentStatement asI = new AssignmentStatement(symbolTable);
         statement.addStatement(asI);
         asI.addAssignment(List.of(iVar), iSafeIndex);
+        asI.addAssignmentsToSymbolTable();
 
 
         String j = VariableNameGenerator.generateVariableValueName(new Int());
@@ -78,6 +79,7 @@ public class SafeMethods {
         AssignmentStatement asJ = new AssignmentStatement(symbolTable);
         statement.addStatement(asJ);
         asJ.addAssignment(List.of(jVar), jSafeIndex);
+        asJ.addAssignmentsToSymbolTable();
 
         IfElseStatement ifElseStatement = new IfElseStatement(symbolTable);
         statement.addStatement(ifElseStatement);

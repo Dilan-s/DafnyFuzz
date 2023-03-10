@@ -96,6 +96,7 @@ public class CallExpression implements Expression {
 
         CallMethodExpression callMethodExpression = new CallMethodExpression(method, variables);
         stat.addAssignment(assignedVariables, callMethodExpression);
+        stat.addAssignmentsToSymbolTable();
 
         assignments.add(stat);
 
