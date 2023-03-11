@@ -25,19 +25,12 @@ public interface Type extends Identifier {
         return true;
     }
 
+    default Type concrete(SymbolTable symbolTable) {
+        return this;
+    }
+
     default boolean isCollection() {
         return false;
     }
 
-    default Type setInnerType(Type type) {
-        return null;
-    }
-
-    default Type getInnerType() {
-        return null;
-    }
-
-    default Type concrete(SymbolTable symbolTable) {
-        return this;
-    }
 }

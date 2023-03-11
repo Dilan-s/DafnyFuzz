@@ -1,14 +1,15 @@
-package AST.SymbolTable.PrimitiveTypes;
+package AST.SymbolTable.DCollectionTypes;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.SeqLiteral;
+import AST.SymbolTable.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 
-public class Seq implements Type {
+public class Seq implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 10;
     private Type type;
@@ -29,7 +30,7 @@ public class Seq implements Type {
 
     @Override
     public String getName() {
-        return String.format("seq");
+        return "seq";
     }
 
     @Override

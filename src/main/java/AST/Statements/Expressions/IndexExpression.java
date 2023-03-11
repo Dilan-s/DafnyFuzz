@@ -4,6 +4,7 @@ import AST.Errors.InvalidArgumentException;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.SymbolTable.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class SeqIndexExpression implements Expression {
+public class IndexExpression implements Expression {
 
     private AssignmentStatement asStatSeq;
     private AssignmentStatement asStatInd;
@@ -25,13 +26,14 @@ public class SeqIndexExpression implements Expression {
 
     private Variable indVar;
 
-    public SeqIndexExpression(SymbolTable symbolTable) {
+    public IndexExpression(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
     }
 
     public void setSeqAndInd(Expression seq, Expression index) {
         this.seq = seq;
-        Type type = seq.getTypes().get(0);
+        DCollection type = (DCollection) seq.getTypes().get(0);
+//        Type type = seq.getTypes().get(0);
 
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(type), type);
         VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
@@ -43,7 +45,7 @@ public class SeqIndexExpression implements Expression {
         indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
 
         asStatInd = new AssignmentStatement(symbolTable);
-        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"));
+        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod(String.format("safe_index_%s", type.getName())));
         try {
             callExp.addArg(seqVarExp);
             callExp.addArg(index);
@@ -57,7 +59,9 @@ public class SeqIndexExpression implements Expression {
     @Override
     public List<Type> getTypes() {
         return seq.getTypes().stream()
-            .map(Type::getInnerType)
+            .filter(Type::isCollection)
+            .map(x -> (DCollection) x)
+            .map(DCollection::getInnerType)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }

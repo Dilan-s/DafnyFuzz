@@ -10,12 +10,12 @@ import AST.Statements.Expressions.Operator.Operator;
 import AST.Statements.Expressions.Operator.UnaryOperator;
 import AST.Statements.Expressions.OperatorExpression;
 import AST.Statements.Expressions.ReassignSeqExpression;
-import AST.Statements.Expressions.SeqIndexExpression;
+import AST.Statements.Expressions.IndexExpression;
 import AST.Statements.Expressions.SubsequenceExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
-import AST.SymbolTable.PrimitiveTypes.Seq;
+import AST.SymbolTable.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
@@ -112,13 +112,13 @@ public class RandomExpressionGenerator {
     }
 
 
-    private SeqIndexExpression generateSeqIndexExpression(Type type, SymbolTable symbolTable) {
+    private IndexExpression generateSeqIndexExpression(Type type, SymbolTable symbolTable) {
         Seq t = new Seq(type);
         Expression seq = t.generateLiteral(symbolTable);
 
         IntLiteral ind = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
 
-        SeqIndexExpression expression = new SeqIndexExpression(symbolTable);
+        IndexExpression expression = new IndexExpression(symbolTable);
         expression.setSeqAndInd(seq, ind);
         return expression;
     }

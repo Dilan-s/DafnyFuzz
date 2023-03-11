@@ -1,16 +1,15 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
-import AST.Generator.RandomStatementGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
+import AST.SymbolTable.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public enum UnaryOperator implements Operator {
     Cardinality("|%s|", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Int()) {
@@ -26,7 +25,8 @@ public enum UnaryOperator implements Operator {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
             Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
             List<Type> ret = new ArrayList<>();
-            ret.add(types.get(0).setInnerType(t));
+            DCollection collection = (DCollection) types.get(0);
+            ret.add(collection.setInnerType(t));
             return ret;
         }
     },

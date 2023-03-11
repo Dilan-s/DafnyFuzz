@@ -16,7 +16,7 @@ import AST.Statements.IfElseStatement;
 import AST.Statements.ReturnStatement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Int;
-import AST.SymbolTable.PrimitiveTypes.Seq;
+import AST.SymbolTable.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Variable;
 import java.util.List;

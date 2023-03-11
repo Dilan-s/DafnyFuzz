@@ -1,14 +1,15 @@
-package AST.SymbolTable.PrimitiveTypes;
+package AST.SymbolTable.DCollectionTypes;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.MultisetLiteral;
+import AST.SymbolTable.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 
-public class Multiset implements Type {
+public class Multiset implements DCollection {
 
     public static final int MAX_SIZE_OF_MULTISET = 10;
     public static final double PROB_USE_DSET = 0.3;
@@ -25,7 +26,7 @@ public class Multiset implements Type {
 
     @Override
     public String getName() {
-        return String.format("multiset");
+        return "multiset";
     }
 
     @Override
@@ -36,6 +37,11 @@ public class Multiset implements Type {
     @Override
     public Type setInnerType(Type type) {
         return new Multiset(type);
+    }
+
+    @Override
+    public Type getInnerType() {
+        return type;
     }
 
     @Override

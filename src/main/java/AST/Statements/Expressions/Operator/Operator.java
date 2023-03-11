@@ -1,16 +1,15 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
-import AST.Generator.RandomStatementGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
+import AST.SymbolTable.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 public interface Operator {
@@ -87,7 +86,8 @@ public interface Operator {
         List<Type> ret = new ArrayList<>();
         for (Type type: types) {
             if (type.isCollection()) {
-                ret.add(type.setInnerType(t));
+                DCollection collection = (DCollection) type;
+                ret.add(collection.setInnerType(t));
             } else {
                 ret.add(type);
             }

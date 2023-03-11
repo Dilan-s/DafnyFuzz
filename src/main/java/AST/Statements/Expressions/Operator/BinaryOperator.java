@@ -1,20 +1,19 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
-import AST.Generator.RandomStatementGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
+import AST.SymbolTable.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
-import AST.SymbolTable.PrimitiveTypes.DSet;
+import AST.SymbolTable.DCollectionTypes.DSet;
 import AST.SymbolTable.PrimitiveTypes.Int;
-import AST.SymbolTable.PrimitiveTypes.Multiset;
-import AST.SymbolTable.PrimitiveTypes.Seq;
+import AST.SymbolTable.DCollectionTypes.Multiset;
+import AST.SymbolTable.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public enum BinaryOperator implements Operator {
     Equivalence("<==>", List.of(Args.BOOL_BOOL), new Bool()),
@@ -75,7 +74,8 @@ public enum BinaryOperator implements Operator {
             Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
-            ret.add(types.get(0).setInnerType(t));
+            DCollection collection = (DCollection) types.get(0);
+            ret.add(collection.setInnerType(t));
             return ret;
         }
     },
@@ -87,7 +87,8 @@ public enum BinaryOperator implements Operator {
             Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
-            ret.add(types.get(0).setInnerType(t));
+            DCollection collection = (DCollection) types.get(0);
+            ret.add(collection.setInnerType(t));
             return ret;
         }
     },

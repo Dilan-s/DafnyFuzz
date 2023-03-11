@@ -2,11 +2,11 @@ package AST.Statements.Expressions.Operator;
 
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.PrimitiveTypes.Char;
-import AST.SymbolTable.PrimitiveTypes.DSet;
+import AST.SymbolTable.DCollectionTypes.DSet;
 import AST.SymbolTable.PrimitiveTypes.Int;
-import AST.SymbolTable.PrimitiveTypes.Multiset;
+import AST.SymbolTable.DCollectionTypes.Multiset;
 import AST.SymbolTable.PrimitiveTypes.Real;
-import AST.SymbolTable.PrimitiveTypes.Seq;
+import AST.SymbolTable.DCollectionTypes.Seq;
 import AST.SymbolTable.Type;
 import java.util.List;
 

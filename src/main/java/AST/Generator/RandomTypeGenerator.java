@@ -1,12 +1,13 @@
 package AST.Generator;
 
+import AST.SymbolTable.DCollectionTypes.DArray;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.PrimitiveTypes.Char;
-import AST.SymbolTable.PrimitiveTypes.DSet;
+import AST.SymbolTable.DCollectionTypes.DSet;
 import AST.SymbolTable.PrimitiveTypes.Int;
-import AST.SymbolTable.PrimitiveTypes.Multiset;
+import AST.SymbolTable.DCollectionTypes.Multiset;
 import AST.SymbolTable.PrimitiveTypes.Real;
-import AST.SymbolTable.PrimitiveTypes.Seq;
+import AST.SymbolTable.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class RandomTypeGenerator {
             collections.addAll(option.stream().map(DSet::new).collect(Collectors.toList()));
             collections.addAll(option.stream().map(Seq::new).collect(Collectors.toList()));
             collections.addAll(option.stream().map(Multiset::new).collect(Collectors.toList()));
+            collections.addAll(option.stream().map(DArray::new).collect(Collectors.toList()));
             option.addAll(collections);
         }
         for (int i = 0; i < noOfTypes; i++) {

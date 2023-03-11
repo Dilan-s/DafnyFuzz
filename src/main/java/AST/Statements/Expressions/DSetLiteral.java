@@ -2,8 +2,7 @@ package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.PrimitiveTypes.Char;
-import AST.SymbolTable.PrimitiveTypes.DSet;
+import AST.SymbolTable.DCollectionTypes.DSet;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import java.util.ArrayList;
