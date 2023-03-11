@@ -23,6 +23,7 @@ mkdir outputs || true
 mkdir errors || true
 mkdir tests || true
 
+t=180
 x=1
 while [ true ]; do
 
@@ -37,10 +38,10 @@ while [ true ]; do
   rm -rf outputs/* || true
   echo "Test number $x"
 
-  timeout 100 java -cp out/ Main.GenerateProgram $x > test.dfy
-  if [ $? -eq 124 ]
+  timeout $t java -cp out/ Main.GenerateProgram $x > test.dfy
+  if [ $? -ne 0 ]
   then
-    echo "Failed to create dafny file in 100 seconds"
+    echo "Failed to create dafny file in $t seconds"
     x=$(( $x + 1 ))
     continue;
   fi
@@ -50,10 +51,10 @@ while [ true ]; do
 
   # GO
   touch outputs/output-go.txt
-  timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
   if [ $? -eq 124 ]
   then
-    echo "Failed to convert to GO in 100 seconds"
+    echo "Failed to convert to GO in $t seconds"
     x=$(( $x + 1 ))
     continue;
   fi
@@ -80,10 +81,10 @@ while [ true ]; do
 
   # js
   touch outputs/output-js.txt
-  timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /spillTargetCode:3 test.dfy > tmp.txt 2>&1
   if [ $? -eq 124 ]
   then
-    echo "Failed to convert to JS in 100 seconds"
+    echo "Failed to convert to JS in $t seconds"
     x=$(( $x + 1 ))
     continue;
   fi
@@ -92,10 +93,10 @@ while [ true ]; do
 
   # java
   touch outputs/output-java.txt
-  timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /spillTargetCode:3 test.dfy > tmp.txt 2>&1
+  timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /spillTargetCode:3 test.dfy > tmp.txt 2>&1
   if [ $? -eq 124 ]
   then
-    echo "Failed to convert to Java in 100 seconds"
+    echo "Failed to convert to Java in $t seconds"
     x=$(( $x + 1 ))
     continue;
   fi
@@ -113,10 +114,10 @@ while [ true ]; do
 
   # py
   touch outputs/output-py.txt
-  timeout 100 ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /spillTargetCode:3 test.dfy > tmp.txt  2>&1
+  timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /spillTargetCode:3 test.dfy > tmp.txt  2>&1
   if [ $? -eq 124 ]
   then
-    echo "Failed to convert to Python in 100 seconds"
+    echo "Failed to convert to Python in $t seconds"
     x=$(( $x + 1 ))
     continue;
   fi
