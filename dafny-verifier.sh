@@ -23,9 +23,12 @@ mkdir outputs || true
 mkdir errors || true
 mkdir tests || true
 
+directory=$(pwd)
+
 t=180
 x=1
 while [ true ]; do
+  cd $directory
 
   rm -rf test-go test-go-run || true
   rm -rf test-java || true
