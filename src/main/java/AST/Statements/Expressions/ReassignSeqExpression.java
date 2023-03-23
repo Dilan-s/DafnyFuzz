@@ -26,6 +26,8 @@ public class ReassignSeqExpression implements Expression {
     public ReassignSeqExpression(SymbolTable symbolTable, Expression seq, Expression ind, Expression exp) {
         this.symbolTable = symbolTable;
         this.seq = seq;
+        Type t = seq.getTypes().get(0);
+        seqVar = new Variable(VariableNameGenerator.generateVariableValueName(t), t);
         this.ind = ind;
         this.exp = exp;
     }
@@ -45,13 +47,10 @@ public class ReassignSeqExpression implements Expression {
         List<String> code = new ArrayList<>();
 
         AssignmentStatement seqAssign = new AssignmentStatement(symbolTable);
-        Type t = seq.getTypes().get(0);
-        seqVar = new Variable(VariableNameGenerator.generateVariableValueName(t), t);
         seqAssign.addAssignment(List.of(seqVar), seq);
         seqAssign.addAssignmentsToSymbolTable();
 
         code.addAll(seqAssign.toCode());
-
 
         CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"));
         try {
@@ -75,5 +74,9 @@ public class ReassignSeqExpression implements Expression {
     @Override
     public String toString() {
         return String.format("%s[%s := %s]", seqVar.getName(), indVar.getName(), exp);
+    }
+
+    public VariableExpression getSequenceVariableExpression() {
+        return new VariableExpression(symbolTable, seqVar);
     }
 }

@@ -16,6 +16,7 @@ import AST.Statements.Expressions.VariableExpression;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.DCollectionTypes.Seq;
+import AST.SymbolTable.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
 import AST.SymbolTable.Variable;
@@ -85,12 +86,23 @@ public class RandomExpressionGenerator {
     private Expression generateReassignSeqExpression(Type type, SymbolTable symbolTable) {
         Seq t = (Seq) type;
 
-        Expression seq = t.generateLiteral(symbolTable);
-        IntLiteral ind = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
+        Expression seq = generateExpression(type, symbolTable);
+        Expression ind = generateLiteral(new Int(), symbolTable);
         Expression exp = generateExpression(t.getInnerType(), symbolTable);
 
         ReassignSeqExpression expression = new ReassignSeqExpression(symbolTable, seq, ind, exp);
-        return expression;
+        VariableExpression seqVar = expression.getSequenceVariableExpression();
+
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals);
+
+        OperatorExpression size = new OperatorExpression(symbolTable, UnaryOperator.Cardinality);
+        size.addArgument(seqVar);
+
+        test.addArgument(size);
+        test.addArgument(new IntLiteral(symbolTable, 0));
+        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, test, expression, seqVar);
+
+        return ifElseExpression;
     }
 
     private Expression generateSubsequenceExpression(Type type, SymbolTable symbolTable) {
@@ -98,11 +110,11 @@ public class RandomExpressionGenerator {
 
         Expression seq = generateExpression(t, symbolTable);
 
-        IntLiteral i = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
+        Expression i = generateLiteral(new Int(), symbolTable);
 
         SubsequenceExpression expression = new SubsequenceExpression(symbolTable, seq);
         if (GeneratorConfig.getRandom().nextDouble() < PROB_HI_AND_LO_SUBSEQUENCE) {
-            IntLiteral j = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
+            Expression j = generateLiteral(new Int(), symbolTable);
             expression.addIndexes(i, j);
         } else {
             expression.addIndexes(i);
