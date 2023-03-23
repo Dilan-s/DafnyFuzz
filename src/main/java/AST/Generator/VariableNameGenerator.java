@@ -1,7 +1,7 @@
 package AST.Generator;
 
 import AST.SymbolTable.Method;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import java.util.HashMap;
 import java.util.Map;
 

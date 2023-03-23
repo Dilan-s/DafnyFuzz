@@ -4,7 +4,7 @@ import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomStatementGenerator;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.PrimitiveTypes.Void;
+import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import java.util.Random;
 
 public class DafnyProgram {

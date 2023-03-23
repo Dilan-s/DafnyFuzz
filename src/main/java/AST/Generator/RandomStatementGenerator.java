@@ -10,13 +10,12 @@ import AST.Statements.ReturnStatement;
 import AST.Statements.Statement;
 import AST.Statements.util.PrintAll;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.PrimitiveTypes.Bool;
+import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.spi.AbstractResourceBundleProvider;
 
 public class RandomStatementGenerator {
 

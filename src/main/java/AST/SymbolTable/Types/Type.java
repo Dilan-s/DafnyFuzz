@@ -1,7 +1,8 @@
-package AST.SymbolTable;
+package AST.SymbolTable.Types;
 
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
+import AST.SymbolTable.Identifier;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 
 public interface Type extends Identifier {

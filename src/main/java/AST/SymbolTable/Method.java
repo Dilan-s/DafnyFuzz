@@ -2,8 +2,9 @@ package AST.SymbolTable;
 
 import AST.Statements.Statement;
 import AST.StringUtils;
-import AST.SymbolTable.PrimitiveTypes.Void;
+import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

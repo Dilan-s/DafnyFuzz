@@ -1,4 +1,4 @@
-package AST.SymbolTable.DCollectionTypes;
+package AST.SymbolTable.Types.DCollectionTypes;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
@@ -7,7 +7,7 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.MultisetLiteral;
 import AST.SymbolTable.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 
 public class Multiset implements DCollection {
 

@@ -6,7 +6,7 @@ import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

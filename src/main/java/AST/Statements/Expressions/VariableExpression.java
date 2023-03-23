@@ -3,7 +3,7 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.List;
 

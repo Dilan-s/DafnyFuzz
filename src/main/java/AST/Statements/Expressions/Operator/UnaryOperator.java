@@ -5,9 +5,9 @@ import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.DCollection;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
 

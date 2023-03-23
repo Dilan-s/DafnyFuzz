@@ -1,15 +1,15 @@
 package AST.Generator;
 
-import AST.SymbolTable.DCollectionTypes.DArray;
-import AST.SymbolTable.PrimitiveTypes.Bool;
-import AST.SymbolTable.PrimitiveTypes.Char;
-import AST.SymbolTable.DCollectionTypes.DSet;
-import AST.SymbolTable.PrimitiveTypes.Int;
-import AST.SymbolTable.DCollectionTypes.Multiset;
-import AST.SymbolTable.PrimitiveTypes.Real;
-import AST.SymbolTable.DCollectionTypes.Seq;
+import AST.SymbolTable.Types.DCollectionTypes.DArray;
+import AST.SymbolTable.Types.PrimitiveTypes.Bool;
+import AST.SymbolTable.Types.PrimitiveTypes.Char;
+import AST.SymbolTable.Types.DCollectionTypes.DSet;
+import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.DCollectionTypes.Multiset;
+import AST.SymbolTable.Types.PrimitiveTypes.Real;
+import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

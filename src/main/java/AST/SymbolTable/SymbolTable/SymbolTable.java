@@ -1,7 +1,7 @@
 package AST.SymbolTable.SymbolTable;
 
 import AST.SymbolTable.Method;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.HashMap;

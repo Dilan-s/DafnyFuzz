@@ -1,11 +1,10 @@
-package AST.SymbolTable.PrimitiveTypes;
+package AST.SymbolTable.Types.PrimitiveTypes;
 
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.RealLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
-import java.util.Random;
+import AST.SymbolTable.Types.Type;
 
 public class Real implements Type {
 

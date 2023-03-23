@@ -1,49 +1,40 @@
-package AST.SymbolTable.DCollectionTypes;
+package AST.SymbolTable.Types.DCollectionTypes;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
+import AST.Statements.Expressions.DSetLiteral;
 import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.SeqLiteral;
 import AST.SymbolTable.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 
-public class Seq implements DCollection {
+public class DSet implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 10;
     private Type type;
 
-    public int getLength() {
-        return length;
-    }
-
-    private int length;
-
-    public Seq(Type type) {
+    public DSet(Type type) {
         this.type = type;
     }
 
-    public Seq() {
+    public DSet() {
         this(null);
     }
 
     @Override
     public String getName() {
-        return "seq";
+        return "set";
     }
 
     @Override
     public String getTypeIndicatorString() {
-        if (type == null) {
-            return ": seq";
-        }
-        return String.format(": seq<%s>", type.getName());
+        return String.format(": set<%s>", type.getName());
     }
 
     @Override
     public Type setInnerType(Type type) {
-        return new Seq(type);
+        return new DSet(type);
     }
 
     @Override
@@ -53,11 +44,11 @@ public class Seq implements DCollection {
 
     @Override
     public boolean isSameType(Type other) {
-        if (!(other instanceof Seq)) {
+        if (!(other instanceof DSet)) {
             return false;
         }
 
-        Seq dsetOther = (Seq) other;
+        DSet dsetOther = (DSet) other;
 
         if (type == null || dsetOther.type == null) {
             return true;
@@ -70,9 +61,9 @@ public class Seq implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
-        SeqLiteral expression = new SeqLiteral(symbolTable,this);
-        for (int i = 0; i < length; i++) {
+        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+        DSetLiteral expression = new DSetLiteral(symbolTable, type);
+        for (int i = 0; i < noOfElems; i++) {
             expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
         }
         return expression;
@@ -83,10 +74,11 @@ public class Seq implements DCollection {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
             Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
-            return new Seq(t);
+            return new DSet(t);
         }
         return this;
     }
+
 
     @Override
     public boolean operatorExists() {
@@ -95,7 +87,7 @@ public class Seq implements DCollection {
 
     @Override
     public boolean isPrintable() {
-        return type != null && type.isPrintable();
+        return false;
     }
 
     @Override

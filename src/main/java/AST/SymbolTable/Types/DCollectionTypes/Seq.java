@@ -1,17 +1,17 @@
-package AST.SymbolTable.DCollectionTypes;
+package AST.SymbolTable.Types.DCollectionTypes;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Statements.Expressions.ArrayLiteral;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.SeqLiteral;
 import AST.SymbolTable.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 
-public class DArray implements DCollection {
+public class Seq implements DCollection {
 
-    public static final int MAX_SIZE_OF_ARRAY = 10;
+    public static final int MAX_SIZE_OF_SET = 10;
     private Type type;
 
     public int getLength() {
@@ -20,30 +20,30 @@ public class DArray implements DCollection {
 
     private int length;
 
-    public DArray(Type type) {
+    public Seq(Type type) {
         this.type = type;
     }
 
-    public DArray() {
+    public Seq() {
         this(null);
     }
 
     @Override
     public String getName() {
-        return "array";
+        return "seq";
     }
 
     @Override
     public String getTypeIndicatorString() {
         if (type == null) {
-            return ": array";
+            return ": seq";
         }
-        return String.format(": array<%s>", type.getName());
+        return String.format(": seq<%s>", type.getName());
     }
 
     @Override
     public Type setInnerType(Type type) {
-        return new DArray(type);
+        return new Seq(type);
     }
 
     @Override
@@ -53,11 +53,11 @@ public class DArray implements DCollection {
 
     @Override
     public boolean isSameType(Type other) {
-        if (!(other instanceof DArray)) {
+        if (!(other instanceof Seq)) {
             return false;
         }
 
-        DArray dsetOther = (DArray) other;
+        Seq dsetOther = (Seq) other;
 
         if (type == null || dsetOther.type == null) {
             return true;
@@ -70,8 +70,8 @@ public class DArray implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
-        ArrayLiteral expression = new ArrayLiteral(symbolTable,this);
+        length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+        SeqLiteral expression = new SeqLiteral(symbolTable,this);
         for (int i = 0; i < length; i++) {
             expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
         }
@@ -83,19 +83,19 @@ public class DArray implements DCollection {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
             Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
-            return new DArray(t);
+            return new Seq(t);
         }
         return this;
     }
 
     @Override
     public boolean operatorExists() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isPrintable() {
-        return false;
+        return type != null && type.isPrintable();
     }
 
     @Override

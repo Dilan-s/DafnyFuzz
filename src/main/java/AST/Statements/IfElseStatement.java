@@ -2,13 +2,12 @@ package AST.Statements;
 
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
-import AST.Statements.util.PrintAll;
 import AST.StringUtils;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.PrimitiveTypes.Bool;
+import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

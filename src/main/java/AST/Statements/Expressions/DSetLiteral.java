@@ -2,9 +2,9 @@ package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.DCollectionTypes.DSet;
+import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

@@ -1,5 +1,7 @@
 package AST.SymbolTable;
 
+import AST.SymbolTable.Types.Type;
+
 public class Variable implements Identifier {
 
     private final String name;

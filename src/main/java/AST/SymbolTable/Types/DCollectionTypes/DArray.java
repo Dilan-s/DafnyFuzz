@@ -1,40 +1,49 @@
-package AST.SymbolTable.DCollectionTypes;
+package AST.SymbolTable.Types.DCollectionTypes;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Statements.Expressions.DSetLiteral;
+import AST.Statements.Expressions.ArrayLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Type;
+import AST.SymbolTable.Types.Type;
 
-public class DSet implements DCollection {
+public class DArray implements DCollection {
 
-    public static final int MAX_SIZE_OF_SET = 10;
+    public static final int MAX_SIZE_OF_ARRAY = 10;
     private Type type;
 
-    public DSet(Type type) {
+    public int getLength() {
+        return length;
+    }
+
+    private int length;
+
+    public DArray(Type type) {
         this.type = type;
     }
 
-    public DSet() {
+    public DArray() {
         this(null);
     }
 
     @Override
     public String getName() {
-        return "set";
+        return "array";
     }
 
     @Override
     public String getTypeIndicatorString() {
-        return String.format(": set<%s>", type.getName());
+        if (type == null) {
+            return ": array";
+        }
+        return String.format(": array<%s>", type.getName());
     }
 
     @Override
     public Type setInnerType(Type type) {
-        return new DSet(type);
+        return new DArray(type);
     }
 
     @Override
@@ -44,11 +53,11 @@ public class DSet implements DCollection {
 
     @Override
     public boolean isSameType(Type other) {
-        if (!(other instanceof DSet)) {
+        if (!(other instanceof DArray)) {
             return false;
         }
 
-        DSet dsetOther = (DSet) other;
+        DArray dsetOther = (DArray) other;
 
         if (type == null || dsetOther.type == null) {
             return true;
@@ -61,9 +70,9 @@ public class DSet implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
-        DSetLiteral expression = new DSetLiteral(symbolTable, type);
-        for (int i = 0; i < noOfElems; i++) {
+        length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
+        ArrayLiteral expression = new ArrayLiteral(symbolTable,this);
+        for (int i = 0; i < length; i++) {
             expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
         }
         return expression;
@@ -74,15 +83,14 @@ public class DSet implements DCollection {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
             Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
-            return new DSet(t);
+            return new DArray(t);
         }
         return this;
     }
 
-
     @Override
     public boolean operatorExists() {
-        return true;
+        return false;
     }
 
     @Override
