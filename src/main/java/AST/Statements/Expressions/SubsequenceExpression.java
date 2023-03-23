@@ -29,6 +29,10 @@ public class SubsequenceExpression implements Expression {
         this.seq = seq;
     }
 
+    public VariableExpression getSequenceVariableExpression() {
+        return new VariableExpression(symbolTable, seqVar);
+    }
+
     public void addIndexes(Expression i) {
         addIndexes(i, new IntLiteral(symbolTable, 0));
     }

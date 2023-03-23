@@ -96,7 +96,7 @@ public class RandomExpressionGenerator {
     private Expression generateSubsequenceExpression(Type type, SymbolTable symbolTable) {
         Seq t = (Seq) type;
 
-        Expression seq = t.generateLiteral(symbolTable);
+        Expression seq = generateExpression(t, symbolTable);
 
         IntLiteral i = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
 
@@ -107,8 +107,18 @@ public class RandomExpressionGenerator {
         } else {
             expression.addIndexes(i);
         }
+        VariableExpression seqVar = expression.getSequenceVariableExpression();
 
-        return expression;
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals);
+
+        OperatorExpression size = new OperatorExpression(symbolTable, UnaryOperator.Cardinality);
+        size.addArgument(seqVar);
+
+        test.addArgument(size);
+        test.addArgument(new IntLiteral(symbolTable, 0));
+        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, test, expression, seqVar);
+
+        return ifElseExpression;
     }
 
 
