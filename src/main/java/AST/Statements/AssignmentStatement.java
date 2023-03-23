@@ -17,11 +17,13 @@ public class AssignmentStatement implements Statement {
     private final SymbolTable symbolTable;
     private final List<Variable> variables;
     private final List<Expression> values;
+    private boolean declared;
 
     public AssignmentStatement(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
         this.variables = new ArrayList<>();
         this.values = new ArrayList<>();
+        declared = false;
     }
 
     public void addAssignment(Expression e) {
@@ -33,6 +35,7 @@ public class AssignmentStatement implements Statement {
     }
 
     public void addAssignment(List<Variable> variablesToAssign, Expression expression) {
+        declared = declared || variablesToAssign.stream().anyMatch(Variable::isDeclared);
         variables.addAll(variablesToAssign);
         values.add(expression);
     }
@@ -95,16 +98,24 @@ public class AssignmentStatement implements Statement {
             .collect(Collectors.toList());
 
         code.addAll(codeForExpressions);
-
-        String lhs = variables.stream()
-            .map(Variable::toString)
-            .collect(Collectors.joining(", "));
-
         String rhs = values.stream()
             .map(Expression::toString)
             .collect(Collectors.joining(", "));
-        code.add(String.format("var %s := %s;\n", lhs, rhs));
 
+        if (declared) {
+            String lhs = variables.stream()
+                .map(Variable::getName)
+                .collect(Collectors.joining(", "));
+
+            code.add(String.format("%s := %s;\n", lhs, rhs));
+        } else {
+            String lhs = variables.stream()
+                .map(Variable::toString)
+                .collect(Collectors.joining(", "));
+
+
+            code.add(String.format("var %s := %s;\n", lhs, rhs));
+        }
         return code;
     }
 }

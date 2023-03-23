@@ -28,3 +28,6 @@ errors
 node_modules
 
 tmp.txt
+
+**/gen/**
+**/antlr_config/DafnyLexer.tokens

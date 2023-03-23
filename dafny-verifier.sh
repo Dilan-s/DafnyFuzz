@@ -28,7 +28,7 @@ directory=$(pwd)
 t=180
 x=1
 while [ true ]; do
-  cd $directory
+  cd "$directory"
 
   rm -rf test-go test-go-run || true
   rm -rf test-java || true
@@ -55,7 +55,7 @@ while [ true ]; do
   # GO
   touch outputs/output-go.txt
   timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
-  if [ $? -eq 124 ]
+  if [ $? -ne 0 ]
   then
     echo "Failed to convert to GO in $t seconds"
     x=$(( $x + 1 ))
@@ -85,7 +85,7 @@ while [ true ]; do
   # js
   touch outputs/output-js.txt
   timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /spillTargetCode:3 test.dfy > tmp.txt 2>&1
-  if [ $? -eq 124 ]
+  if [ $? -ne 0 ]
   then
     echo "Failed to convert to JS in $t seconds"
     x=$(( $x + 1 ))
@@ -97,7 +97,7 @@ while [ true ]; do
   # java
   touch outputs/output-java.txt
   timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /spillTargetCode:3 test.dfy > tmp.txt 2>&1
-  if [ $? -eq 124 ]
+  if [ $? -ne 0 ]
   then
     echo "Failed to convert to Java in $t seconds"
     x=$(( $x + 1 ))
@@ -118,7 +118,7 @@ while [ true ]; do
   # py
   touch outputs/output-py.txt
   timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /spillTargetCode:3 test.dfy > tmp.txt  2>&1
-  if [ $? -eq 124 ]
+  if [ $? -ne 0 ]
   then
     echo "Failed to convert to Python in $t seconds"
     x=$(( $x + 1 ))
@@ -149,4 +149,3 @@ while [ true ]; do
 
 done
 
-rm -rf out || true

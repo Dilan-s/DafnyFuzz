@@ -13,6 +13,8 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Type;
+import AST.SymbolTable.Variable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.spi.AbstractResourceBundleProvider;
 
@@ -26,7 +28,7 @@ public class RandomStatementGenerator {
     public static final double PROB_METHOD_ASSIGN = 0.05;
     public static final double PROB_ELSE_STAT = 0.5;
 
-    public static final int MAX_STATEMENT_DEPTH = 7;
+    public static final int MAX_STATEMENT_DEPTH = 5;
     public static final double PROB_NEXT_STAT = 0.85;
 
     private static int statementDepth = 0;
@@ -142,6 +144,40 @@ public class RandomStatementGenerator {
         AssignmentStatement statement = new AssignmentStatement(symbolTable);
         int noOfReturns = GeneratorConfig.getRandom().nextInt(5) + 1;
         List<Type> returnTypes = typeGenerator.generateTypes(noOfReturns, symbolTable);
+
+        double probReassign = GeneratorConfig.getRandom().nextDouble();
+        boolean canReassign = true;
+
+        List<Variable> toReassign = new ArrayList<>();
+        for (int i = 0, returnTypesSize = returnTypes.size(); canReassign && i < returnTypesSize; i++) {
+            Type t = returnTypes.get(i);
+            List<Variable> allVariables = symbolTable.getAllVariables(t, false);
+            if (allVariables.isEmpty()) {
+                canReassign = false;
+                break;
+            }
+            boolean toAdd = true;
+            for (int j = 0, allVariablesSize = allVariables.size(); toAdd && j < allVariablesSize; j++) {
+                Variable v = allVariables.get(j);
+                if (!toReassign.contains(v)) {
+                    toReassign.add(v);
+                    toAdd = false;
+                }
+            }
+
+            if (toAdd) {
+                canReassign = false;
+                break;
+            }
+        }
+
+        if (canReassign) {
+            for (Variable v : toReassign) {
+                statement.addAssignment(List.of(v), expressionGenerator.generateExpression(v.getType(), symbolTable));
+            }
+            statement.addAssignmentsToSymbolTable();
+            return statement;
+        }
 
         double probCallMethod = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.DECAY_FACTOR, statementDepth);
         if (probCallMethod < PROB_METHOD_ASSIGN) {

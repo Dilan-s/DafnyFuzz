@@ -36,7 +36,7 @@ public class RandomExpressionGenerator {
     public static final double PROB_CALL_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.05;
 
     public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.7;
-    public static final int MAX_EXPRESSION_DEPTH = 7;
+    public static final int MAX_EXPRESSION_DEPTH = 5;
 
     private static int expressionDepth = 0;
 

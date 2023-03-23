@@ -29,4 +29,8 @@ public class Variable implements Identifier {
     public String toString() {
         return String.format("%s%s", name, getType().getTypeIndicatorString());
     }
+
+    public boolean isDeclared() {
+        return isDeclared;
+    }
 }

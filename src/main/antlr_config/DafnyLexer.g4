@@ -1,94 +1,103 @@
 lexer grammar DafnyLexer;
 
-METHOD: 'method'
-
-BLOCK_COMMENT: '/*' (.)+? '*/' -> skip;
-COMMENT: '//' ~[\n\r]*  EOL -> skip ;
-
-LPAREN: '(' ;
-RPAREN: ')' ;
-LCURLY: '{' ;
-RCURLY: '}' ;
-COMMA: ',' ;
-
-ASSIGN: ':=';
-VAR: 'var';
-TYPEINDICATOR: ':'
-RETURN: 'return';
 RETURNS: 'returns';
+MAIN: 'Main';
+METHOD: 'method';
 
+IFF: '<==>';
+IMPLIES: '==>';
+REVERSE_IMPLIES: '<==';
+CONJUNCT: '&&';
+DISJUNCT: '||';
+MINUS: '-';
+PLUS: '+';
+EQUALITY: '==';
+DISEQUALITY: '!=';
+LTE: '<=';
+GTE: '>=';
+IN: 'in';
+NOT_IN: '!in';
+DISJOINT: '!!';
+SHIFT_LEFT: '<<';
+SHIFT_RIGHT: '>>';
+MULT: '*';
+DIV: '/';
+MOD: '%';
+
+SPREAD: '..';
+
+CARDINALITY: '|';
+
+NEW: 'new';
+TRUE: 'true';
+FALSE: 'false';
+
+SEMICOLON: ';';
+VAR: 'var';
+EQUALS: '=';
 
 IF: 'if';
 THEN: 'then';
 ELSE: 'else';
 
-INT: 'int' ;
-BOOL: 'bool' ;
-CHAR: 'char' ;
-STRING: 'string' ;
+PRINT: 'print';
+RETURN: 'return';
 
-PRINT: 'print' ;
+ARRAY: 'array';
+SET: 'set';
+MULTISET: 'multiset';
+SEQ: 'seq';
+BOOL: 'bool';
+CHAR: 'char';
+INT: 'int';
+REAL: 'real';
 
-SEMICOLON: ';' ;
+LANGLE: '<';
+RANGLE: '>';
 
-IFF: '<==>';
-IMPLIES: '==>'
-REVERSEIMPLIES: '<=='
-MINUS: '-' ;
-MUL: '*' ;
-DIV: '/' ;
-MOD: '%' ;
-PLUS: '+' ;
-GREATER: '>';
-GREATEREQUAL: '>=';
-LESS: '<';
-LESSEQUAL: '<=';
-EQUAL: '==';
-NOTEQUAL: '!=';
-AND: '&' ;
-CONJUNCT: '&&';
-DISJUNCT: '||' ;
-LSHIFT: '<<';
-RSHIFT: '>>';
-OR: '|' ;
-XOR: '^';
+COLON: ':';
+
+LBRACKET: '(';
+RBRACKET: ')';
+
+COMMA: ',';
+
+LCURLY: '{';
+RCURLY: '}';
+
+LSQUARE: '[';
+RSQUARE: ']';
 
 WS: [ \t\n\r]+ -> skip ;
 
-INT_LITER: DIGIT+ | '0b' BIN_DIGIT+ | '0c' OCT_DIGIT+ | '0x' HEX_DIGIT+ ;
+SINGLE_QUOTE: '\'';
+DOUBLE_QUOTE: '"';
 
-fragment DIGIT: '0'..'9' ;
-fragment BIN_DIGIT: '0' | '1' ;
-fragment OCT_DIGIT: '0'..'7' ;
-fragment HEX_DIGIT: '0'..'9' | 'A'..'F' ;
+NAME: LOWERCASE (LOWERCASE | UPPERCASE | UNDERSCORE | DIGIT)*;
 
-BOOL_LITER: TRUE | FALSE ;
-fragment TRUE: 'true';
-fragment FALSE: 'false';
+LOWERCASE: 'a'..'z';
+UPPERCASE: 'A'..'Z';
+UNDERSCORE: '_';
 
-CHAR_LITER: SINGLE_QUOTE CHARACTER SINGLE_QUOTE ;
-fragment SINGLE_QUOTE: '\'';
+HEX: '0x';
+DECIMAL_POINT: '.';
 
-STRING_LITER: DOUBLE_QUOTE CHARACTER* DOUBLE_QUOTE ;
-fragment DOUBLE_QUOTE: '"';
+DIGIT: '0'..'9';
+BIN_DIGIT: '0' | '1' ;
+OCT_DIGIT: '0'..'7' ;
+HEX_DIGIT: '0'..'9' | 'A'..'F' ;
 
-fragment CHARACTER: ~['"\\] | ESCAPE_CHAR ;
-//escaped characters
-fragment ESCAPE_CHAR: ESCAPE_BACKSLASH (ESCAPE_ZERO | ESCAPE_TAB | ESCAPE_NEWLINE |
-ESCAPE_CARRIAGERETURN | DOUBLE_QUOTE | SINGLE_QUOTE | ESCAPE_BACKSLASH) ;
+CHARACTER: ~['"\\] | ESCAPE_CHAR ;
 
-fragment ESCAPE_BACKSLASH : '\\' ;
+fragment ESCAPE_CHAR: ESCAPE_BACKSLASH (ESCAPE_ZERO | ESCAPE_BACKSPACE | ESCAPE_TAB | ESCAPE_NEWLINE | ESCAPE_FORMFEED
+| ESCAPE_CARRIAGERETURN | DOUBLE_QUOTE | SINGLE_QUOTE | ESCAPE_BACKSLASH) ;
 fragment ESCAPE_ZERO : '0' ;
-fragment ESCAPE_NEWLINE : 'n' ;
-fragment ESCAPE_CARRIAGERETURN : 'r' ;
+fragment ESCAPE_BACKSPACE : 'b' ;
 fragment ESCAPE_TAB : 't' ;
+fragment ESCAPE_NEWLINE : 'n' ;
+fragment ESCAPE_FORMFEED : 'f' ;
+fragment ESCAPE_CARRIAGERETURN : 'r' ;
+fragment ESCAPE_BACKSLASH : '\\' ;
 
-METHODIDENT: (LOWERCASE | UPPERCASE) (UNDERSCORE | LOWERCASE | UPPERCASE | DIGIT)* ;
-IDENT: LOWERCASE (UNDERSCORE | LOWERCASE | UPPERCASE | DIGIT)* ;
-fragment LOWERCASE : 'a'..'z' ;
-fragment UPPERCASE : 'A'..'Z' ;
-fragment UNDERSCORE: '_' ;
-
-EOL: '\n' | '\r' ;
 
 ERROR: .;

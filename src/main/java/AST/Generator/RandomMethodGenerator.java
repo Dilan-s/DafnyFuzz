@@ -12,7 +12,7 @@ import java.util.concurrent.RecursiveTask;
 public class RandomMethodGenerator {
 
     public static final double PROB_REUSE_METHOD = 0.75;
-    public static final int MAX_METHOD_DEPTH = 5;
+    public static final int MAX_METHOD_DEPTH = 3;
 
     private static int methodDepth = 0;
 
