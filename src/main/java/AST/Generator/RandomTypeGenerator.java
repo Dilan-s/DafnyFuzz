@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class RandomTypeGenerator {
 
-    public static final int MAX_TYPE_DEPTH = 2;
+    public static final int MAX_TYPE_DEPTH = 3;
     private static int typeDepth = 0;
 
     public Type generateNonCollectionType(int noOfTypes, SymbolTable symbolTable) {
@@ -30,18 +30,23 @@ public class RandomTypeGenerator {
         typeDepth++;
         List<Type> types = new ArrayList<>();
         List<Type> option = new ArrayList<>(List.of(new Int(), new Bool(), new Char(), new Real()));
-
         if (typeDepth < MAX_TYPE_DEPTH) {
-            List<Type> collections = new ArrayList<>();
-            collections.addAll(option.stream().map(DSet::new).collect(Collectors.toList()));
-            collections.addAll(option.stream().map(Seq::new).collect(Collectors.toList()));
-            collections.addAll(option.stream().map(Multiset::new).collect(Collectors.toList()));
-            collections.addAll(option.stream().map(DArray::new).collect(Collectors.toList()));
-            option.addAll(collections);
+            option.addAll(List.of(new DSet(), new Seq(), new Multiset(), new DArray()));
         }
+
+//        if (typeDepth < MAX_TYPE_DEPTH) {
+//            List<Type> collections = new ArrayList<>();
+//            collections.addAll(option.stream().map(DSet::new).collect(Collectors.toList()));
+//            collections.addAll(option.stream().map(Seq::new).collect(Collectors.toList()));
+//            collections.addAll(option.stream().map(Multiset::new).collect(Collectors.toList()));
+//            collections.addAll(option.stream().map(DArray::new).collect(Collectors.toList()));
+//            option.addAll(collections);
+//        }
         for (int i = 0; i < noOfTypes; i++) {
             int randType = GeneratorConfig.getRandom().nextInt(option.size());
-            types.add(option.get(randType));
+            Type t = option.get(randType);
+            Type concrete = t.concrete(symbolTable);
+            types.add(concrete);
         }
 
         typeDepth--;

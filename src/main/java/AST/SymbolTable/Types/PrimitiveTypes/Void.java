@@ -22,16 +22,6 @@ public class Void implements Type {
     }
 
     @Override
-    public String getTypeIndicatorString() {
-        return "";
-    }
-
-    @Override
-    public String getReturnTypeIndicator(String method) {
-        return "";
-    }
-
-    @Override
     public boolean operatorExists() {
         return false;
     }

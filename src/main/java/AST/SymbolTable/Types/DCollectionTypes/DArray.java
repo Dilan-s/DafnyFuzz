@@ -34,14 +34,6 @@ public class DArray implements DCollection {
     }
 
     @Override
-    public String getTypeIndicatorString() {
-        if (type == null) {
-            return ": array";
-        }
-        return String.format(": array<%s>", type.getName());
-    }
-
-    @Override
     public Type setInnerType(Type type) {
         return new DArray(type);
     }
@@ -71,7 +63,7 @@ public class DArray implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
-        ArrayLiteral expression = new ArrayLiteral(symbolTable,this);
+        ArrayLiteral expression = new ArrayLiteral(symbolTable, this);
         for (int i = 0; i < length; i++) {
             expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
         }
@@ -79,10 +71,18 @@ public class DArray implements DCollection {
     }
 
     @Override
+    public String getVariableType() {
+        if (type == null) {
+            return "array";
+        }
+        return String.format("array<%s>", type.getVariableType());
+    }
+
+    @Override
     public Type concrete(SymbolTable symbolTable) {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
+            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             return new DArray(t);
         }
         return this;

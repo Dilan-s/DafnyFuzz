@@ -1,5 +1,6 @@
 package AST.SymbolTable;
 
+import AST.Generator.VariableNameGenerator;
 import AST.Statements.Statement;
 import AST.StringUtils;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
@@ -114,7 +115,9 @@ public class Method implements Identifier {
             .map(Variable::toString)
             .collect(Collectors.joining(", "));
         String types = getReturnTypes().stream()
-            .map(x -> x.getReturnTypeIndicator(getName()))
+            .filter(x -> !x.isSameType(new Void()))
+            .map(Type::getVariableType)
+            .map(x -> String.format("%s: %s", VariableNameGenerator.generateReturnVariableName(getName()), x))
             .collect(Collectors.joining(", "));
         return String.format("method %s(%s) returns (%s) { \n", getName(), arguments, types);
     }

@@ -11,13 +11,8 @@ public interface Type extends Identifier {
 
     Expression generateLiteral(SymbolTable symbolTable);
 
-    default String getTypeIndicatorString() {
-        return String.format(": %s", getName());
-    }
-
-    default String getReturnTypeIndicator(String method) {
-        String returnParameter = VariableNameGenerator.generateReturnVariableName(method);
-        return String.format("%s%s", returnParameter, getTypeIndicatorString());
+    default String getVariableType() {
+        return getName();
     }
 
     boolean operatorExists();

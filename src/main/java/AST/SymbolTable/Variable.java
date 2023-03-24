@@ -29,7 +29,7 @@ public class Variable implements Identifier {
 
     @Override
     public String toString() {
-        return String.format("%s%s", name, getType().getTypeIndicatorString());
+        return String.format("%s: %s", name, getType().getVariableType());
     }
 
     public boolean isDeclared() {

@@ -34,14 +34,6 @@ public class Seq implements DCollection {
     }
 
     @Override
-    public String getTypeIndicatorString() {
-        if (type == null) {
-            return ": seq";
-        }
-        return String.format(": seq<%s>", type.getName());
-    }
-
-    @Override
     public Type setInnerType(Type type) {
         return new Seq(type);
     }
@@ -79,10 +71,18 @@ public class Seq implements DCollection {
     }
 
     @Override
+    public String getVariableType() {
+        if (type == null) {
+            return "seq";
+        }
+        return String.format("seq<%s>", type.getVariableType());
+    }
+
+    @Override
     public Type concrete(SymbolTable symbolTable) {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
+            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             return new Seq(t);
         }
         return this;
