@@ -3,7 +3,7 @@ package AST.Statements.Expressions.Operator;
 import AST.Errors.SemanticException;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
-import AST.SymbolTable.DCollection;
+import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -25,7 +25,7 @@ public interface Operator {
     int getNumberOfArgs();
 
     default boolean returnType(Type type) {
-        return getType().stream().anyMatch(t -> t.isSameType(type));
+        return getType().stream().anyMatch(t -> t.equals(type));
     }
 
     static void numericTypeCheck(Expression lhs, Expression rhs, String operator)
@@ -47,7 +47,7 @@ public interface Operator {
         }
         Type leftType = leftTypes.get(0);
         Type rightType = rightTypes.get(0);
-        if (!(leftType.isSameType(rightType))) {
+        if (!(leftType.equals(rightType))) {
             throw new SemanticException(
                 String.format("Expected arguments to %s to be (Num, Num) but actually got (%s, %s)",
                     operator, leftType.getName(), rightType.getName()));
@@ -73,7 +73,7 @@ public interface Operator {
         }
         Type leftType = leftTypes.get(0);
         Type rightType = rightTypes.get(0);
-        if (!(leftType.isSameType(new Bool()) && rightType.isSameType(new Bool()))) {
+        if (!(leftType.equals(new Bool()) && rightType.equals(new Bool()))) {
             throw new SemanticException(String.format(
                 "Expected arguments to %s to be (Bool, Bool) but actually got (%s, %s)", operator,
                 leftType.getName(), rightType.getName()));
@@ -82,7 +82,7 @@ public interface Operator {
 
     default List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-        Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
+        Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
         List<Type> ret = new ArrayList<>();
         for (Type type: types) {
             if (type.isCollection()) {

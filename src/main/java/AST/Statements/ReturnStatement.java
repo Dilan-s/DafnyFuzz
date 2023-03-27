@@ -50,7 +50,7 @@ public class ReturnStatement implements Statement {
             Type expressionType = valueTypes.get(i);
             Type returnType = returnTypes.get(i);
 
-            if (!returnType.isSameType(expressionType)) {
+            if (!returnType.equals(expressionType)) {
                 throw new SemanticException(
                     String.format("Expected %dth argument to be %s but actually go %s", i,
                         returnType.getName(), expressionType.getName()));

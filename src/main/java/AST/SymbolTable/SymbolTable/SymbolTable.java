@@ -74,8 +74,10 @@ public class SymbolTable {
         return getAllVariables(t, true);
     }
     public List<Variable> getAllVariables(Type t, boolean enclosing) {
-        List<Variable> vars = variables.values().stream()
-            .filter(x -> x.getType().isSameType(t)).collect(Collectors.toList());
+        List<Variable> vars = variables.values()
+            .stream()
+            .filter(x -> x.getType().equals(t))
+            .collect(Collectors.toList());
 
         if (enclosing) {
             if (enclosingSymbolTable != null) {
@@ -98,7 +100,7 @@ public class SymbolTable {
         for (int i = 0; i < methodReturnTypes.size(); i++) {
             Type rt = methodReturnTypes.get(i);
             Type wt = wantedReturnTypes.get(i);
-            if (!rt.isSameType(wt)) {
+            if (!rt.equals(wt)) {
                 return false;
             }
         }

@@ -76,7 +76,7 @@ public class AssignmentStatement implements Statement {
             Type expressionType = valueTypes.get(i);
             Type assignType = assignmentTypes.get(i);
 
-            if (!assignType.isSameType(expressionType)) {
+            if (!assignType.equals(expressionType)) {
                 throw new SemanticException(
                     String.format("Expected %dth argument to be %s but actually go %s", i,
                         assignType.getName(), expressionType.getName()));

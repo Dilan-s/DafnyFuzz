@@ -3,7 +3,7 @@ package AST.Statements.Expressions.Operator;
 import AST.Errors.SemanticException;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
-import AST.SymbolTable.DCollection;
+import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -23,7 +23,7 @@ public enum UnaryOperator implements Operator {
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateNonCollectionType(1, symbolTable);
+            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             DCollection collection = (DCollection) types.get(0);
             ret.add(collection.setInnerType(t));

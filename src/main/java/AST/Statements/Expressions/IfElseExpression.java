@@ -40,7 +40,7 @@ public class IfElseExpression implements Expression {
         }
 
         Type testType = testTypes.get(0);
-        if (!testType.isSameType(new Bool())) {
+        if (!testType.equals(new Bool())) {
             throw new SemanticException(String.format(
                 "Test condition expected to be a bool but actually is %s", testType.getName()));
         }
@@ -59,7 +59,7 @@ public class IfElseExpression implements Expression {
             Type ifType = ifTypes.get(i);
             Type elseType = elseTypes.get(i);
 
-            if (!ifType.isSameType(elseType)) {
+            if (!ifType.equals(elseType)) {
                 throw new SemanticException(
                     String.format("Expected %dth argument to be %s but actually go %s", i,
                         ifType.getName(), elseType.getName()));

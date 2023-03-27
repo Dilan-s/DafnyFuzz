@@ -4,7 +4,7 @@ import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 
-public class Void implements Type {
+public class Void implements BaseType {
 
     @Override
     public String getName() {
@@ -12,7 +12,16 @@ public class Void implements Type {
     }
 
     @Override
-    public boolean isSameType(Type other) {
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Type)) {
+            return false;
+        }
+        Type other = (Type) obj;
         return other instanceof Void;
     }
 
@@ -24,5 +33,10 @@ public class Void implements Type {
     @Override
     public boolean operatorExists() {
         return false;
+    }
+
+    @Override
+    public Type concrete(SymbolTable symbolTable) {
+        return new Void();
     }
 }

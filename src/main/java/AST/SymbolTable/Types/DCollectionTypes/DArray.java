@@ -5,7 +5,6 @@ import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.ArrayLiteral;
 import AST.Statements.Expressions.Expression;
-import AST.SymbolTable.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 
@@ -44,7 +43,16 @@ public class DArray implements DCollection {
     }
 
     @Override
-    public boolean isSameType(Type other) {
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Type)) {
+            return false;
+        }
+        Type other = (Type) obj;
         if (!(other instanceof DArray)) {
             return false;
         }
@@ -55,7 +63,7 @@ public class DArray implements DCollection {
             return true;
         }
 
-        return dsetOther.type.isSameType(type);
+        return dsetOther.type.equals(type);
     }
 
     @Override
@@ -96,10 +104,5 @@ public class DArray implements DCollection {
     @Override
     public boolean isPrintable() {
         return false;
-    }
-
-    @Override
-    public boolean isCollection() {
-        return true;
     }
 }

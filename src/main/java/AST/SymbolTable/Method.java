@@ -63,7 +63,7 @@ public class Method implements Identifier {
     }
 
     public boolean hasReturn() {
-        return (returnTypes.size() == 1 && !returnTypes.get(0).isSameType(new Void()))
+        return (returnTypes.size() == 1 && !returnTypes.get(0).equals(new Void()))
             || returnTypes.size() > 1;
     }
 
@@ -115,7 +115,7 @@ public class Method implements Identifier {
             .map(Variable::toString)
             .collect(Collectors.joining(", "));
         String types = getReturnTypes().stream()
-            .filter(x -> !x.isSameType(new Void()))
+            .filter(x -> !x.equals(new Void()))
             .map(Type::getVariableType)
             .map(x -> String.format("%s: %s", VariableNameGenerator.generateReturnVariableName(getName()), x))
             .collect(Collectors.joining(", "));

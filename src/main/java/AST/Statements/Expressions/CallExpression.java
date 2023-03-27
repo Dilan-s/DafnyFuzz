@@ -74,7 +74,7 @@ public class CallExpression implements Expression {
             Type methodType = methodTypes.get(i);
             Type varType = variables.get(i).getType();
 
-            if (!methodType.isSameType(varType)) {
+            if (!methodType.equals(varType)) {
                 throw new SemanticException(
                     String.format("Expected %dth argument to be %s, but actually was %s type", i,
                         methodType.getName(), varType.getName()));

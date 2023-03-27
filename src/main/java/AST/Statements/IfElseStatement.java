@@ -54,7 +54,7 @@ public class IfElseStatement implements Statement {
 
         Type testType = testTypes.get(0);
 
-        if (!testType.isSameType(new Bool())) {
+        if (!testType.equals(new Bool())) {
             throw new SemanticException(String.format(
                 "Test condition expected to be a bool but actually is %s", testType.getName()));
         }

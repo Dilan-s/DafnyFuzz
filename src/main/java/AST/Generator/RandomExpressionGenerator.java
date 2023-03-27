@@ -66,9 +66,9 @@ public class RandomExpressionGenerator {
                 }
             } else if (probTypeOfExpression < PROB_SEQ_INDEX_EXPRESSION && !type.isCollection()) {
                 ret = generateSeqIndexExpression(type, symbolTable);
-            } else if (probTypeOfExpression < PROB_SUBSEQUENCE_EXPRESSION && type.isSameType(new Seq())) {
+            } else if (probTypeOfExpression < PROB_SUBSEQUENCE_EXPRESSION && type.equals(new Seq())) {
                 ret = generateSubsequenceExpression(type, symbolTable);
-            } else if (probTypeOfExpression < PROB_REASSIGN_SEQ_EXPRESSION && type.isSameType(new Seq())) {
+            } else if (probTypeOfExpression < PROB_REASSIGN_SEQ_EXPRESSION && type.equals(new Seq())) {
                 ret = generateReassignSeqExpression(type, symbolTable);
             } else if (probTypeOfExpression < PROB_IF_ELSE_EXPRESSION) {
                 //ifElse
@@ -195,12 +195,9 @@ public class RandomExpressionGenerator {
         List<Operator> ops = Arrays.stream(BinaryOperator.values()).collect(Collectors.toList());
         ops.addAll(Arrays.stream(UnaryOperator.values()).collect(Collectors.toList()));
 
-        List<Operator> validOperators = new ArrayList<>();
-        for (Operator x : ops) {
-            if (x.returnType(type)) {
-                validOperators.add(x);
-            }
-        }
+        List<Operator> validOperators = ops.stream()
+            .filter(x -> x.returnType(type))
+            .collect(Collectors.toList());
 
         if (validOperators.size() > 0) {
             int randOp = GeneratorConfig.getRandom().nextInt(validOperators.size());

@@ -6,7 +6,7 @@ import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 
-public class Bool implements Type {
+public class Bool implements BaseType {
 
     @Override
     public String getName() {
@@ -14,7 +14,16 @@ public class Bool implements Type {
     }
 
     @Override
-    public boolean isSameType(Type other) {
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Type)) {
+            return false;
+        }
+        Type other = (Type) obj;
         return other instanceof Bool;
     }
 
@@ -26,5 +35,10 @@ public class Bool implements Type {
     @Override
     public boolean operatorExists() {
         return true;
+    }
+
+    @Override
+    public Type concrete(SymbolTable symbolTable) {
+        return new Bool();
     }
 }
