@@ -7,6 +7,8 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.MultisetLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Multiset implements DCollection {
 
@@ -14,9 +16,11 @@ public class Multiset implements DCollection {
     public static final double PROB_USE_DSET = 0.3;
     public static final double PROB_USE_SEQ = PROB_USE_DSET + 0.3;
     private Type type;
+    private Map<Expression, Integer> multiset;
 
     public Multiset(Type type) {
         this.type = type;
+        multiset = new HashMap<>();
     }
 
     public Multiset() {
@@ -68,15 +72,25 @@ public class Multiset implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         double probType = GeneratorConfig.getRandom().nextDouble();
         if (probType < PROB_USE_DSET) {
-            Expression exp = expressionGenerator.generateExpression(new DSet(type), symbolTable);
+            DSet t = new DSet(this.type.concrete(symbolTable));
+            Expression exp = expressionGenerator.generateExpression(t, symbolTable);
             expression.setCollection(exp);
+            for (Expression e : t.getSet()) {
+                multiset.put(e, multiset.getOrDefault(e, 0) + 1);
+            }
         } else if (probType < PROB_USE_SEQ) {
-            Expression exp = expressionGenerator.generateExpression(new Seq(type), symbolTable);
+            Seq t = new Seq(this.type.concrete(symbolTable));
+            Expression exp = expressionGenerator.generateExpression(t, symbolTable);
             expression.setCollection(exp);
+            for (Expression e : t.getSequence()) {
+                multiset.put(e, multiset.getOrDefault(e, 0) + 1);
+            }
         } else {
             int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET) + 1;
             for (int i = 0; i < noOfElems; i++) {
-                expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
+                Expression exp = expressionGenerator.generateExpression(type.concrete(symbolTable), symbolTable);
+                expression.addValue(exp);
+                multiset.put(exp, multiset.getOrDefault(exp, 0) + 1);
             }
         }
         return expression;
@@ -94,10 +108,10 @@ public class Multiset implements DCollection {
     public Type concrete(SymbolTable symbolTable) {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            Type t = typeGenerator.generateBaseTypes(1, symbolTable).get(0);
             return new Multiset(t);
         }
-        return this;
+        return new Multiset(type.concrete(symbolTable));
     }
 
 

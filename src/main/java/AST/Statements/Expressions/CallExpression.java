@@ -12,36 +12,34 @@ import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CallExpression implements Expression {
 
     private SymbolTable symbolTable;
-    private final Method method;
-    private final List<Variable> variables;
-    private final List<Statement> assignments;
+    private Method method;
+    private List<Variable> variables;
+    private List<Statement> assignments;
     private List<Variable> assignedVariables;
-
-    public CallExpression(SymbolTable symbolTable, Method method) {
+    
+    public CallExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
         this.symbolTable = symbolTable;
         this.method = method;
         this.variables = new ArrayList<>();
         this.assignments = new ArrayList<>();
         this.assignedVariables = new ArrayList<>();
+        addArg(args);
+        generateReturnAssignment();
     }
 
-    public void addArg(List<Expression> expressions) throws InvalidArgumentException {
+    private void addArg(List<Expression> expressions) {
         for (Expression e : expressions) {
             addArg(e);
         }
     }
 
-    public void addArg(Expression expression) throws InvalidArgumentException {
-
-        if (expression.getTypes().size() != 1) {
-            throw new InvalidArgumentException("Cannot add argument with more than 1 return value");
-        }
-
+    private void addArg(Expression expression) {
         Type type = expression.getTypes().get(0);
         String var = VariableNameGenerator.generateVariableValueName(type);
         Variable variable = new Variable(var, type);
@@ -54,6 +52,23 @@ public class CallExpression implements Expression {
         assignments.add(stat);
     }
 
+
+    private void generateReturnAssignment() {
+        AssignmentStatement stat = new AssignmentStatement(symbolTable);
+        assignedVariables = new ArrayList<>();
+        for (Type returnType : method.getReturnTypes()) {
+            String var = VariableNameGenerator.generateVariableValueName(returnType);
+            Variable variable = new Variable(var, returnType);
+            assignedVariables.add(variable);
+            symbolTable.addVariable(variable);
+        }
+
+        CallMethodExpression callMethodExpression = new CallMethodExpression(method, variables);
+        stat.addAssignment(assignedVariables, callMethodExpression);
+        stat.addAssignmentsToSymbolTable();
+
+        assignments.add(stat);
+    }
 
     @Override
     public List<Type> getTypes() {
@@ -85,21 +100,6 @@ public class CallExpression implements Expression {
 
     @Override
     public List<String> toCode() {
-        AssignmentStatement stat = new AssignmentStatement(symbolTable);
-        assignedVariables = new ArrayList<>();
-        for (Type returnType : method.getReturnTypes()) {
-            String var = VariableNameGenerator.generateVariableValueName(returnType);
-            Variable variable = new Variable(var, returnType);
-            assignedVariables.add(variable);
-            symbolTable.addVariable(variable);
-        }
-
-        CallMethodExpression callMethodExpression = new CallMethodExpression(method, variables);
-        stat.addAssignment(assignedVariables, callMethodExpression);
-        stat.addAssignmentsToSymbolTable();
-
-        assignments.add(stat);
-
         return assignments.stream()
             .map(Statement::toCode)
             .flatMap(Collection::stream)
@@ -118,6 +118,42 @@ public class CallExpression implements Expression {
             .collect(Collectors.joining(", "));
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(method, variables, assignedVariables);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CallExpression)) {
+            return false;
+        }
+        CallExpression other = (CallExpression) obj;
+        if (!other.method.equals(method)) {
+            return false;
+        }
+
+        if (other.variables.size() != variables.size()) {
+            return false;
+        }
+
+        if (other.assignedVariables.size() != assignedVariables.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < variables.size(); i++) {
+            if (!other.variables.get(i).equals(variables.get(i))) {
+                return false;
+            }
+        }
+
+        for (int i = 0; i < assignedVariables.size(); i++) {
+            if (!other.assignedVariables.get(i).equals(assignedVariables.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     private static class CallMethodExpression implements Expression {
 

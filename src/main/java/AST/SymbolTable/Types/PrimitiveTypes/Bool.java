@@ -8,6 +8,12 @@ import AST.SymbolTable.Types.Type;
 
 public class Bool implements BaseType {
 
+    private boolean value;
+
+    public Bool() {
+        value = false;
+    }
+
     @Override
     public String getName() {
         return "bool";
@@ -29,7 +35,8 @@ public class Bool implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        return new BoolLiteral(symbolTable, GeneratorConfig.getRandom().nextBoolean());
+        value = GeneratorConfig.getRandom().nextBoolean();
+        return new BoolLiteral(this, symbolTable, value);
     }
 
     @Override

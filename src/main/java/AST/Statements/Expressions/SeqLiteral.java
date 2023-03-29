@@ -50,4 +50,26 @@ public class SeqLiteral implements Expression {
         return String.format("[%s]", value);
     }
 
+    @Override
+    public int hashCode() {
+        return values.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SeqLiteral)) {
+            return false;
+        }
+        SeqLiteral other = (SeqLiteral) obj;
+        if (values.size() != other.values.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < values.size(); i++) {
+            if (!values.get(i).equals(other.values.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

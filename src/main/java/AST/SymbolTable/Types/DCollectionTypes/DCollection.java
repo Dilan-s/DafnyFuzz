@@ -12,4 +12,9 @@ public interface DCollection extends Type {
     default boolean isCollection() {
         return true;
     }
+
+    @Override
+    default boolean operatorExists() {
+        return !getInnerType().isCollection();
+    }
 }

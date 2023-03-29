@@ -16,19 +16,15 @@ public class DSetLiteral implements Expression {
     private final List<Expression> values;
     private SymbolTable symbolTable;
 
-    public DSetLiteral(SymbolTable symbolTable, Type type) {
+    public DSetLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
-        this.values = new ArrayList<>();
+        this.values = values;
     }
 
     @Override
     public List<Type> getTypes() {
-        return List.of(new DSet(type));
-    }
-
-    public void addValue(Expression expression) {
-        values.add(expression);
+        return List.of(type);
     }
 
     @Override
@@ -51,4 +47,26 @@ public class DSetLiteral implements Expression {
         return String.format("{%s}", value);
     }
 
+    @Override
+    public int hashCode() {
+        return values.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DSetLiteral)) {
+            return false;
+        }
+        DSetLiteral other = (DSetLiteral) obj;
+        if (values.size() != other.values.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < values.size(); i++) {
+            if (!values.get(i).equals(other.values.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

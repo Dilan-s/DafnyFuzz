@@ -10,6 +10,7 @@ public class Char implements BaseType {
 
     private static final double PROB_UPPERCASE = 0.5;
     public static final int LOWER_TO_UPPER_SHIFT = 'A' - 'a';
+    private char c;
 
     @Override
     public String getName() {
@@ -32,9 +33,9 @@ public class Char implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        char c = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
+        c = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
         c += GeneratorConfig.getRandom().nextDouble() < PROB_UPPERCASE ? LOWER_TO_UPPER_SHIFT : 0;
-        return new CharLiteral(symbolTable, c);
+        return new CharLiteral(this, symbolTable, c);
     }
 
     @Override

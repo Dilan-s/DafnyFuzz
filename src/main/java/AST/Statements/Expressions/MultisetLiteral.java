@@ -7,6 +7,7 @@ import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -63,7 +64,39 @@ public class MultisetLiteral implements Expression {
         } else {
             return String.format("multiset(%s)", collection.get());
         }
-
     }
 
+    @Override
+    public int hashCode() {
+        if (collection.isPresent()) {
+            return collection.hashCode();
+        } else {
+            return Objects.hash(values);
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof MultisetLiteral)) {
+            return false;
+        }
+        MultisetLiteral other = (MultisetLiteral) obj;
+
+        if (collection.isPresent() && other.collection.isPresent()) {
+            return collection.get().equals(other.collection.get());
+        } else if (collection.isEmpty() && other.collection.isEmpty()) {
+            if (values.size() != other.values.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < values.size(); i++) {
+                if (!values.get(i).equals(other.values.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

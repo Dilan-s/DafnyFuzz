@@ -10,6 +10,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public enum UnaryOperator implements Operator {
     Cardinality("|%s|", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Int()) {
@@ -22,12 +23,16 @@ public enum UnaryOperator implements Operator {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
-            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
-            List<Type> ret = new ArrayList<>();
-            DCollection collection = (DCollection) types.get(0);
-            ret.add(collection.setInnerType(t));
-            return ret;
+//            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+//            Type t = typeGenerator.generateBaseTypes(1, symbolTable).get(0);
+            List<Type> collect = types.stream()
+                .map(x -> x.concrete(symbolTable))
+                .collect(Collectors.toList());
+            return collect;
+//            List<Type> ret = new ArrayList<>();
+//            DCollection collection = (DCollection) types.get(0);
+//            ret.add(collection.setInnerType(t));
+//            return ret;
         }
     },
     ;

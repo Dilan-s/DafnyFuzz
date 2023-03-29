@@ -12,6 +12,7 @@ public class Int implements BaseType {
     private static final double PROB_HEX = 0.2;
     public static final double PROB_NEGATION = 0.1;
     private int max;
+    private int value;
 
     public Int(int max) {
         this.max = max;
@@ -42,9 +43,9 @@ public class Int implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        int value = GeneratorConfig.getRandom().nextInt(max);
+        value = GeneratorConfig.getRandom().nextInt(max);
         value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
-        return new IntLiteral(symbolTable, value, value > 0 &&  GeneratorConfig.getRandom().nextDouble() < PROB_HEX);
+        return new IntLiteral(this, symbolTable, value, value > 0 &&  GeneratorConfig.getRandom().nextDouble() < PROB_HEX);
     }
 
     @Override
@@ -54,6 +55,14 @@ public class Int implements BaseType {
 
     @Override
     public Type concrete(SymbolTable symbolTable) {
-        return new Bool();
+        return new Int();
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
     }
 }

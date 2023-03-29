@@ -11,24 +11,26 @@ import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ArrayLiteral implements Expression {
 
     private final Type type;
-    private Variable variable;
-    private final List<Expression> values;
     private SymbolTable symbolTable;
+
+    private Variable variable;
+    private List<Expression> values;
     private AssignmentStatement statement;
 
-    public ArrayLiteral(SymbolTable symbolTable, Type type) {
+    public ArrayLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type), type);
-        this.values = new ArrayList<>();
-        ArrayInitValues arrayInitValues = new ArrayInitValues(values);
+        this.values = values;
+
         statement = new AssignmentStatement(symbolTable);
-        statement.addAssignment(List.of(variable), arrayInitValues);
+        statement.addAssignment(List.of(variable), new ArrayInitValues(values));
         statement.addAssignmentsToSymbolTable();
     }
 
@@ -60,6 +62,33 @@ public class ArrayLiteral implements Expression {
     @Override
     public String toString() {
         return variable.getName();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(variable, values);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ArrayLiteral)) {
+            return false;
+        }
+        ArrayLiteral other = (ArrayLiteral) obj;
+        if (!other.variable.equals(variable)) {
+            return false;
+        }
+
+        if (other.values.size() != values.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < values.size(); i++) {
+            if (!other.values.get(i).equals(values.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private class ArrayInitValues implements Expression {

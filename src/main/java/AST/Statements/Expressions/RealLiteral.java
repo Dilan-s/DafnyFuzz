@@ -6,19 +6,23 @@ import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.List;
+import java.util.Objects;
 
 public class RealLiteral implements Expression {
 
+    private final Type type;
     private final double value;
     private SymbolTable symbolTable;
 
-    public RealLiteral(SymbolTable symbolTable, double value) {
+    public RealLiteral(Type type, SymbolTable symbolTable, double value) {
+        this.type = type;
+        this.symbolTable = symbolTable;
         this.value = value;
     }
 
     @Override
     public List<Type> getTypes() {
-        return List.of(new Real());
+        return List.of(type);
     }
 
     @Override
@@ -28,5 +32,19 @@ public class RealLiteral implements Expression {
     @Override
     public String toString() {
         return String.format("%.2f", value);
+    }
+
+    @Override
+    public int hashCode() {
+        return String.format("%.2f", value).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof RealLiteral)) {
+            return false;
+        }
+        RealLiteral other = (RealLiteral) obj;
+        return String.format("%.2f", value).equals(String.format("%.2f", other.value));
     }
 }

@@ -8,6 +8,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class IfElseExpression implements Expression {
@@ -89,5 +90,19 @@ public class IfElseExpression implements Expression {
         code.addAll(elseExp.toCode());
 
         return code;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(test, ifExp, elseExp);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IfElseExpression)) {
+            return false;
+        }
+        IfElseExpression other = (IfElseExpression) obj;
+        return other.test.equals(test) && other.ifExp.equals(ifExp) && other.elseExp.equals(elseExp);
     }
 }

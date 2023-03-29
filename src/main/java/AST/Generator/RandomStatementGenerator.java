@@ -29,6 +29,7 @@ public class RandomStatementGenerator {
 
     public static final int MAX_STATEMENT_DEPTH = 5;
     public static final double PROB_NEXT_STAT = 0.85;
+    public static final double PROB_FORCE_RETURN = 0.05;
 
     private static int statementDepth = 0;
 
@@ -43,6 +44,14 @@ public class RandomStatementGenerator {
             statement = generateStatement(method, body.getSymbolTable());
             body.addStatement(statement);
             if (statement.isReturn()) {
+                break;
+            }
+            double probForceReturn = GeneratorConfig.getRandom().nextDouble();
+            if (probForceReturn < PROB_FORCE_RETURN) {
+                if (hasReturn) {
+                    statement = generateReturnStatement(method, body.getSymbolTable());
+                    body.addStatement(statement);
+                }
                 break;
             }
             probContinue = GeneratorConfig.getRandom().nextDouble();

@@ -11,30 +11,47 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ReassignSeqExpression implements Expression {
 
     private SymbolTable symbolTable;
 
-    private Expression seq;
+    private AssignmentStatement seqAssign;
+    private AssignmentStatement indAssign;
+
     private Variable seqVar;
-    private Expression ind;
     private Variable indVar;
     private Expression exp;
 
 
     public ReassignSeqExpression(SymbolTable symbolTable, Expression seq, Expression ind, Expression exp) {
         this.symbolTable = symbolTable;
-        this.seq = seq;
+        this.exp = exp;
+        generateVariableCalls(seq, ind);
+    }
+
+    private void generateVariableCalls(Expression seq, Expression ind) {
         Type t = seq.getTypes().get(0);
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(t), t);
-        this.ind = ind;
-        this.exp = exp;
+
+        seqAssign = new AssignmentStatement(symbolTable);
+        seqAssign.addAssignment(List.of(seqVar), seq);
+        seqAssign.addAssignmentsToSymbolTable();
+        VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
+
+        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(seqVarExp, ind));
+
+        indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
+
+        indAssign = new AssignmentStatement(symbolTable);
+        indAssign.addAssignment(List.of(indVar), callExp);
+        indAssign.addAssignmentsToSymbolTable();
     }
 
     @Override
     public List<Type> getTypes() {
-        return seq.getTypes();
+        return List.of(seqVar.getType());
     }
 
     @Override
@@ -46,28 +63,10 @@ public class ReassignSeqExpression implements Expression {
     public List<String> toCode() {
         List<String> code = new ArrayList<>();
 
-        AssignmentStatement seqAssign = new AssignmentStatement(symbolTable);
-        seqAssign.addAssignment(List.of(seqVar), seq);
-        seqAssign.addAssignmentsToSymbolTable();
-
         code.addAll(seqAssign.toCode());
-
-        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"));
-        try {
-            callExp.addArg(new VariableExpression(symbolTable, seqVar));
-            callExp.addArg(ind);
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        }
-
-        AssignmentStatement indAssign = new AssignmentStatement(symbolTable);
-        indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
-        indAssign.addAssignment(List.of(indVar), callExp);
-        indAssign.addAssignmentsToSymbolTable();
-
         code.addAll(indAssign.toCode());
-
         code.addAll(exp.toCode());
+
         return code;
     }
 
@@ -78,5 +77,20 @@ public class ReassignSeqExpression implements Expression {
 
     public VariableExpression getSequenceVariableExpression() {
         return new VariableExpression(symbolTable, seqVar);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(seqVar, indVar, exp);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ReassignSeqExpression)) {
+            return false;
+        }
+        ReassignSeqExpression other = (ReassignSeqExpression) obj;
+        return other.seqVar.equals(seqVar) && other.indVar.equals(indVar) && other.exp.equals(exp);
+
     }
 }

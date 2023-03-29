@@ -50,13 +50,7 @@ public class SafeMethods {
         Variable iVar = new Variable(i, new Int());
         VariableExpression iVarExp = new VariableExpression(symbolTable,iVar);
 
-        CallExpression iSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"));
-        try {
-            iSafeIndex.addArg(p1VarExp);
-            iSafeIndex.addArg(p2VarExp);
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        }
+        CallExpression iSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p2VarExp));
 
         AssignmentStatement asI = new AssignmentStatement(symbolTable);
         statement.addStatement(asI);
@@ -68,13 +62,7 @@ public class SafeMethods {
         Variable jVar = new Variable(j, new Int());
         VariableExpression jVarExp = new VariableExpression(symbolTable,jVar);
 
-        CallExpression jSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"));
-        try {
-            jSafeIndex.addArg(p1VarExp);
-            jSafeIndex.addArg(p3VarExp);
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        }
+        CallExpression jSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p3VarExp));
 
         AssignmentStatement asJ = new AssignmentStatement(symbolTable);
         statement.addStatement(asJ);
@@ -84,9 +72,7 @@ public class SafeMethods {
         IfElseStatement ifElseStatement = new IfElseStatement(symbolTable);
         statement.addStatement(ifElseStatement);
 
-        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Less_Than);
-        test.addArgument(iVarExp);
-        test.addArgument(jVarExp);
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Less_Than, List.of(iVarExp, jVarExp));
         ifElseStatement.setTest(test);
 
         ReturnStatement ifRet = new ReturnStatement(symbolTable);
@@ -122,22 +108,16 @@ public class SafeMethods {
 
         VariableExpression p2VarExp = new VariableExpression(symbolTable,p2Var);
 
-        OperatorExpression size = new OperatorExpression(symbolTable, UnaryOperator.Cardinality);
-        size.addArgument(p1VarExp);
+        OperatorExpression size = new OperatorExpression(symbolTable, UnaryOperator.Cardinality, List.of(p1VarExp));
 
-        OperatorExpression ltSize = new OperatorExpression(symbolTable, BinaryOperator.Less_Than);
-        ltSize.addArgument(p2VarExp);
-        ltSize.addArgument(size);
+        OperatorExpression ltSize = new OperatorExpression(symbolTable, BinaryOperator.Less_Than, List.of(p2VarExp, size));
 
-        OperatorExpression gtZero = new OperatorExpression(symbolTable, BinaryOperator.Less_Than_Or_Equal);
-        gtZero.addArgument(new IntLiteral(symbolTable, 0));
-        gtZero.addArgument(p2VarExp);
+        IntLiteral zero = new IntLiteral(new Int(), symbolTable, 0);
+        OperatorExpression gtZero = new OperatorExpression(symbolTable, BinaryOperator.Less_Than_Or_Equal, List.of(zero, p2VarExp));
 
-        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.And);
-        test.addArgument(ltSize);
-        test.addArgument(gtZero);
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.And, List.of(ltSize, gtZero));
 
-        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, test, p2VarExp, new IntLiteral(symbolTable, 0));
+        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, test, p2VarExp, new IntLiteral(new Int(), symbolTable, 0));
         statement.addValue(ifElseExpression);
 
         System.out.println(safe_index_seq);
@@ -158,21 +138,14 @@ public class SafeMethods {
         ReturnStatement statement = new ReturnStatement(symbolTable);
         safe_div.setBody(statement);
 
-        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals);
+        VariableExpression lhsTest = new VariableExpression(symbolTable, p2Var);
+        IntLiteral rhsTest = new IntLiteral(new Int(), symbolTable, 0);
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals, List.of(lhsTest, rhsTest));
 
-        VariableExpression lhsTest = new VariableExpression(symbolTable,p2Var);
-        test.addArgument(lhsTest);
 
-        IntLiteral rhsTest = new IntLiteral(symbolTable, 0);
-        test.addArgument(rhsTest);
-
-        OperatorExpression ifDiv = new OperatorExpression(symbolTable, BinaryOperator.Divide, false);
-
-        VariableExpression lhsIf = new VariableExpression(symbolTable,p1Var);
-        ifDiv.addArgument(lhsIf);
-
-        VariableExpression rhsIf = new VariableExpression(symbolTable,p2Var);
-        ifDiv.addArgument(rhsIf);
+        VariableExpression lhsIf = new VariableExpression(symbolTable, p1Var);
+        VariableExpression rhsIf = new VariableExpression(symbolTable, p2Var);
+        OperatorExpression ifDiv = new OperatorExpression(symbolTable, BinaryOperator.Divide, List.of(lhsIf, rhsIf), false);
 
         Expression elseDiv = new VariableExpression(symbolTable,p1Var);
 
@@ -197,21 +170,13 @@ public class SafeMethods {
         ReturnStatement statement = new ReturnStatement(symbolTable);
         safe_mod.setBody(statement);
 
-        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals);
-
         VariableExpression lhsTest = new VariableExpression(symbolTable,p2Var);
-        test.addArgument(lhsTest);
-
-        IntLiteral rhsTest = new IntLiteral(symbolTable, 0);
-        test.addArgument(rhsTest);
-
-        OperatorExpression ifDiv = new OperatorExpression(symbolTable, BinaryOperator.Modulus, false);
+        IntLiteral rhsTest = new IntLiteral(new Int(), symbolTable, 0);
+        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals, List.of(lhsTest, rhsTest));
 
         VariableExpression lhsIf = new VariableExpression(symbolTable,p1Var);
-        ifDiv.addArgument(lhsIf);
-
         VariableExpression rhsIf = new VariableExpression(symbolTable,p2Var);
-        ifDiv.addArgument(rhsIf);
+        OperatorExpression ifDiv = new OperatorExpression(symbolTable, BinaryOperator.Modulus, List.of(lhsIf, rhsIf), false);
 
         Expression elseDiv = new VariableExpression(symbolTable,p1Var);
 

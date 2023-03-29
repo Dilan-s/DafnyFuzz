@@ -7,10 +7,13 @@ import AST.Statements.Expressions.ArrayLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DArray implements DCollection {
 
     public static final int MAX_SIZE_OF_ARRAY = 10;
+    private List<Expression> sequence;
     private Type type;
 
     public int getLength() {
@@ -71,10 +74,12 @@ public class DArray implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
-        ArrayLiteral expression = new ArrayLiteral(symbolTable, this);
+
+        List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
-            expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
+            values.add(expressionGenerator.generateExpression(type.concrete(symbolTable), symbolTable));
         }
+        ArrayLiteral expression = new ArrayLiteral(symbolTable, this, values);
         return expression;
     }
 
@@ -93,7 +98,7 @@ public class DArray implements DCollection {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             return new DArray(t);
         }
-        return this;
+        return new DArray(type.concrete(symbolTable));
     }
 
     @Override

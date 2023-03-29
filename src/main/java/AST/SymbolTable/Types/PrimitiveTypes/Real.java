@@ -10,6 +10,7 @@ public class Real implements BaseType {
 
     private static final int MAX_DOUBLE = 30;
     public static final double PROB_NEGATION = 0.5;
+    private double value;
 
     @Override
     public String getName() {
@@ -32,9 +33,9 @@ public class Real implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        double value = GeneratorConfig.getRandom().nextDouble() * MAX_DOUBLE;
+        value = GeneratorConfig.getRandom().nextDouble() * MAX_DOUBLE;
         value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
-        return new RealLiteral(symbolTable, value);
+        return new RealLiteral(this, symbolTable, value);
     }
 
     @Override
@@ -49,6 +50,6 @@ public class Real implements BaseType {
 
     @Override
     public Type concrete(SymbolTable symbolTable) {
-        return new Bool();
+        return new Real();
     }
 }

@@ -11,33 +11,36 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SubsequenceExpression implements Expression {
 
     private SymbolTable symbolTable;
 
     private final Expression seq;
-    private AssignmentStatement statSeq;
-    private Variable seqVar;
 
+    private AssignmentStatement statSeq;
     private AssignmentStatement statLoHi;
+
+    private Variable seqVar;
     private Variable loVar;
     private Variable hiVar;
 
-    public SubsequenceExpression(SymbolTable symbolTable, Expression seq) {
+    public SubsequenceExpression(SymbolTable symbolTable, Expression seq, Expression i, Expression j) {
         this.symbolTable = symbolTable;
         this.seq = seq;
+        addIndexes(seq, i, j);
+    }
+
+    public SubsequenceExpression(SymbolTable symbolTable, Expression seq, Expression i) {
+        this(symbolTable, seq, i , new IntLiteral(new Int(), symbolTable, 0));
     }
 
     public VariableExpression getSequenceVariableExpression() {
         return new VariableExpression(symbolTable, seqVar);
     }
 
-    public void addIndexes(Expression i) {
-        addIndexes(i, new IntLiteral(symbolTable, 0));
-    }
-
-    public void addIndexes(Expression i, Expression j) {
+    private void addIndexes(Expression seq, Expression i, Expression j) {
         Type seqType = seq.getTypes().get(0);
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqType), seqType);
         VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
@@ -49,15 +52,8 @@ public class SubsequenceExpression implements Expression {
         this.loVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
         this.hiVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
 
-        CallExpression expr = new CallExpression(symbolTable, symbolTable.getMethod("safe_subsequence"));
-        try {
-            expr.addArg(seqVarExp);
-            expr.addArg(i);
-            expr.addArg(j);
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
+        CallExpression expr = new CallExpression(symbolTable, symbolTable.getMethod("safe_subsequence"), List.of(seqVarExp, i, j));
 
-        }
         statLoHi = new AssignmentStatement(symbolTable);
         statLoHi.addAssignment(List.of(loVar, hiVar), expr);
         statLoHi.addAssignmentsToSymbolTable();
@@ -65,7 +61,7 @@ public class SubsequenceExpression implements Expression {
 
     @Override
     public List<Type> getTypes() {
-        return seq.getTypes();
+        return List.of(seqVar.getType());
     }
 
     @Override
@@ -86,5 +82,19 @@ public class SubsequenceExpression implements Expression {
     @Override
     public String toString() {
         return String.format("%s[%s..%s]", seqVar.getName(), loVar.getName(), hiVar.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(seqVar, loVar, hiVar);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SubsequenceExpression)) {
+            return false;
+        }
+        SubsequenceExpression other = (SubsequenceExpression) obj;
+        return other.seqVar.equals(seqVar) && other.loVar.equals(loVar) && other.hiVar.equals(hiVar);
     }
 }

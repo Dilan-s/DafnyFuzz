@@ -35,4 +35,18 @@ public class VariableExpression implements Expression {
     public String toString() {
         return variable.getName();
     }
+
+    @Override
+    public int hashCode() {
+        return variable.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof VariableExpression)) {
+            return false;
+        }
+        VariableExpression other = (VariableExpression) obj;
+        return other.variable.equals(variable);
+    }
 }

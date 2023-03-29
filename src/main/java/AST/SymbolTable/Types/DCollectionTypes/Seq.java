@@ -7,24 +7,27 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.SeqLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Seq implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 10;
+    private List<Expression> sequence;
     private Type type;
-
-    public int getLength() {
-        return length;
-    }
-
     private int length;
 
     public Seq(Type type) {
         this.type = type;
+        this.sequence = new ArrayList<>();
     }
 
     public Seq() {
         this(null);
+    }
+
+    public int getLength() {
+        return length;
     }
 
     @Override
@@ -73,7 +76,9 @@ public class Seq implements DCollection {
         length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
         SeqLiteral expression = new SeqLiteral(symbolTable,this);
         for (int i = 0; i < length; i++) {
-            expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
+            Expression exp = expressionGenerator.generateExpression(type.concrete(symbolTable), symbolTable);
+            expression.addValue(exp);
+            sequence.add(exp);
         }
         return expression;
     }
@@ -93,7 +98,11 @@ public class Seq implements DCollection {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             return new Seq(t);
         }
-        return this;
+        return new Seq(type.concrete(symbolTable));
+    }
+
+    public List<Expression> getSequence() {
+        return sequence;
     }
 
     @Override

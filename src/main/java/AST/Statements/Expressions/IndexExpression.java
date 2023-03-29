@@ -21,19 +21,16 @@ public class IndexExpression implements Expression {
     private AssignmentStatement asStatInd;
     private SymbolTable symbolTable;
 
-    private Expression seq;
     private Variable seqVar;
-
     private Variable indVar;
 
-    public IndexExpression(SymbolTable symbolTable) {
+    public IndexExpression(SymbolTable symbolTable, Expression seq, Expression index) {
         this.symbolTable = symbolTable;
+        setSeqAndInd(seq, index);
     }
 
     public void setSeqAndInd(Expression seq, Expression index) {
-        this.seq = seq;
         DCollection type = (DCollection) seq.getTypes().get(0);
-//        Type type = seq.getTypes().get(0);
 
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(type), type);
         VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
@@ -44,26 +41,17 @@ public class IndexExpression implements Expression {
 
         indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
 
+        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod(String.format("safe_index_%s", type.getName())), List.of(seqVarExp, index));
+
         asStatInd = new AssignmentStatement(symbolTable);
-        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod(String.format("safe_index_%s", type.getName())));
-        try {
-            callExp.addArg(seqVarExp);
-            callExp.addArg(index);
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        }
         asStatInd.addAssignment(List.of(indVar), callExp);
         asStatInd.addAssignmentsToSymbolTable();
     }
 
     @Override
     public List<Type> getTypes() {
-        return seq.getTypes().stream()
-            .filter(Type::isCollection)
-            .map(x -> (DCollection) x)
-            .map(DCollection::getInnerType)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        DCollection collection = (DCollection) seqVar.getType();
+        return List.of(collection.getInnerType());
     }
 
     @Override
@@ -84,5 +72,19 @@ public class IndexExpression implements Expression {
     @Override
     public String toString() {
         return String.format("%s[%s]", seqVar.getName(), indVar.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(seqVar, indVar);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IndexExpression)) {
+            return false;
+        }
+        IndexExpression other = (IndexExpression) obj;
+        return other.seqVar.equals(seqVar) && other.indVar.equals(indVar);
     }
 }
