@@ -18,11 +18,18 @@ public class MultisetLiteral implements Expression {
     private List<Expression> values;
     private Optional<Expression> collection;
 
-    public MultisetLiteral(SymbolTable symbolTable, Type type) {
+    public MultisetLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
+        this.symbolTable = symbolTable;
+        this.type = type;
+        this.values = values;
+        this.collection = Optional.empty();
+    }
+
+    public MultisetLiteral(SymbolTable symbolTable, Type type, Optional<Expression> collection) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = new ArrayList<>();
-        this.collection = Optional.empty();
+        this.collection = collection;
     }
 
     @Override

@@ -2,7 +2,6 @@ package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.List;

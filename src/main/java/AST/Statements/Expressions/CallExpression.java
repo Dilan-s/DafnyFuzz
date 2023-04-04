@@ -1,6 +1,5 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.InvalidArgumentException;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
@@ -41,7 +40,7 @@ public class CallExpression implements Expression {
 
     private void addArg(Expression expression) {
         Type type = expression.getTypes().get(0);
-        String var = VariableNameGenerator.generateVariableValueName(type);
+        String var = VariableNameGenerator.generateVariableValueName(type, symbolTable);
         Variable variable = new Variable(var, type);
         variables.add(variable);
 
@@ -57,10 +56,11 @@ public class CallExpression implements Expression {
         AssignmentStatement stat = new AssignmentStatement(symbolTable);
         assignedVariables = new ArrayList<>();
         for (Type returnType : method.getReturnTypes()) {
-            String var = VariableNameGenerator.generateVariableValueName(returnType);
-            Variable variable = new Variable(var, returnType);
+            Type rt = returnType.concrete(symbolTable);
+            rt.setValue(returnType.getValue());
+            String var = VariableNameGenerator.generateVariableValueName(rt, symbolTable);
+            Variable variable = new Variable(var, rt);
             assignedVariables.add(variable);
-            symbolTable.addVariable(variable);
         }
 
         CallMethodExpression callMethodExpression = new CallMethodExpression(method, variables);
@@ -74,6 +74,7 @@ public class CallExpression implements Expression {
     public List<Type> getTypes() {
         return method.getReturnTypes();
     }
+
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {

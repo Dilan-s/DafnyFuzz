@@ -10,16 +10,18 @@ import java.util.List;
 public class VariableExpression implements Expression {
 
     private Variable variable;
+    private Type type;
     private SymbolTable symbolTable;
 
-    public VariableExpression(SymbolTable symbolTable, Variable variable) {
+    public VariableExpression(SymbolTable symbolTable, Variable variable, Type type) {
         this.symbolTable = symbolTable;
         this.variable = variable;
+        this.type = type;
     }
 
     @Override
     public List<Type> getTypes() {
-        return List.of(variable.getType());
+        return List.of(type);
     }
 
     @Override

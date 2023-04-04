@@ -13,13 +13,15 @@ import java.util.stream.Collectors;
 
 public class IfElseExpression implements Expression {
 
+    private Type type;
     private final Expression test;
     private final Expression ifExp;
     private final Expression elseExp;
     private SymbolTable symbolTable;
 
-    public IfElseExpression(SymbolTable symbolTable, Expression test, Expression ifExp, Expression elseExp) {
+    public IfElseExpression(SymbolTable symbolTable, Type type, Expression test, Expression ifExp, Expression elseExp) {
         this.symbolTable = symbolTable;
+        this.type = type;
         this.test = test;
         this.ifExp = ifExp;
         this.elseExp = elseExp;
@@ -27,7 +29,7 @@ public class IfElseExpression implements Expression {
 
     @Override
     public List<Type> getTypes() {
-        return ifExp.getTypes();
+        return List.of(type);
     }
 
     @Override

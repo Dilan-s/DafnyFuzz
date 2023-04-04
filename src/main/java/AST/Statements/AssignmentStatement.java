@@ -3,6 +3,7 @@ package AST.Statements;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -29,7 +30,7 @@ public class AssignmentStatement implements Statement {
     public void addAssignment(Expression e) {
         List<Variable> variables = new ArrayList<>();
         for (Type t : e.getTypes()) {
-            variables.add(new Variable(VariableNameGenerator.generateVariableValueName(t), t));
+            variables.add(new Variable(VariableNameGenerator.generateVariableValueName(t, symbolTable), t));
         }
         addAssignment(variables, e);
     }
@@ -38,6 +39,11 @@ public class AssignmentStatement implements Statement {
         declared = declared || variablesToAssign.stream().anyMatch(Variable::isDeclared);
         variables.addAll(variablesToAssign);
         values.add(expression);
+
+        for (int i = 0; i < variablesToAssign.size(); i++) {
+            Type t = variablesToAssign.get(i).getType();
+            t.setExpressionAndIndAndDependencies(expression, i, new ArrayList<>());
+        }
     }
 
     public void addAssignmentsToSymbolTable() {
@@ -117,5 +123,10 @@ public class AssignmentStatement implements Statement {
             code.add(String.format("var %s := %s;\n", lhs, rhs));
         }
         return code;
+    }
+
+    @Override
+    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
+        return currStatus;
     }
 }

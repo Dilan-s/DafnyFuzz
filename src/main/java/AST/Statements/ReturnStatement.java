@@ -3,6 +3,7 @@ package AST.Statements;
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.PrintAll;
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -15,18 +16,26 @@ public class ReturnStatement implements Statement {
 
     private final SymbolTable symbolTable;
     private final List<Expression> values;
+    private boolean printAll;
 
-    public ReturnStatement(SymbolTable symbolTable) {
+    public ReturnStatement(SymbolTable symbolTable, List<Expression> values) {
         this.symbolTable = symbolTable;
-        this.values = new ArrayList<>();
+        this.values = values;
+        this.printAll = true;
+
     }
 
-    public void addValue(Expression expression) {
-        values.add(expression);
+    public void setPrintAll(boolean printAll) {
+        this.printAll = printAll;
     }
 
     @Override
     public boolean isReturn() {
+        return true;
+    }
+
+    @Override
+    public boolean couldReturn() {
         return true;
     }
 
@@ -75,11 +84,22 @@ public class ReturnStatement implements Statement {
             .map(Expression::toString)
             .collect(Collectors.joining(", "));
 
-        PrintAll printAll = new PrintAll(symbolTable);
-        code.addAll(printAll.toCode());
+        if (printAll) {
+            PrintAll printAll = new PrintAll(symbolTable);
+            code.addAll(printAll.toCode());
+        }
 
         code.add(String.format("return %s;\n", returnValues));
         return code;
     }
 
+    public List<Expression> getReturnValues() {
+        return values;
+    }
+
+    @Override
+    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
+        method.setReturnValues(values, dependencies);
+        return ReturnStatus.ASSIGNED;
+    }
 }

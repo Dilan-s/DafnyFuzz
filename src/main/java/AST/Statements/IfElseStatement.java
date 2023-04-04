@@ -2,6 +2,9 @@ package AST.Statements;
 
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.Operator.UnaryOperator;
+import AST.Statements.Expressions.OperatorExpression;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Method;
@@ -43,6 +46,11 @@ public class IfElseStatement implements Statement {
     }
 
     @Override
+    public boolean couldReturn() {
+        return ifStat.couldReturn() || (elseStat.isPresent() && elseStat.get().couldReturn());
+    }
+
+    @Override
     public void semanticCheck(Method method) throws SemanticException {
         List<Type> testTypes = test.getTypes();
 
@@ -80,5 +88,46 @@ public class IfElseStatement implements Statement {
 
         code.add("}\n");
         return code;
+    }
+
+    @Override
+    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
+        Type testT = test.getTypes().get(0);
+
+        Boolean testB = (Boolean) testT.getValue();
+
+        if (testB != null) {
+            if (testB && ifStat.couldReturn()) {
+                return ifStat.assignReturnIfPossible(method, currStatus, dependencies);
+            } else if (!testB && elseStat.isPresent() && elseStat.get().couldReturn()) {
+                return elseStat.get().assignReturnIfPossible(method, currStatus, dependencies);
+            }
+        } else {
+            ReturnStatus rIf = currStatus;
+            ReturnStatus rElse = currStatus;
+            if (ifStat.couldReturn()) {
+
+                List<Expression> trueDep = new ArrayList<>(dependencies);
+                trueDep.add(test);
+                rIf = ifStat.assignReturnIfPossible(method, currStatus,
+                    trueDep);
+            }
+            if (elseStat.isPresent() && elseStat.get().couldReturn()) {
+
+                List<Expression> falseDep = new ArrayList<>(dependencies);
+
+                Bool bool = new Bool();
+                OperatorExpression op = new OperatorExpression(symbolTable, bool,
+                    UnaryOperator.Negate, List.of(test));
+                falseDep.add(op);
+                bool.setValue(true);
+                rElse = elseStat.get()
+                    .assignReturnIfPossible(method, currStatus, falseDep);
+            }
+            if (rIf == ReturnStatus.ASSIGNED && rElse == ReturnStatus.ASSIGNED) {
+                return ReturnStatus.ASSIGNED;
+            }
+        }
+        return currStatus;
     }
 }

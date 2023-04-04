@@ -4,13 +4,18 @@ import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.CharLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
+import java.util.Objects;
 
-public class Char implements BaseType {
+public class Char extends AbstractType implements BaseType {
 
     private static final double PROB_UPPERCASE = 0.5;
-    public static final int LOWER_TO_UPPER_SHIFT = 'A' - 'a';
-    private char c;
+    private Character value;
+
+    public Char() {
+        this.value = null;
+    }
 
     @Override
     public String getName() {
@@ -33,9 +38,18 @@ public class Char implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        c = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
-        c += GeneratorConfig.getRandom().nextDouble() < PROB_UPPERCASE ? LOWER_TO_UPPER_SHIFT : 0;
-        return new CharLiteral(this, symbolTable, c);
+        value = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
+        if (GeneratorConfig.getRandom().nextDouble() < PROB_UPPERCASE) {
+            value = Character.toUpperCase(value);
+        }
+        return new CharLiteral(this, symbolTable, value);
+    }
+
+    @Override
+    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
+        Type t = this.concrete(symbolTable);
+        t.setValue(value);
+        return new CharLiteral(t, symbolTable, (Character) value);
     }
 
     @Override
@@ -46,5 +60,33 @@ public class Char implements BaseType {
     @Override
     public Type concrete(SymbolTable symbolTable) {
         return new Char();
+    }
+
+    @Override
+    public boolean lessThanOrEqual(Type rhsT) {
+        Char rhsChar = (Char) rhsT;
+        return value <= rhsChar.value;
+    }
+
+    @Override
+    public boolean lessThan(Type rhsT) {
+        Char rhsChar = (Char) rhsT;
+        return value <= rhsChar.value;
+    }
+
+    @Override
+    public boolean equal(Type rhsT) {
+        Char rhsChar = (Char) rhsT;
+        return Objects.equals(value, rhsChar.value);
+    }
+
+    @Override
+    public void setValue(Object value) {
+        this.value = (Character) value;
+    }
+
+    @Override
+    public Object getValue() {
+        return value;
     }
 }

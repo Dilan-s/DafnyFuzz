@@ -2,6 +2,7 @@ package AST.Statements;
 
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -49,5 +50,10 @@ public class PrintStatement implements Statement {
             code.add(String.format("print %s, \"\\n\";\n", printValues));
         }
         return code;
+    }
+
+    @Override
+    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
+        return currStatus;
     }
 }

@@ -4,14 +4,15 @@ import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.BoolLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
 
-public class Bool implements BaseType {
+public class Bool extends AbstractType implements BaseType {
 
-    private boolean value;
+    private Boolean value;
 
     public Bool() {
-        value = false;
+        this.value = null;
     }
 
     @Override
@@ -34,9 +35,26 @@ public class Bool implements BaseType {
     }
 
     @Override
+    public Object getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        this.value = (Boolean) value;
+    }
+
+    @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
         value = GeneratorConfig.getRandom().nextBoolean();
         return new BoolLiteral(this, symbolTable, value);
+    }
+
+    @Override
+    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
+        Type t = this.concrete(symbolTable);
+        t.setValue(value);
+        return new BoolLiteral(t, symbolTable, (Boolean) value);
     }
 
     @Override

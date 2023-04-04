@@ -1,6 +1,5 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.InvalidArgumentException;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
@@ -13,35 +12,48 @@ import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class IndexExpression implements Expression {
 
     private AssignmentStatement asStatSeq;
     private AssignmentStatement asStatInd;
     private SymbolTable symbolTable;
+    private Type type;
 
     private Variable seqVar;
     private Variable indVar;
 
-    public IndexExpression(SymbolTable symbolTable, Expression seq, Expression index) {
+    public IndexExpression(SymbolTable symbolTable, Type type, Expression seq, Expression index) {
         this.symbolTable = symbolTable;
+        this.type = type;
         setSeqAndInd(seq, index);
     }
 
-    public void setSeqAndInd(Expression seq, Expression index) {
-        DCollection type = (DCollection) seq.getTypes().get(0);
+    public VariableExpression getSequenceVariableExpression() {
+        return new VariableExpression(symbolTable, seqVar, seqVar.getType());
+    }
 
-        seqVar = new Variable(VariableNameGenerator.generateVariableValueName(type), type);
-        VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
+    public void setSeqAndInd(Expression seq, Expression index) {
+        DCollection seqT = (DCollection) seq.getTypes().get(0);
+
+        seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqT, symbolTable), seqT);
+        VariableExpression seqVarExp = getSequenceVariableExpression();
 
         asStatSeq = new AssignmentStatement(symbolTable);
         asStatSeq.addAssignment(List.of(seqVar), seq);
         asStatSeq.addAssignmentsToSymbolTable();
 
-        indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
+        Int indT = new Int();
+        Type indType = index.getTypes().get(0);
+        indVar = new Variable(VariableNameGenerator.generateVariableValueName(indT, symbolTable), indT);
 
-        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod(String.format("safe_index_%s", type.getName())), List.of(seqVarExp, index));
+        if (seqT.getValue() != null && indType.getValue() != null) {
+            Integer i = (Integer) indType.getValue();
+            int iIndex = i < seqT.getSize() && 0 <= i ? i : 0;
+            indT.setValue(iIndex);
+        }
+
+        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod(String.format("safe_index_%s", seqT.getName())), List.of(seqVarExp, index));
 
         asStatInd = new AssignmentStatement(symbolTable);
         asStatInd.addAssignment(List.of(indVar), callExp);
@@ -50,8 +62,7 @@ public class IndexExpression implements Expression {
 
     @Override
     public List<Type> getTypes() {
-        DCollection collection = (DCollection) seqVar.getType();
-        return List.of(collection.getInnerType());
+        return List.of(type);
     }
 
     @Override

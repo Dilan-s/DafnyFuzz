@@ -8,7 +8,6 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -23,15 +22,21 @@ public class ArrayLiteral implements Expression {
     private List<Expression> values;
     private AssignmentStatement statement;
 
-    public ArrayLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
+    public ArrayLiteral(SymbolTable symbolTable, Type type, List<Expression> values, boolean toAssign) {
         this.symbolTable = symbolTable;
         this.type = type;
-        this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type), type);
         this.values = values;
 
-        statement = new AssignmentStatement(symbolTable);
-        statement.addAssignment(List.of(variable), new ArrayInitValues(values));
-        statement.addAssignmentsToSymbolTable();
+        if (toAssign) {
+            this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
+            statement = new AssignmentStatement(symbolTable);
+            statement.addAssignment(List.of(variable), new ArrayInitValues(values));
+            statement.addAssignmentsToSymbolTable();
+        }
+    }
+
+    public ArrayLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
+        this(symbolTable, type, values, true);
     }
 
     @Override
@@ -75,9 +80,6 @@ public class ArrayLiteral implements Expression {
             return false;
         }
         ArrayLiteral other = (ArrayLiteral) obj;
-        if (!other.variable.equals(variable)) {
-            return false;
-        }
 
         if (other.values.size() != values.size()) {
             return false;

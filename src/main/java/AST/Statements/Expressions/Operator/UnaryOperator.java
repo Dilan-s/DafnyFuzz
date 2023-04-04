@@ -1,14 +1,13 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
-import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
+import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,19 +22,37 @@ public enum UnaryOperator implements Operator {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
-//            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-//            Type t = typeGenerator.generateBaseTypes(1, symbolTable).get(0);
-            List<Type> collect = types.stream()
+            return types.stream()
                 .map(x -> x.concrete(symbolTable))
                 .collect(Collectors.toList());
-            return collect;
-//            List<Type> ret = new ArrayList<>();
-//            DCollection collection = (DCollection) types.get(0);
-//            ret.add(collection.setInnerType(t));
-//            return ret;
+        }
+
+        @Override
+        public void apply(Type type, List<Expression> args) {
+            Expression expression = args.get(0);
+            DCollection t = (DCollection) expression.getTypes().get(0);
+            Int i = (Int) type;
+            i.setValue(t.getValue() == null ? null : t.getSize());
         }
     },
-    ;
+    Negate("!", List.of(Args.BOOL), new Bool()) {
+        @Override
+        public void apply(Type type, List<Expression> args) {
+            Bool bool = (Bool) type;
+
+            Expression arg = args.get(0);
+            Bool argT = (Bool) arg.getTypes().get(0);
+
+            Boolean value = (Boolean) argT.getValue();
+            bool.setValue(value == null ? null : !value);
+        }
+
+        @Override
+        public String formExpression(List<Expression> args) {
+            String res = args.get(0).toString();
+            return String.format("!(%s)", res);
+        }
+    };
 
     private final String operator;
     private final List<List<Type>> typeArgs;

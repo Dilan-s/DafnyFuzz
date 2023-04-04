@@ -1,6 +1,5 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.InvalidArgumentException;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
@@ -33,16 +32,16 @@ public class ReassignSeqExpression implements Expression {
 
     private void generateVariableCalls(Expression seq, Expression ind) {
         Type t = seq.getTypes().get(0);
-        seqVar = new Variable(VariableNameGenerator.generateVariableValueName(t), t);
+        seqVar = new Variable(VariableNameGenerator.generateVariableValueName(t, symbolTable), t);
 
         seqAssign = new AssignmentStatement(symbolTable);
         seqAssign.addAssignment(List.of(seqVar), seq);
         seqAssign.addAssignmentsToSymbolTable();
-        VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
+        VariableExpression seqVarExp = getSequenceVariableExpression();
 
         CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(seqVarExp, ind));
 
-        indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
+        indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int(), symbolTable), new Int());
 
         indAssign = new AssignmentStatement(symbolTable);
         indAssign.addAssignment(List.of(indVar), callExp);
@@ -76,7 +75,7 @@ public class ReassignSeqExpression implements Expression {
     }
 
     public VariableExpression getSequenceVariableExpression() {
-        return new VariableExpression(symbolTable, seqVar);
+        return new VariableExpression(symbolTable, seqVar, seqVar.getType());
     }
 
     @Override

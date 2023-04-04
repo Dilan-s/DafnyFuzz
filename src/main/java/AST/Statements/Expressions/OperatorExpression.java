@@ -1,6 +1,5 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.InvalidArgumentException;
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
@@ -24,22 +23,19 @@ public class OperatorExpression implements Expression {
     private boolean convertToCall;
     private SymbolTable symbolTable;
 
-    public OperatorExpression(SymbolTable symbolTable, Operator operator, List<Expression> args, boolean convertToCall) {
+    public OperatorExpression(SymbolTable symbolTable, Type type, Operator operator, List<Expression> args, boolean convertToCall) {
         this.symbolTable = symbolTable;
         this.replacementExpression = Optional.empty();
         this.operator = operator;
         this.convertToCall = convertToCall;
-        this.type = null;
+        this.type = type;
         this.args = args;
+        operator.apply(type, args);
         generateMethodCallReplacement();
     }
 
-    public OperatorExpression(SymbolTable symbolTable, Operator operator, List<Expression> args) {
-        this(symbolTable, operator, args, true);
-    }
-
-    public void setType(Type type) {
-        this.type = type;
+    public OperatorExpression(SymbolTable symbolTable, Type type, Operator operator, List<Expression> args) {
+        this(symbolTable, type, operator, args, true);
     }
 
     @Override

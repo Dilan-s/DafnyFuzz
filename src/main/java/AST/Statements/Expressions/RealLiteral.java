@@ -2,11 +2,9 @@ package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.List;
-import java.util.Objects;
 
 public class RealLiteral implements Expression {
 

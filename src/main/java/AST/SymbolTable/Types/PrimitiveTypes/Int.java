@@ -4,22 +4,26 @@ import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IntLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
+import java.util.Objects;
 
-public class Int implements BaseType {
+public class Int extends AbstractType implements BaseType {
 
     private static final int MAX_INT = 30;
     private static final double PROB_HEX = 0.2;
     public static final double PROB_NEGATION = 0.1;
     private int max;
-    private int value;
+    private Integer value;
+    private boolean asHex;
 
     public Int(int max) {
         this.max = max;
+        this.value = null;
     }
 
     public Int() {
-        this.max = MAX_INT;
+        this(MAX_INT);
     }
 
     @Override
@@ -45,7 +49,15 @@ public class Int implements BaseType {
     public Expression generateLiteral(SymbolTable symbolTable) {
         value = GeneratorConfig.getRandom().nextInt(max);
         value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
-        return new IntLiteral(this, symbolTable, value, value > 0 &&  GeneratorConfig.getRandom().nextDouble() < PROB_HEX);
+        asHex = value > 0 && GeneratorConfig.getRandom().nextDouble() < PROB_HEX;
+        return new IntLiteral(this, symbolTable, value, asHex);
+    }
+
+    @Override
+    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
+        Type t = this.concrete(symbolTable);
+        t.setValue(value);
+        return new IntLiteral(t, symbolTable, (Integer) value, asHex);
     }
 
     @Override
@@ -58,11 +70,30 @@ public class Int implements BaseType {
         return new Int();
     }
 
-    public void setValue(int value) {
-        this.value = value;
+    @Override
+    public void setValue(Object value) {
+        this.value = (Integer) value;
     }
 
-    public int getValue() {
+    public Object getValue() {
         return value;
+    }
+
+    @Override
+    public boolean lessThanOrEqual(Type rhsT) {
+        Int rhsInt = (Int) rhsT;
+        return value <= rhsInt.value;
+    }
+
+    @Override
+    public boolean lessThan(Type rhsT) {
+        Int rhsInt = (Int) rhsT;
+        return value <= rhsInt.value;
+    }
+
+    @Override
+    public boolean equal(Type rhsT) {
+        Int rhsInt = (Int) rhsT;
+        return Objects.equals(value, rhsInt.value);
     }
 }

@@ -90,13 +90,12 @@ public interface Operator {
             t = typeGenerator.generateBaseTypes(1, symbolTable).get(0);
         } else {
             t = typeGenerator.generateTypes(1, symbolTable).get(0);
-
         }
         List<Type> ret = new ArrayList<>();
         for (Type type: types) {
             if (type.isCollection()) {
                 DCollection collection = (DCollection) type;
-                ret.add(collection.setInnerType(t).concrete(symbolTable));
+                ret.add(collection.setInnerType(t.concrete(symbolTable)).concrete(symbolTable));
             } else {
                 ret.add(type.concrete(symbolTable));
             }
@@ -105,4 +104,5 @@ public interface Operator {
     }
 
 
+    void apply(Type type, List<Expression> args);
 }

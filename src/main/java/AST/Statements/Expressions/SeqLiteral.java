@@ -4,7 +4,6 @@ import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,19 +14,15 @@ public class SeqLiteral implements Expression {
     private final List<Expression> values;
     private SymbolTable symbolTable;
 
-    public SeqLiteral(SymbolTable symbolTable, Type type) {
+    public SeqLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
-        this.values = new ArrayList<>();
+        this.values = values;
     }
 
     @Override
     public List<Type> getTypes() {
         return List.of(type);
-    }
-
-    public void addValue(Expression expression) {
-        values.add(expression);
     }
 
     @Override

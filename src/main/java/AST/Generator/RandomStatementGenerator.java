@@ -9,6 +9,7 @@ import AST.Statements.PrintStatement;
 import AST.Statements.ReturnStatement;
 import AST.Statements.Statement;
 import AST.Statements.util.PrintAll;
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -29,7 +30,7 @@ public class RandomStatementGenerator {
 
     public static final int MAX_STATEMENT_DEPTH = 5;
     public static final double PROB_NEXT_STAT = 0.85;
-    public static final double PROB_FORCE_RETURN = 0.05;
+    public static final double PROB_FORCE_RETURN = 0.02;
 
     private static int statementDepth = 0;
 
@@ -84,7 +85,7 @@ public class RandomStatementGenerator {
 
             } else if (probTypeOfStatement < PROB_PRINT_STAT) {
                 //Print
-                ret = generatePrintStatement(symbolTable);
+//                ret = generatePrintStatement(symbolTable);
             } else if (probTypeOfStatement < PROB_IF_ELSE_STAT) {
                 //IfElse
                 ret = generateIfElseStatement(method, symbolTable);
@@ -98,14 +99,17 @@ public class RandomStatementGenerator {
     private ReturnStatement generateReturnStatement(Method method, SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        ReturnStatement statement = new ReturnStatement(symbolTable);
 
         List<Type> types = method.getReturnTypes();
+
+        List<Expression> values = new ArrayList<>();
         for (Type type : types) {
-            Expression expression = expressionGenerator.generateExpression(type, symbolTable);
-            statement.addValue(expression);
+            Type concrete = type.concrete(symbolTable);
+            Expression expression = expressionGenerator.generateExpression(concrete, symbolTable);
+            values.add(expression);
         }
 
+        ReturnStatement statement = new ReturnStatement(symbolTable, values);
         return statement;
     }
 
@@ -115,7 +119,7 @@ public class RandomStatementGenerator {
 
         PrintStatement statement = new PrintStatement(symbolTable);
 
-        int noOfValues = GeneratorConfig.getRandom().nextInt(5) + 1;
+        int noOfValues = GeneratorConfig.getRandom().nextInt(10) + 1;
         List<Type> types = typeGenerator.generateTypes(noOfValues, symbolTable);
 
         for (Type type : types) {
@@ -181,7 +185,8 @@ public class RandomStatementGenerator {
 
         if (canReassign) {
             for (Variable v : toReassign) {
-                statement.addAssignment(List.of(v), expressionGenerator.generateExpression(v.getType(), symbolTable));
+                Type type = v.getType().concrete(symbolTable);
+                statement.addAssignment(List.of(v), expressionGenerator.generateExpression(type, symbolTable));
             }
             statement.addAssignmentsToSymbolTable();
             return statement;

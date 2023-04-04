@@ -1,6 +1,7 @@
 package AST.Statements.util;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.PrintStatement;
 import AST.Statements.Statement;
@@ -18,8 +19,6 @@ public class PrintAll implements Statement {
         this.symbolTable = symbolTable;
     }
 
-
-
     @Override
     public void semanticCheck(Method method) throws SemanticException {
 
@@ -31,10 +30,15 @@ public class PrintAll implements Statement {
         List<Variable> allVariablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope();
         PrintStatement statement = new PrintStatement(symbolTable);
         for (Variable v : allVariablesInCurrentScope) {
-            VariableExpression expression = new VariableExpression(symbolTable, v);
+            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
             statement.addValue(expression);
         }
         code.addAll(statement.toCode());
         return code;
+    }
+
+    @Override
+    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
+        return currStatus;
     }
 }

@@ -1,5 +1,6 @@
 package AST.SymbolTable.Types.DCollectionTypes;
 
+import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Types.Type;
 
 public interface DCollection extends Type {
@@ -17,4 +18,12 @@ public interface DCollection extends Type {
     default boolean operatorExists() {
         return !getInnerType().isCollection();
     }
+
+    int getSize();
+
+    boolean contains(Expression val);
+
+    boolean disjoint(DCollection rhs);
+
+    Object union(DCollection rhs);
 }

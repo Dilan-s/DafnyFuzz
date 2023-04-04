@@ -1,10 +1,10 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.InvalidArgumentException;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.SymbolTable.Method;
+import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -32,25 +32,38 @@ public class SubsequenceExpression implements Expression {
         addIndexes(seq, i, j);
     }
 
-    public SubsequenceExpression(SymbolTable symbolTable, Expression seq, Expression i) {
-        this(symbolTable, seq, i , new IntLiteral(new Int(), symbolTable, 0));
-    }
-
     public VariableExpression getSequenceVariableExpression() {
-        return new VariableExpression(symbolTable, seqVar);
+        return new VariableExpression(symbolTable, seqVar, seqVar.getType());
     }
 
     private void addIndexes(Expression seq, Expression i, Expression j) {
-        Type seqType = seq.getTypes().get(0);
-        seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqType), seqType);
-        VariableExpression seqVarExp = new VariableExpression(symbolTable, seqVar);
+        DCollection seqType = (DCollection) seq.getTypes().get(0);
+        seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqType, symbolTable), seqType);
+        VariableExpression seqVarExp = getSequenceVariableExpression();
 
         statSeq = new AssignmentStatement(symbolTable);
         statSeq.addAssignment(List.of(seqVar), seq);
         statSeq.addAssignmentsToSymbolTable();
 
-        this.loVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
-        this.hiVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int()), new Int());
+        Int loT = new Int();
+        Int hiT = new Int();
+        this.loVar = new Variable(VariableNameGenerator.generateVariableValueName(loT, symbolTable), loT);
+        this.hiVar = new Variable(VariableNameGenerator.generateVariableValueName(hiT, symbolTable), hiT);
+
+        Type iT = i.getTypes().get(0);
+        Type jT = j.getTypes().get(0);
+
+
+        if (seqType.getValue() != null && iT.getValue() != null && jT.getValue() != null) {
+            Integer iVal = (Integer) iT.getValue();
+            Integer jVal = (Integer) jT.getValue();
+
+            int iIndex = iVal < seqType.getSize() && 0 <= iVal ? iVal : 0;
+            int jIndex = jVal < seqType.getSize() && 0 <= jVal ? jVal : 0;
+
+            loT.setValue(Math.min(iIndex, jIndex));
+            hiT.setValue(Math.max(iIndex, jIndex));
+        }
 
         CallExpression expr = new CallExpression(symbolTable, symbolTable.getMethod("safe_subsequence"), List.of(seqVarExp, i, j));
 
