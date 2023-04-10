@@ -59,7 +59,7 @@ public class ArrayLiteral implements Expression {
             .flatMap(Collection::stream)
             .collect(Collectors.toList()));
         if (toAssign) {
-            r.addAll(statement.expand());
+            r.add(statement);
         }
         return r;
     }

@@ -66,7 +66,6 @@ public class CallExpression implements Expression {
         callExpr = new CallMethodExpression(method, variables);
 
         assignStat = new AssignmentStatement(symbolTable, assignedVariables, callExpr);
-//        assignments.add(assignStat);
     }
 
     @Override

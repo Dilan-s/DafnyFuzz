@@ -26,14 +26,18 @@ import java.util.stream.Collectors;
 
 public class RandomExpressionGenerator {
 
-    public static final double PROB_LITERAL_EXPRESSION = 0.2;
-    public static final double PROB_OPERATOR_EXPRESSION = PROB_LITERAL_EXPRESSION + 0.3;
-    public static final double PROB_VARIABLE_EXPRESSION = PROB_OPERATOR_EXPRESSION + 0.3;
-    public static final double PROB_SEQ_INDEX_EXPRESSION = PROB_VARIABLE_EXPRESSION + 0.03;
-    public static final double PROB_SUBSEQUENCE_EXPRESSION = PROB_SEQ_INDEX_EXPRESSION + 0.03;
-    public static final double PROB_REASSIGN_SEQ_EXPRESSION = PROB_SUBSEQUENCE_EXPRESSION + 0.03;
-    public static final double PROB_IF_ELSE_EXPRESSION = PROB_REASSIGN_SEQ_EXPRESSION + 0.05;
-    public static final double PROB_CALL_EXPRESSION = PROB_IF_ELSE_EXPRESSION + 0.05;
+    public static final double PROB_LITERAL_EXPRESSION = 3.0;
+    public static final double PROB_OPERATOR_EXPRESSION = 4.0;
+    public static final double PROB_VARIABLE_EXPRESSION = 6.0;
+    public static final double PROB_SEQ_INDEX_EXPRESSION = 2.0;
+    public static final double PROB_SUBSEQUENCE_EXPRESSION = 2.0;
+    public static final double PROB_REASSIGN_SEQ_EXPRESSION = 2.0;
+    public static final double PROB_IF_ELSE_EXPRESSION = 5.0;
+    public static final double PROB_CALL_EXPRESSION = 3.0;
+
+    public static final double RATIO_SUM = PROB_LITERAL_EXPRESSION + PROB_OPERATOR_EXPRESSION +
+        PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_SUBSEQUENCE_EXPRESSION +
+        PROB_REASSIGN_SEQ_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_EXPRESSION;
 
     public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.7;
     public static final int MAX_EXPRESSION_DEPTH = 5;
@@ -46,35 +50,40 @@ public class RandomExpressionGenerator {
         Expression ret = null;
         expressionDepth++;
         while (ret == null) {
-            double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.DECAY_FACTOR, expressionDepth - 1);
-            if (expressionDepth > MAX_EXPRESSION_DEPTH
-                || probTypeOfExpression < PROB_LITERAL_EXPRESSION) {
+            double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.OPTION_DECAY_FACTOR, expressionDepth - 1) * RATIO_SUM;
+            if (expressionDepth > MAX_EXPRESSION_DEPTH || (probTypeOfExpression -= PROB_LITERAL_EXPRESSION) < 0) {
                 //literal
                 ret = generateLiteral(type, symbolTable);
 
-            } else if (probTypeOfExpression < PROB_OPERATOR_EXPRESSION && type.operatorExists()) {
-                //Operator
-                OperatorExpression expression = generateOperatorExpression(type, symbolTable);
-                if (expression != null) {
-                    ret = expression;
-                }
-            } else if (probTypeOfExpression < PROB_VARIABLE_EXPRESSION) {
+            } else if ((probTypeOfExpression -= PROB_VARIABLE_EXPRESSION) < 0) {
                 //variable
                 VariableExpression expression = generateVariableExpression(type, symbolTable);
                 if (expression != null) {
                     ret = expression;
                 }
-            } else if (probTypeOfExpression < PROB_SEQ_INDEX_EXPRESSION && !type.isCollection()) {
-                ret = generateSeqIndexExpression(type, symbolTable);
-            } else if (probTypeOfExpression < PROB_SUBSEQUENCE_EXPRESSION && type.equals(new Seq())) {
-                ret = generateSubsequenceExpression(type, symbolTable);
-            } else if (probTypeOfExpression < PROB_REASSIGN_SEQ_EXPRESSION && type.equals(new Seq())) {
-                ret = generateReassignSeqExpression(type, symbolTable);
-            } else if (probTypeOfExpression < PROB_IF_ELSE_EXPRESSION) {
+            } else if ((probTypeOfExpression -= PROB_OPERATOR_EXPRESSION) < 0 && type.operatorExists()) {
+                //Operator
+                OperatorExpression expression = generateOperatorExpression(type, symbolTable);
+                if (expression != null) {
+                    ret = expression;
+                }
+            }else if ((probTypeOfExpression -= PROB_SEQ_INDEX_EXPRESSION) < 0) {
+                if (!type.isCollection()) {
+                    ret = generateSeqIndexExpression(type, symbolTable);
+                }
+            } else if ((probTypeOfExpression -= PROB_SUBSEQUENCE_EXPRESSION) < 0) {
+                if (type.equals(new Seq())) {
+                    ret = generateSubsequenceExpression(type, symbolTable);
+                }
+            } else if ((probTypeOfExpression -= PROB_REASSIGN_SEQ_EXPRESSION) < 0) {
+                if (type.equals(new Seq())) {
+                    ret = generateReassignSeqExpression(type, symbolTable);
+                }
+            } else if ((probTypeOfExpression -= PROB_IF_ELSE_EXPRESSION) < 0) {
                 //ifElse
                 ret = generateIfElseExpression(type, symbolTable);
 
-            } else if (probTypeOfExpression < PROB_CALL_EXPRESSION) {
+            } else if ((probTypeOfExpression -= PROB_CALL_EXPRESSION) < 0) {
                 //call
                 ret = generateCallExpression(symbolTable, List.of(type));
             }

@@ -25,7 +25,7 @@ public class RandomMethodGenerator {
         methodDepth++;
         List<Method> methodWithSameType = symbolTable.getMethodWithTypes(returnTypes);
 
-        double probReuseMethod = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.DECAY_FACTOR,
+        double probReuseMethod = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.OPTION_DECAY_FACTOR,
             methodDepth - 1);
         if (!methodWithSameType.isEmpty() && probReuseMethod < PROB_REUSE_METHOD) {
             int i = GeneratorConfig.getRandom().nextInt(methodWithSameType.size());

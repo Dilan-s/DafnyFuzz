@@ -31,7 +31,8 @@ public class VariableNameGenerator {
         String typeName = type.getName();
         Integer i = variableValues.getOrDefault(typeName, 1);
         variableValues.put(typeName, i + 1);
-        return String.format("v_%s_%d", typeName, i);
+        String format = String.format("v_%s_%d", typeName, i);
+        return format;
     }
 
     public static String generateMethodName() {
