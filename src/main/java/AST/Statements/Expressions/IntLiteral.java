@@ -5,7 +5,9 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class IntLiteral implements Expression {
@@ -24,8 +26,6 @@ public class IntLiteral implements Expression {
 
     public IntLiteral(Type type, SymbolTable symbolTable, int value) {
         this(type, symbolTable, value, false);
-        Int t = (Int) type;
-        t.setValue(value);
     }
 
 

@@ -2,10 +2,9 @@ package AST.SymbolTable.Types.PrimitiveTypes;
 
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
 
-public class Void extends AbstractType implements BaseType{
+public class Void implements BaseType {
 
     @Override
     public String getName() {
@@ -37,6 +36,16 @@ public class Void extends AbstractType implements BaseType{
     }
 
     @Override
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        return false;
+    }
+
+    @Override
+    public Boolean equal(Object lhsV, Object rhsV) {
+        return false;
+    }
+
+    @Override
     public boolean operatorExists() {
         return false;
     }
@@ -44,14 +53,5 @@ public class Void extends AbstractType implements BaseType{
     @Override
     public Type concrete(SymbolTable symbolTable) {
         return new Void();
-    }
-
-    @Override
-    public void setValue(Object value) {
-    }
-
-    @Override
-    public Object getValue() {
-        return null;
     }
 }

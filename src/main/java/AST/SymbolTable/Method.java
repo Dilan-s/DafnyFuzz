@@ -11,6 +11,7 @@ import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Method implements Identifier {
@@ -20,16 +21,18 @@ public class Method implements Identifier {
     private final List<Variable> args;
     private final SymbolTable symbolTable;
     private Statement body;
+    private List<PotentialValue> returnValues;
 
-    public Method(List<Type> returnTypes, String name, SymbolTable symbolTable, List<Variable> args) {
+    public Method(List<Type> returnTypes, String name, SymbolTable symbolTable, List<Variable> args, List<PotentialValue> returnValues) {
         this.returnTypes = returnTypes;
         this.name = name;
         this.symbolTable = symbolTable;
         this.args = args;
+        this.returnValues = returnValues;
     }
 
     public Method(List<Type> returnTypes, String name, SymbolTable symbolTable) {
-        this(returnTypes, name, symbolTable, new ArrayList<>());
+        this(returnTypes, name, symbolTable, new ArrayList<>(), new ArrayList<>());
     }
 
     public Method(Type returnTypes, String name, SymbolTable symbolTable) {
@@ -132,39 +135,27 @@ public class Method implements Identifier {
     }
 
     public Method getSimpleMethod() {
-        return new Method(returnTypes, name, getSymbolTable(), args);
-    }
-
-    public void setReturnValues(List<Expression> values, List<Expression> dependencies) {
-        List<Type> actualTypes = values.stream()
-            .map(Expression::getTypes)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-
-
-        List<Type> returnTypes = getReturnTypes();
-
-
-        for (int i = 0; i < returnTypes.size(); i++) {
-            Type actual = actualTypes.get(i);
-            Type retType = returnTypes.get(i);
-            retType.setValue(actual.getValue());
-        }
-
-        int i = 0;
-        for (Expression expression : values) {
-            for (int k = 0; k < expression.getTypes().size(); k++) {
-                Type retType = returnTypes.get(i);
-                retType.setExpressionAndIndAndDependencies(expression, k, dependencies);
-                i++;
-            }
-        }
-        return;
+        return this;
     }
 
     public void assignReturn() {
         if (hasReturn()) {
             body.assignReturnIfPossible(this, ReturnStatus.UNASSIGNED, new ArrayList<>());
+        }
+    }
+
+    public void setReturnValues(List<Expression> expression, List<Expression> dependencies) {
+        this.returnValues.add(new PotentialValue(expression, dependencies));
+    }
+
+
+    private static class PotentialValue {
+        List<Expression> expression;
+        List<Expression> dependencies;
+
+        public PotentialValue(List<Expression> expression, List<Expression> dependencies) {
+            this.expression = expression;
+            this.dependencies = dependencies;
         }
     }
 }

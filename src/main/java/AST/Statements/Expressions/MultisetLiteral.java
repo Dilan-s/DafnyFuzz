@@ -3,12 +3,19 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DCollectionTypes.DSet;
+import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
 public class MultisetLiteral implements Expression {
@@ -36,15 +43,6 @@ public class MultisetLiteral implements Expression {
     public List<Type> getTypes() {
         return List.of(type);
     }
-
-    public void addValue(Expression expression) {
-        values.add(expression);
-    }
-
-    public void setCollection(Expression expression) {
-        this.collection = Optional.of(expression);
-    }
-
 
     @Override
     public List<String> toCode() {

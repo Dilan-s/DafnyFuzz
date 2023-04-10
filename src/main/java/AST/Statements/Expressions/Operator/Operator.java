@@ -8,8 +8,11 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public interface Operator {
@@ -103,6 +106,5 @@ public interface Operator {
         return ret;
     }
 
-
-    void apply(Type type, List<Expression> args);
+    Object apply(List<Expression> args, Map<Variable, Variable> paramsMap);
 }

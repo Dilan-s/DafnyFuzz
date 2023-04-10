@@ -4,11 +4,10 @@ import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.CharLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
 import java.util.Objects;
 
-public class Char extends AbstractType implements BaseType {
+public class Char implements BaseType {
 
     private static final double PROB_UPPERCASE = 0.5;
     private Character value;
@@ -48,7 +47,6 @@ public class Char extends AbstractType implements BaseType {
     @Override
     public Expression generateLiteral(SymbolTable symbolTable, Object value) {
         Type t = this.concrete(symbolTable);
-        t.setValue(value);
         return new CharLiteral(t, symbolTable, (Character) value);
     }
 
@@ -63,30 +61,16 @@ public class Char extends AbstractType implements BaseType {
     }
 
     @Override
-    public boolean lessThanOrEqual(Type rhsT) {
-        Char rhsChar = (Char) rhsT;
-        return value <= rhsChar.value;
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        Character lhs = (Character) lhsV;
+        Character rhs = (Character) rhsV;
+        return lhs < rhs;
     }
 
     @Override
-    public boolean lessThan(Type rhsT) {
-        Char rhsChar = (Char) rhsT;
-        return value <= rhsChar.value;
-    }
-
-    @Override
-    public boolean equal(Type rhsT) {
-        Char rhsChar = (Char) rhsT;
-        return Objects.equals(value, rhsChar.value);
-    }
-
-    @Override
-    public void setValue(Object value) {
-        this.value = (Character) value;
-    }
-
-    @Override
-    public Object getValue() {
-        return value;
+    public Boolean equal(Object lhsV, Object rhsV) {
+        Character lhs = (Character) lhsV;
+        Character rhs = (Character) rhsV;
+        return Objects.equals(lhs, rhs);
     }
 }

@@ -12,271 +12,315 @@ import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 public enum BinaryOperator implements Operator {
     Equivalence("<==>", List.of(Args.BOOL_BOOL), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Bool lhsT = (Bool) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Bool rhsT = (Bool) rhs.getTypes().get(0);
-
-            Object lhsB = lhsT.getValue();
-            Object rhsB = rhsT.getValue();
-            bool.setValue(lhsB == null || rhsB == null ? null : Objects.equals(lhsB, rhsB));
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return lhsVB == rhsVB;
+            }
+            return null;
         }
     },
     Implies("==>", List.of(Args.BOOL_BOOL), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Bool lhsT = (Bool) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Bool rhsT = (Bool) rhs.getTypes().get(0);
-
-            Boolean lhsB = (Boolean) lhsT.getValue();
-            Boolean rhsB = (Boolean) rhsT.getValue();
-            bool.setValue(lhsB == null || rhsB == null ? null : !(lhsB && !rhsB));
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return !(lhsVB && !rhsVB);
+            }
+            return null;
         }
     },
     ReverseImplies("<==", List.of(Args.BOOL_BOOL), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Bool lhsT = (Bool) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Bool rhsT = (Bool) rhs.getTypes().get(0);
-
-            Boolean lhsB = (Boolean) lhsT.getValue();
-            Boolean rhsB = (Boolean) rhsT.getValue();
-            bool.setValue(lhsB == null || rhsB == null ? null : !(!lhsB && rhsB));
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return !(!lhsVB && rhsVB);
+            }
+            return null;
         }
     },
     And("&&", List.of(Args.BOOL_BOOL), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Bool lhsT = (Bool) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Bool rhsT = (Bool) rhs.getTypes().get(0);
-
-            Boolean lhsB = (Boolean) lhsT.getValue();
-            Boolean rhsB = (Boolean) rhsT.getValue();
-            bool.setValue(lhsB == null || rhsB == null ? null : lhsB && rhsB);
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return lhsVB && rhsVB;
+            }
+            return null;
         }
     },
     Or("||", List.of(Args.BOOL_BOOL), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Bool lhsT = (Bool) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Bool rhsT = (Bool) rhs.getTypes().get(0);
-
-            Boolean lhsB = (Boolean) lhsT.getValue();
-            Boolean rhsB = (Boolean) rhsT.getValue();
-            bool.setValue(lhsB == null || rhsB == null ? null : lhsB || rhsB);
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return lhsVB || rhsVB;
+            }
+            return null;
         }
     },
     Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
 
-            Expression lhs = args.get(0);
-            Type lhsT = lhs.getTypes().get(0);
-
-            Expression rhs = args.get(1);
-            Type rhsT = rhs.getTypes().get(0);
-
-            bool.setValue(lhsT.getValue() == null || rhsT.getValue() == null ? null : lhsT.equal(rhsT));
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+            if (lhsV != null && rhsV != null) {
+                return type.equal(lhsV, rhsV);
+            }
+            return null;
         }
     },
     Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
 
-            Expression lhs = args.get(0);
-            Type lhsT = lhs.getTypes().get(0);
-
-            Expression rhs = args.get(1);
-            Type rhsT = rhs.getTypes().get(0);
-
-            bool.setValue(lhsT.getValue() == null || rhsT.getValue() == null ? null : !lhsT.equal(rhsT));
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+            if (lhsV != null && rhsV != null) {
+                return !type.equal(lhsV, rhsV);
+            }
+            return null;
         }
     },
     Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
 
-            Expression lhs = args.get(0);
-            Type lhsT = lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Type rhsT = rhs.getTypes().get(0);
 
-            bool.setValue(lhsT.getValue() == null || rhsT.getValue() == null ? null : lhsT.lessThan(rhsT));
+            if (lhsV != null && rhsV != null) {
+                return type.lessThan(lhsV, rhsV);
+            }
+            return null;
         }
     },
     Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
 
-            Expression lhs = args.get(0);
-            Type lhsT = lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Type rhsT = rhs.getTypes().get(0);
 
-            bool.setValue(lhsT.getValue() == null || rhsT.getValue() == null ? null : lhsT.lessThanOrEqual(rhsT));
+            if (lhsV != null && rhsV != null) {
+                return type.lessThanOrEqual(lhsV, rhsV);
+            }
+            return null;
         }
     },
     Greater_Than(">", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
 
-            Expression lhs = args.get(0);
-            Type lhsT = lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Type rhsT = rhs.getTypes().get(0);
 
-            bool.setValue(lhsT.getValue() == null || rhsT.getValue() == null ? null : lhsT.greaterThan(rhsT));
+            if (lhsV != null && rhsV != null) {
+                return type.greaterThan(lhsV, rhsV);
+            }
+            return null;
         }
     },
     Greater_Than_Or_Equal(">=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
 
-            Expression lhs = args.get(0);
-            Type lhsT = lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Type rhsT = rhs.getTypes().get(0);
 
-            bool.setValue(lhsT.getValue() == null || rhsT.getValue() == null ? null : lhsT.greaterThanOrEqual(rhsT));
+            if (lhsV != null && rhsV != null) {
+                return type.greaterThanOrEqual(lhsV, rhsV);
+            }
+            return null;
         }
     },
     Plus("+", List.of(Args.INT_INT), new Int()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Int i = (Int) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Int lhsT = (Int) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Int rhsT = (Int) rhs.getTypes().get(0);
-
-            Integer lhsI = (Integer) lhsT.getValue();
-            Integer rhsI = (Integer) rhsT.getValue();
-            i.setValue(lhsI == null || rhsI == null ? null : lhsI + rhsI);
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI + rhsVI;
+            }
+            return null;
         }
     },
     Minus("-", List.of(Args.INT_INT), new Int()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Int i = (Int) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Int lhsT = (Int) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Int rhsT = (Int) rhs.getTypes().get(0);
-
-            Integer lhsI = (Integer) lhsT.getValue();
-            Integer rhsI = (Integer) rhsT.getValue();
-            i.setValue(lhsI == null || rhsI == null ? null : lhsI - rhsI);
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI - rhsVI;
+            }
+            return null;
         }
     },
     Times("*", List.of(Args.INT_INT), new Int()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Int i = (Int) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Int lhsT = (Int) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Int rhsT = (Int) rhs.getTypes().get(0);
-
-            Integer lhsI = (Integer) lhsT.getValue();
-            Integer rhsI = (Integer) rhsT.getValue();
-            i.setValue(lhsI == null || rhsI == null ? null : lhsI * rhsI);
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI * rhsVI;
+            }
+            return null;
         }
     },
     Divide("/", List.of(Args.INT_INT), new Int()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Int i = (Int) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Int lhsT = (Int) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Int rhsT = (Int) rhs.getTypes().get(0);
-
-            Integer lhsI = (Integer) lhsT.getValue();
-            Integer rhsI = (Integer) rhsT.getValue();
-            i.setValue(lhsI == null || rhsI == null ? null : (rhsI != 0 ? lhsI / rhsI : lhsI));
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI / rhsVI;
+            }
+            return null;
         }
     },
     Modulus("%", List.of(Args.INT_INT), new Int()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Int i = (Int) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
-            Expression lhs = args.get(0);
-            Int lhsT = (Int) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            Int rhsT = (Int) rhs.getTypes().get(0);
-
-            Integer lhsI = (Integer) lhsT.getValue();
-            Integer rhsI = (Integer) rhsT.getValue();
-            i.setValue(lhsI == null || rhsI == null ? null : rhsI != 0 ? lhsI % rhsI : lhsI);
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI % rhsVI;
+            }
+            return null;
         }
     },
     Disjoint("!!", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) lhsE.getTypes().get(0);
 
-            Expression lhs = args.get(0);
-            DCollection lhsT = (DCollection) lhs.getTypes().get(0);
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-            Expression rhs = args.get(1);
-            DCollection rhsT = (DCollection) rhs.getTypes().get(0);
 
-            bool.setValue(lhsT.getValue() == null || rhsT.getValue() == null ? null : lhsT.disjoint(rhsT));
+            if (lhsV != null && rhsV != null) {
+                return type.disjoint(lhsV, rhsV);
+            }
+            return null;
         }
     },
     Union("+", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), List.of(new DSet(), new Seq(), new Multiset())) {
         @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.union(lhsV, rhsV);
+            }
+            return null;
+        }
+
+        @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             List<Type> ret = new ArrayList<>();
@@ -284,25 +328,26 @@ public enum BinaryOperator implements Operator {
                 ret.add(expected.concrete(symbolTable));
             }
             return ret;
-        }
-
-        @Override
-        public void apply(Type type, List<Expression> args) {
-            Expression lhs = args.get(0);
-            DCollection lhsT = (DCollection) lhs.getTypes().get(0);
-
-            Expression rhs = args.get(1);
-            DCollection rhsT = (DCollection) rhs.getTypes().get(0);
-
-            if (type instanceof DCollection) {
-                DCollection set = (DCollection) type;
-
-                set.setValue(lhsT.getValue() == null || rhsT.getValue() == null ? null : lhsT.union(rhsT));
-            }
         }
     },
     Difference("-", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
         @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.difference(lhsV, rhsV);
+            }
+            return null;
+        }
+
+        @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             List<Type> ret = new ArrayList<>();
@@ -310,33 +355,26 @@ public enum BinaryOperator implements Operator {
                 ret.add(expected.concrete(symbolTable));
             }
             return ret;
-        }
-
-        @Override
-        public void apply(Type type, List<Expression> args) {
-            Expression lhs = args.get(0);
-            DCollection lhsT = (DCollection) lhs.getTypes().get(0);
-
-            Expression rhs = args.get(1);
-            DCollection rhsT = (DCollection) rhs.getTypes().get(0);
-
-            if (type instanceof DSet) {
-                DSet set = (DSet) type;
-
-                DSet lhsSet = (DSet) lhsT;
-                DSet rhsSet = (DSet) rhsT;
-                set.setValue(lhsSet.getValue() == null || rhsSet.getValue() == null ? null : lhsSet.difference(rhsSet));
-            } else if (type instanceof Multiset) {
-                Multiset set = (Multiset) type;
-
-                Multiset lhsMultiset = (Multiset) lhsT;
-                Multiset rhsMultiset = (Multiset) rhsT;
-                set.setValue(lhsMultiset.getValue() == null || rhsMultiset.getValue() == null ? null : lhsMultiset.difference(rhsMultiset));
-            }
         }
     },
     Intersection("*", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
         @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.intersection(lhsV, rhsV);
+            }
+            return null;
+        }
+
+        @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             List<Type> ret = new ArrayList<>();
@@ -345,31 +383,23 @@ public enum BinaryOperator implements Operator {
             }
             return ret;
         }
-
-        @Override
-        public void apply(Type type, List<Expression> args) {
-            Expression lhs = args.get(0);
-            DCollection lhsT = (DCollection) lhs.getTypes().get(0);
-
-            Expression rhs = args.get(1);
-            DCollection rhsT = (DCollection) rhs.getTypes().get(0);
-
-            if (type instanceof DSet) {
-                DSet set = (DSet) type;
-
-                DSet lhsSet = (DSet) lhsT;
-                DSet rhsSet = (DSet) rhsT;
-                set.setValue(lhsSet.getValue() == null || rhsSet.getValue() == null ? null :lhsSet.intersection(rhsSet));
-            } else if (type instanceof Multiset) {
-                Multiset set = (Multiset) type;
-
-                Multiset lhsMultiset = (Multiset) lhsT;
-                Multiset rhsMultiset = (Multiset) rhsT;
-                set.setValue(lhsMultiset.getValue() == null || rhsMultiset.getValue() == null ? null : lhsMultiset.intersection(rhsMultiset));
-            }
-        }
     },
     Membership("in", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) rhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                return type.contains(lhsV, rhsV);
+            }
+            return null;
+        }
+
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
@@ -380,22 +410,24 @@ public enum BinaryOperator implements Operator {
             DCollection collection = (DCollection) types.get(0);
             ret.add(collection.setInnerType(t));
             return ret;
-        }
-
-        @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
-
-            Expression val = args.get(0);
-
-            Expression col = args.get(1);
-            DCollection colT = (DCollection) col.getTypes().get(0);
-
-            bool.setValue(colT.getValue() == null ? null : colT.contains(val));
         }
     },
     NotMembership("!in", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Bool()) {
         @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) rhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                return !type.contains(lhsV, rhsV);
+            }
+            return null;
+        }
+        @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
@@ -405,18 +437,6 @@ public enum BinaryOperator implements Operator {
             DCollection collection = (DCollection) types.get(0);
             ret.add(collection.setInnerType(t));
             return ret;
-        }
-
-        @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
-
-            Expression val = args.get(0);
-
-            Expression col = args.get(1);
-            DCollection colT = (DCollection) col.getTypes().get(0);
-
-            bool.setValue(colT.getValue() == null ? null : !colT.contains(val));
         }
     },
 
@@ -467,9 +487,5 @@ public enum BinaryOperator implements Operator {
 
     public int getNumberOfArgs() {
         return 2;
-    }
-
-    @Override
-    public void apply(Type type, List<Expression> args) {
     }
 }

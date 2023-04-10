@@ -19,11 +19,13 @@ public interface DCollection extends Type {
         return !getInnerType().isCollection();
     }
 
-    int getSize();
+    Boolean disjoint(Object lhsV, Object rhsV);
 
-    boolean contains(Expression val);
+    Object union(Object lhsV, Object rhsV);
 
-    boolean disjoint(DCollection rhs);
+    Object difference(Object lhsV, Object rhsV);
 
-    Object union(DCollection rhs);
+    Object intersection(Object lhsV, Object rhsV);
+
+    Boolean contains(Object lhsV, Object rhsV);
 }

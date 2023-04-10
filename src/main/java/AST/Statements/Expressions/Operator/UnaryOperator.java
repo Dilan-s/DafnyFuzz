@@ -4,11 +4,18 @@ import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
+import AST.SymbolTable.Types.DCollectionTypes.DSet;
+import AST.SymbolTable.Types.DCollectionTypes.Multiset;
+import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
+import java.lang.invoke.MutableCallSite;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum UnaryOperator implements Operator {
@@ -28,29 +35,46 @@ public enum UnaryOperator implements Operator {
         }
 
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Expression expression = args.get(0);
-            DCollection t = (DCollection) expression.getTypes().get(0);
-            Int i = (Int) type;
-            i.setValue(t.getValue() == null ? null : t.getSize());
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression exp = args.get(0);
+            List<Object> expValue = exp.getValue(paramsMap);
+            Object val = expValue.get(0);
+            if (val != null) {
+                Type type = exp.getTypes().get(0);
+                if (type.equals(new Seq())) {
+                    List<Object> valL = (List<Object>) val;
+                    return valL.size();
+
+                } else if (type.equals(new DSet())) {
+                    Set<Object> valS = (Set<Object>) val;
+                    return valS.size();
+
+                } else if (type.equals(new Multiset())) {
+                    Map<Object, Integer> valM = (Map<Object, Integer>) val;
+                    return valM.values().stream().reduce(0, Integer::sum);
+
+                }
+            }
+            return null;
         }
     },
     Negate("!", List.of(Args.BOOL), new Bool()) {
         @Override
-        public void apply(Type type, List<Expression> args) {
-            Bool bool = (Bool) type;
-
-            Expression arg = args.get(0);
-            Bool argT = (Bool) arg.getTypes().get(0);
-
-            Boolean value = (Boolean) argT.getValue();
-            bool.setValue(value == null ? null : !value);
-        }
-
-        @Override
         public String formExpression(List<Expression> args) {
             String res = args.get(0).toString();
             return String.format("!(%s)", res);
+        }
+
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression exp = args.get(0);
+            List<Object> expValue = exp.getValue(paramsMap);
+            Object val = expValue.get(0);
+            if (val != null) {
+                Boolean bool = (Boolean) val;
+                return !bool;
+            }
+            return null;
         }
     };
 

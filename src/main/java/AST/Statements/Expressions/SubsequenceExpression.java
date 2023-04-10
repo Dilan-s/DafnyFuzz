@@ -11,13 +11,14 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class SubsequenceExpression implements Expression {
 
-    private SymbolTable symbolTable;
-
     private final Expression seq;
+
+    private SymbolTable symbolTable;
 
     private AssignmentStatement statSeq;
     private AssignmentStatement statLoHi;
@@ -25,6 +26,7 @@ public class SubsequenceExpression implements Expression {
     private Variable seqVar;
     private Variable loVar;
     private Variable hiVar;
+    private CallExpression callExp;
 
     public SubsequenceExpression(SymbolTable symbolTable, Expression seq, Expression i, Expression j) {
         this.symbolTable = symbolTable;
@@ -41,35 +43,16 @@ public class SubsequenceExpression implements Expression {
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqType, symbolTable), seqType);
         VariableExpression seqVarExp = getSequenceVariableExpression();
 
-        statSeq = new AssignmentStatement(symbolTable);
-        statSeq.addAssignment(List.of(seqVar), seq);
-        statSeq.addAssignmentsToSymbolTable();
+        statSeq = new AssignmentStatement(symbolTable, List.of(seqVar), seq);
 
         Int loT = new Int();
         Int hiT = new Int();
-        this.loVar = new Variable(VariableNameGenerator.generateVariableValueName(loT, symbolTable), loT);
-        this.hiVar = new Variable(VariableNameGenerator.generateVariableValueName(hiT, symbolTable), hiT);
+        loVar = new Variable(VariableNameGenerator.generateVariableValueName(loT, symbolTable), loT);
+        hiVar = new Variable(VariableNameGenerator.generateVariableValueName(hiT, symbolTable), hiT);
 
-        Type iT = i.getTypes().get(0);
-        Type jT = j.getTypes().get(0);
+        callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_subsequence"), List.of(seqVarExp, i, j));
 
-
-        if (seqType.getValue() != null && iT.getValue() != null && jT.getValue() != null) {
-            Integer iVal = (Integer) iT.getValue();
-            Integer jVal = (Integer) jT.getValue();
-
-            int iIndex = iVal < seqType.getSize() && 0 <= iVal ? iVal : 0;
-            int jIndex = jVal < seqType.getSize() && 0 <= jVal ? jVal : 0;
-
-            loT.setValue(Math.min(iIndex, jIndex));
-            hiT.setValue(Math.max(iIndex, jIndex));
-        }
-
-        CallExpression expr = new CallExpression(symbolTable, symbolTable.getMethod("safe_subsequence"), List.of(seqVarExp, i, j));
-
-        statLoHi = new AssignmentStatement(symbolTable);
-        statLoHi.addAssignment(List.of(loVar, hiVar), expr);
-        statLoHi.addAssignmentsToSymbolTable();
+        statLoHi = new AssignmentStatement(symbolTable, List.of(loVar, hiVar), callExp);
     }
 
     @Override

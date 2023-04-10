@@ -12,6 +12,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -92,16 +93,18 @@ public class IfElseStatement implements Statement {
 
     @Override
     public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
-        Type testT = test.getTypes().get(0);
 
-        Boolean testB = (Boolean) testT.getValue();
+//        Object testV = test.getValue().get(0);
 
-        if (testB != null) {
-            if (testB && ifStat.couldReturn()) {
-                return ifStat.assignReturnIfPossible(method, currStatus, dependencies);
-            } else if (!testB && elseStat.isPresent() && elseStat.get().couldReturn()) {
-                return elseStat.get().assignReturnIfPossible(method, currStatus, dependencies);
-            }
+
+//        if (testV != null) {
+//            Boolean testVB = (Boolean) testV;
+//            if (testVB && ifStat.couldReturn()) {
+//                return ifStat.assignReturnIfPossible(method, currStatus, dependencies);
+//            } else if (!testVB && elseStat.isPresent() && elseStat.get().couldReturn()) {
+//                return elseStat.get().assignReturnIfPossible(method, currStatus, dependencies);
+//            }
+        if (false) {
         } else {
             ReturnStatus rIf = currStatus;
             ReturnStatus rElse = currStatus;
@@ -109,8 +112,7 @@ public class IfElseStatement implements Statement {
 
                 List<Expression> trueDep = new ArrayList<>(dependencies);
                 trueDep.add(test);
-                rIf = ifStat.assignReturnIfPossible(method, currStatus,
-                    trueDep);
+                rIf = ifStat.assignReturnIfPossible(method, currStatus, trueDep);
             }
             if (elseStat.isPresent() && elseStat.get().couldReturn()) {
 
@@ -120,7 +122,6 @@ public class IfElseStatement implements Statement {
                 OperatorExpression op = new OperatorExpression(symbolTable, bool,
                     UnaryOperator.Negate, List.of(test));
                 falseDep.add(op);
-                bool.setValue(true);
                 rElse = elseStat.get()
                     .assignReturnIfPossible(method, currStatus, falseDep);
             }

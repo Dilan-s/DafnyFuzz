@@ -9,11 +9,14 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class ReassignSeqExpression implements Expression {
 
+    private final Expression seq;
     private SymbolTable symbolTable;
 
     private AssignmentStatement seqAssign;
@@ -22,30 +25,28 @@ public class ReassignSeqExpression implements Expression {
     private Variable seqVar;
     private Variable indVar;
     private Expression exp;
+    private CallExpression callExp;
 
 
     public ReassignSeqExpression(SymbolTable symbolTable, Expression seq, Expression ind, Expression exp) {
         this.symbolTable = symbolTable;
+        this.seq = seq;
         this.exp = exp;
-        generateVariableCalls(seq, ind);
+        generateVariableCalls(this.seq, ind);
     }
 
     private void generateVariableCalls(Expression seq, Expression ind) {
         Type t = seq.getTypes().get(0);
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(t, symbolTable), t);
 
-        seqAssign = new AssignmentStatement(symbolTable);
-        seqAssign.addAssignment(List.of(seqVar), seq);
-        seqAssign.addAssignmentsToSymbolTable();
+        seqAssign = new AssignmentStatement(symbolTable, List.of(seqVar), seq);
         VariableExpression seqVarExp = getSequenceVariableExpression();
 
-        CallExpression callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(seqVarExp, ind));
+        callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(seqVarExp, ind));
 
         indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int(), symbolTable), new Int());
 
-        indAssign = new AssignmentStatement(symbolTable);
-        indAssign.addAssignment(List.of(indVar), callExp);
-        indAssign.addAssignmentsToSymbolTable();
+        indAssign = new AssignmentStatement(symbolTable, List.of(indVar), callExp);
     }
 
     @Override

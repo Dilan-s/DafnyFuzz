@@ -4,11 +4,10 @@ import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.RealLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
 import java.util.Objects;
 
-public class Real extends AbstractType implements BaseType{
+public class Real implements BaseType {
 
     private static final int MAX_DOUBLE = 30;
     public static final double PROB_NEGATION = 0.5;
@@ -47,8 +46,21 @@ public class Real extends AbstractType implements BaseType{
     @Override
     public Expression generateLiteral(SymbolTable symbolTable, Object value) {
         Type t = this.concrete(symbolTable);
-        t.setValue(value);
         return new RealLiteral(t, symbolTable, (Double) value);
+    }
+
+    @Override
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        Double lhs = (Double) lhsV;
+        Double rhs = (Double) rhsV;
+        return lhs < rhs;
+    }
+
+    @Override
+    public Boolean equal(Object lhsV, Object rhsV) {
+        Double lhs = (Double) lhsV;
+        Double rhs = (Double) rhsV;
+        return Objects.equals(lhs, rhs);
     }
 
     @Override
@@ -64,33 +76,5 @@ public class Real extends AbstractType implements BaseType{
     @Override
     public Type concrete(SymbolTable symbolTable) {
         return new Real();
-    }
-
-    @Override
-    public boolean lessThanOrEqual(Type rhsT) {
-        Real rhsReal = (Real) rhsT;
-        return value <= rhsReal.value;
-    }
-
-    @Override
-    public boolean lessThan(Type rhsT) {
-        Real rhsReal = (Real) rhsT;
-        return value <= rhsReal.value;
-    }
-
-    @Override
-    public boolean equal(Type rhsT) {
-        Real rhsReal = (Real) rhsT;
-        return Objects.equals(value, rhsReal.value);
-    }
-
-    @Override
-    public void setValue(Object value) {
-        this.value = (Double) value;
-    }
-
-    @Override
-    public Object getValue() {
-        return value;
     }
 }

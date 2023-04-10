@@ -6,20 +6,18 @@ import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.SeqLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Seq extends AbstractType implements DCollection{
+public class Seq implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 10;
-    private List<Expression> sequence;
     private Type type;
 
     public Seq(Type type) {
         this.type = type;
-        this.sequence = null;
     }
 
     public Seq() {
@@ -47,16 +45,6 @@ public class Seq extends AbstractType implements DCollection{
     }
 
     @Override
-    public Object getValue() {
-        return sequence;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        this.sequence = (List<Expression>) value;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Type)) {
             return false;
@@ -79,15 +67,11 @@ public class Seq extends AbstractType implements DCollection{
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        this.sequence = new ArrayList<>();
         int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             Type concrete = type.concrete(symbolTable);
-            Expression exp = expressionGenerator.generateExpression(concrete, symbolTable);
-            Expression expLiteral = concrete.generateLiteral(symbolTable, exp, concrete.getValue());
-            values.add(exp);
-            sequence.add(expLiteral);
+            values.add(expressionGenerator.generateExpression(concrete, symbolTable));
         }
         SeqLiteral expression = new SeqLiteral(symbolTable,this, values);
         return expression;
@@ -96,7 +80,6 @@ public class Seq extends AbstractType implements DCollection{
     @Override
     public Expression generateLiteral(SymbolTable symbolTable, Object value) {
         Type t = this.concrete(symbolTable);
-        t.setValue(value);
         return new SeqLiteral(symbolTable, t, (List<Expression>) value);
     }
 
@@ -124,19 +107,17 @@ public class Seq extends AbstractType implements DCollection{
     }
 
     @Override
-    public int getSize() {
-        return sequence.size();
+    public Boolean contains(Object lhsV, Object rhsV) {
+        List<Object> rhsVL = (List<Object>) rhsV;
+        return rhsVL.contains(lhsV);
     }
 
     @Override
-    public boolean contains(Expression val) {
-        return sequence.contains(val);
-    }
+    public Boolean disjoint(Object lhsV, Object rhsV) {
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
 
-    @Override
-    public boolean disjoint(DCollection rhs) {
-        Seq rhsSeq = (Seq) rhs;
-        return rhsSeq.sequence.stream().noneMatch(this::contains);
+        return !lhsVL.containsAll(rhsVL);
     }
 
     @Override
@@ -145,83 +126,56 @@ public class Seq extends AbstractType implements DCollection{
     }
 
     @Override
-    public boolean lessThanOrEqual(Type rhsT) {
-        Seq rhsSeq = (Seq) rhsT;
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
 
-        if (sequence.size() > rhsSeq.getSize()) {
+        if (lhsVL.size() > rhsVL.size()) {
             return false;
         }
 
-        for (int i = 0; i < sequence.size(); i++) {
-            if (!sequence.get(i).equals(rhsSeq.sequence.get(i))) {
+        for (int i = 0; i < lhsVL.size(); i++) {
+            if (!Objects.equals(lhsVL.get(i), rhsVL.get(i))) {
                 return false;
             }
         }
-
         return true;
     }
 
     @Override
-    public boolean lessThan(Type rhsT) {
-        Seq rhsSeq = (Seq) rhsT;
+    public Boolean equal(Object lhsV, Object rhsV) {
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
 
-        if (sequence.size() > rhsSeq.getSize()) {
+        if (lhsVL.size() != rhsVL.size()) {
             return false;
         }
 
-        for (int i = 0; i < sequence.size(); i++) {
-            if (!sequence.get(i).equals(rhsSeq.sequence.get(i))) {
+        for (int i = 0; i < lhsVL.size(); i++) {
+            if (!Objects.equals(lhsVL.get(i), rhsVL.get(i))) {
                 return false;
             }
         }
-
-        return rhsSeq.sequence.size() > sequence.size();
-    }
-
-    @Override
-    public boolean equal(Type rhsT) {
-        Seq rhsSeq = (Seq) rhsT;
-
-        if (sequence.size() != rhsSeq.getSize()) {
-            return false;
-        }
-
-        for (int i = 0; i < sequence.size(); i++) {
-            if (!sequence.get(i).equals(rhsSeq.sequence.get(i))) {
-                return false;
-            }
-        }
-
         return true;
     }
 
-    public Object get(Object value) {
-        return sequence.get((Integer) value).getTypes().get(0).getValue();
-    }
+    @Override
+    public Object union(Object lhsV, Object rhsV) {
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
 
-    public Object subsequence(Object indI, Object indJ) {
-        Integer i = (Integer) indI;
-        Integer j = (Integer) indJ;
-
-        int min = Math.min(i, j);
-        int max = Math.max(i, j);
-        return sequence.subList(min, max);
+        List<Object> res = new ArrayList<>(lhsVL);
+        res.addAll(rhsVL);
+        return res;
     }
 
     @Override
-    public Object union(DCollection rhs) {
-        Seq rhsSeq = (Seq) rhs;
-        List<Expression> res = new ArrayList<>(this.sequence);
-        res.addAll(rhsSeq.sequence);
-        return res;
+    public Object difference(Object lhsV, Object rhsV) {
+        return null;
     }
 
-    public Object reassignIndex(Integer i, Expression value) {
-        List<Expression> res = new ArrayList<>();
-        List<Expression> curr = new ArrayList<>(sequence);
-        res.addAll(curr.subList(0, i));
-        res.add(value);
-        res.addAll(curr.subList(i + 1, curr.size()));
-        return res;
+    @Override
+    public Object intersection(Object lhsV, Object rhsV) {
+        return null;
     }
 }

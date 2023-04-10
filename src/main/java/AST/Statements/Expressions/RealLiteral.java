@@ -4,7 +4,10 @@ import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RealLiteral implements Expression {
 

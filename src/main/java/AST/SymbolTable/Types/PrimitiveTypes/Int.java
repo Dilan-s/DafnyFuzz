@@ -4,11 +4,10 @@ import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IntLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
 import java.util.Objects;
 
-public class Int extends AbstractType implements BaseType {
+public class Int implements BaseType {
 
     private static final int MAX_INT = 30;
     private static final double PROB_HEX = 0.2;
@@ -56,7 +55,6 @@ public class Int extends AbstractType implements BaseType {
     @Override
     public Expression generateLiteral(SymbolTable symbolTable, Object value) {
         Type t = this.concrete(symbolTable);
-        t.setValue(value);
         return new IntLiteral(t, symbolTable, (Integer) value, asHex);
     }
 
@@ -71,29 +69,16 @@ public class Int extends AbstractType implements BaseType {
     }
 
     @Override
-    public void setValue(Object value) {
-        this.value = (Integer) value;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean lessThanOrEqual(Type rhsT) {
-        Int rhsInt = (Int) rhsT;
-        return value <= rhsInt.value;
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        Integer lhs = (Integer) lhsV;
+        Integer rhs = (Integer) rhsV;
+        return lhs < rhs;
     }
 
     @Override
-    public boolean lessThan(Type rhsT) {
-        Int rhsInt = (Int) rhsT;
-        return value <= rhsInt.value;
-    }
-
-    @Override
-    public boolean equal(Type rhsT) {
-        Int rhsInt = (Int) rhsT;
-        return Objects.equals(value, rhsInt.value);
+    public Boolean equal(Object lhsV, Object rhsV) {
+        Integer lhs = (Integer) lhsV;
+        Integer rhs = (Integer) rhsV;
+        return Objects.equals(lhs, rhs);
     }
 }

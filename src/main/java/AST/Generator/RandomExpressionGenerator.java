@@ -40,6 +40,7 @@ public class RandomExpressionGenerator {
 
     private static int expressionDepth = 0;
 
+    public static boolean allowNullValues = true;
 
     public Expression generateExpression(Type type, SymbolTable symbolTable) {
         Expression ret = null;
@@ -85,11 +86,9 @@ public class RandomExpressionGenerator {
     private Expression generateReassignSeqExpression(Type type, SymbolTable symbolTable) {
         Seq seqT = (Seq) type.concrete(symbolTable);
         Expression seq = generateExpression(seqT, symbolTable);
-        Object s = seqT.getValue();
 
         Int indT = new Int();
         Expression ind = generateLiteral(indT, symbolTable);
-        Integer i = (Integer) indT.getValue();
 
         Type expT = seqT.getInnerType().concrete(symbolTable);
         Expression exp = generateExpression(expT, symbolTable);
@@ -104,22 +103,15 @@ public class RandomExpressionGenerator {
 
         IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, type, test, expression, seqVar);
 
-        if (i != null && expT.getValue() != null && seqT.getValue() != null) {
-            int iIndex = i < seqT.getSize() && 0 <= i ? i : 0;
-            Expression expLiteral = expT.generateLiteral(symbolTable, exp, expT.getValue());
-            type.setValue(s == null ? null : seqT.getSize() > 0 ? seqT.reassignIndex(iIndex, expLiteral) : seqT.getValue());
-        }
         return ifElseExpression;
     }
 
     private Expression generateSubsequenceExpression(Type type, SymbolTable symbolTable) {
         Seq seqT = (Seq) type.concrete(symbolTable);
         Expression seq = generateExpression(seqT, symbolTable);
-        Object s = seqT.getValue();
 
         Int indIT = new Int();
         Expression indI = generateExpression(indIT, symbolTable);
-        Integer i = (Integer) indIT.getValue();
 
         Expression indJ;
         Int indJT = new Int();
@@ -128,7 +120,6 @@ public class RandomExpressionGenerator {
         } else {
             indJ = new IntLiteral(indJT, symbolTable, 0);
         }
-        Integer j = (Integer) indJT.getValue();
         SubsequenceExpression expression = new SubsequenceExpression(symbolTable, seq, indI, indJ);
         VariableExpression seqVar = expression.getSequenceVariableExpression();
 
@@ -139,11 +130,6 @@ public class RandomExpressionGenerator {
 
         IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, type, test, expression, seqVar);
 
-        if (i != null && j != null && seqT.getValue() != null) {
-            int iIndex = i < seqT.getSize() && 0 <= i ? i : 0;
-            int jIndex = j < seqT.getSize() && 0 <= j ? j : 0;
-            type.setValue(s == null ? null : seqT.getSize() > 0 ? seqT.subsequence(iIndex, jIndex) : seqT.getValue());
-        }
         return ifElseExpression;
     }
 
@@ -151,11 +137,9 @@ public class RandomExpressionGenerator {
     private Expression generateSeqIndexExpression(Type type, SymbolTable symbolTable) {
         Seq seqT = new Seq(type.concrete(symbolTable));
         Expression seq = seqT.generateLiteral(symbolTable);
-        Object s = seqT.getValue();
 
         Int indT = new Int();
         Expression ind = generateExpression(indT, symbolTable);
-        Integer i = (Integer) indT.getValue();
 
         IndexExpression expression = new IndexExpression(symbolTable, type, seq, ind);
 
@@ -170,20 +154,21 @@ public class RandomExpressionGenerator {
         Expression def = generateExpression(defT, symbolTable);
         IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, type, test, expression, def);
 
-        if (i != null) {
-            int iIndex = i < seqT.getSize() && 0 <= i ? i : 0;
-            type.setValue(s == null ? null : seqT.getSize() > 0 ? seqT.get(iIndex) : defT.getValue());
-        }
         return ifElseExpression;
     }
 
     private VariableExpression generateVariableExpression(Type type, SymbolTable symbolTable) {
         List<Variable> variables = symbolTable.getAllVariables(type);
 
+        if (!allowNullValues) {
+            variables = variables.stream()
+                .filter(v -> v.getValue() == null)
+                .collect(Collectors.toList());
+        }
+
         if (!variables.isEmpty()) {
             int index = GeneratorConfig.getRandom().nextInt(variables.size());
             Variable variable = variables.get(index);
-            type.setValue(variable.getType().getValue());
             VariableExpression expression = new VariableExpression(symbolTable, variable, type);
             return expression;
         }
@@ -224,14 +209,6 @@ public class RandomExpressionGenerator {
         Expression elseExp = generateExpression(elseT, symbolTable);
         IfElseExpression expression = new IfElseExpression(symbolTable, type, test, ifExp, elseExp);
 
-        if (testT.getValue() != null) {
-            boolean testValue = (boolean) testT.getValue();
-            if (testValue) {
-                type.setValue(ifT.getValue());
-            } else {
-                type.setValue(elseT.getValue());
-            }
-        }
         return expression;
     }
 

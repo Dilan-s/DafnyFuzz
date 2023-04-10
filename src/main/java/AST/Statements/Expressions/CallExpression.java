@@ -10,7 +10,9 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,8 @@ public class CallExpression implements Expression {
     private List<Variable> variables;
     private List<Statement> assignments;
     private List<Variable> assignedVariables;
-    
+    private CallMethodExpression callExpr;
+
     public CallExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
         this.symbolTable = symbolTable;
         this.method = method;
@@ -44,29 +47,24 @@ public class CallExpression implements Expression {
         Variable variable = new Variable(var, type);
         variables.add(variable);
 
-        AssignmentStatement stat = new AssignmentStatement(symbolTable);
-        stat.addAssignment(List.of(variable), expression);
-        stat.addAssignmentsToSymbolTable();
-
+        AssignmentStatement stat = new AssignmentStatement(symbolTable, List.of(variable), expression);
         assignments.add(stat);
     }
 
 
     private void generateReturnAssignment() {
-        AssignmentStatement stat = new AssignmentStatement(symbolTable);
         assignedVariables = new ArrayList<>();
+
         for (Type returnType : method.getReturnTypes()) {
             Type rt = returnType.concrete(symbolTable);
-            rt.setValue(returnType.getValue());
             String var = VariableNameGenerator.generateVariableValueName(rt, symbolTable);
             Variable variable = new Variable(var, rt);
             assignedVariables.add(variable);
         }
 
-        CallMethodExpression callMethodExpression = new CallMethodExpression(method, variables);
-        stat.addAssignment(assignedVariables, callMethodExpression);
-        stat.addAssignmentsToSymbolTable();
+        callExpr = new CallMethodExpression(method, variables);
 
+        AssignmentStatement stat = new AssignmentStatement(symbolTable, assignedVariables, callExpr);
         assignments.add(stat);
     }
 
@@ -96,7 +94,6 @@ public class CallExpression implements Expression {
                         methodType.getName(), varType.getName()));
             }
         }
-
     }
 
     @Override

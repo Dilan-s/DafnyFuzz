@@ -6,27 +6,24 @@ import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.MultisetLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
-public class Multiset extends AbstractType implements DCollection{
+public class Multiset implements DCollection {
 
     public static final int MAX_SIZE_OF_MULTISET = 10;
     public static final double PROB_USE_DSET = 0.3;
     public static final double PROB_USE_SEQ = PROB_USE_DSET + 0.3;
     private Type type;
-    private Map<Expression, Integer> multiset;
 
     public Multiset(Type type) {
         this.type = type;
-        this.multiset = null;
     }
 
     public Multiset() {
@@ -75,7 +72,6 @@ public class Multiset extends AbstractType implements DCollection{
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
 
-        this.multiset = new HashMap<>();
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         double probType = GeneratorConfig.getRandom().nextDouble();
 
@@ -83,34 +79,12 @@ public class Multiset extends AbstractType implements DCollection{
             DSet t = new DSet(this.type.concrete(symbolTable));
             Expression exp = expressionGenerator.generateExpression(t, symbolTable);
 
-            Expression expLiteral = t.generateLiteral(symbolTable, exp, t.getValue());
-            Set<Expression> value = (Set<Expression>) expLiteral.getTypes().get(0).getValue();
-
-            if (value == null) {
-                this.multiset = null;
-            } else {
-                for (Expression e : value) {
-                    multiset.put(e, 1);
-                }
-            }
-
             MultisetLiteral expression = new MultisetLiteral(symbolTable, this, Optional.of(exp));
             return expression;
         }
         if (probType < PROB_USE_SEQ) {
             Seq t = new Seq(this.type.concrete(symbolTable));
             Expression exp = expressionGenerator.generateExpression(t, symbolTable);
-
-            Expression expLiteral = t.generateLiteral(symbolTable, exp, t.getValue());
-            List<Expression> value = (List<Expression>) expLiteral.getTypes().get(0).getValue();
-
-            if (value == null) {
-                this.multiset = null;
-            } else {
-                for (Expression e : value) {
-                    multiset.put(e, multiset.getOrDefault(e, 0) + 1);
-                }
-            }
 
             MultisetLiteral expression = new MultisetLiteral(symbolTable, this, Optional.of(exp));
             return expression;
@@ -122,9 +96,6 @@ public class Multiset extends AbstractType implements DCollection{
             Type t = type.concrete(symbolTable);
 
             Expression exp = expressionGenerator.generateExpression(t, symbolTable);
-            Expression expLiteral = t.generateLiteral(symbolTable, exp, t.getValue());
-
-            multiset.put(expLiteral, multiset.getOrDefault(expLiteral, 0) + 1);
             values.add(exp);
         }
         MultisetLiteral expression = new MultisetLiteral(symbolTable, this, values);
@@ -141,7 +112,6 @@ public class Multiset extends AbstractType implements DCollection{
             }
         }
         Type t = this.concrete(symbolTable);
-        t.setValue(value);
         return new MultisetLiteral(symbolTable, t, res);
     }
 
@@ -163,6 +133,10 @@ public class Multiset extends AbstractType implements DCollection{
         return new Multiset(type.concrete(symbolTable));
     }
 
+    @Override
+    public boolean isPrintable() {
+        return false;
+    }
 
     @Override
     public boolean operatorExists() {
@@ -170,111 +144,95 @@ public class Multiset extends AbstractType implements DCollection{
     }
 
     @Override
-    public void setValue(Object value) {
-        this.multiset = (Map<Expression, Integer>) value;
+    public Boolean contains(Object lhsV, Object rhsV) {
+        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        return rhsVM.containsKey(lhsV);
     }
 
     @Override
-    public Object getValue() {
-        return multiset;
+    public Boolean disjoint(Object lhsV, Object rhsV) {
+        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
+        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+
+        for (Object k : lhsVM.keySet()) {
+            if (rhsVM.containsKey(k)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
-    public int getSize() {
-        return multiset.values().stream().reduce(0, Integer::sum);
-    }
+    public Object intersection(Object lhsV, Object rhsV) {
+        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
+        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
 
-    @Override
-    public boolean contains(Expression val) {
-        return multiset.containsKey(val) && multiset.get(val) != 0;
-    }
-
-    @Override
-    public boolean disjoint(DCollection rhs) {
-        Multiset rhsMultiset = (Multiset) rhs;
-
-        return rhsMultiset.multiset.entrySet().stream()
-            .filter(x -> x.getValue() > 0)
-            .map(Entry::getKey)
-            .noneMatch(this::contains);
-    }
-
-    @Override
-    public boolean isPrintable() {
-        return false;
-    }
-
-    public Map<Expression, Integer> intersection(Multiset rhsMultiset) {
-        Map<Expression, Integer> lhsm = multiset;
-        Map<Expression, Integer> rhsm = rhsMultiset.multiset;
-
-        Map<Expression, Integer> res = new HashMap<>();
-        for (Expression e : lhsm.keySet()) {
-            if (rhsm.containsKey(e)) {
-                res.put(e, Math.min(lhsm.get(e), rhsm.get(e)));
+        Map<Object, Integer> res = new HashMap<>();
+        for (Object k : lhsVM.keySet()) {
+            if (rhsVM.containsKey(k)) {
+                res.put(k, Math.min(lhsVM.get(k), rhsVM.get(k)));
             }
         }
         return res;
     }
 
-    public Map<Expression, Integer> difference(Multiset rhsMultiset) {
-        Map<Expression, Integer> lhsm = multiset;
-        Map<Expression, Integer> rhsm = rhsMultiset.multiset;
+    @Override
+    public Object difference(Object lhsV, Object rhsV) {
+        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
+        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
 
-        Map<Expression, Integer> res = new HashMap<>();
-        for (Expression e : lhsm.keySet()) {
-            int freq = lhsm.get(e) - rhsm.getOrDefault(e, 0);
+        Map<Object, Integer> res = new HashMap<>();
+        for (Object k : lhsVM.keySet()) {
+            int freq = lhsVM.get(k) - rhsVM.getOrDefault(k, 0);
             if (freq > 0) {
-                res.put(e, freq);
+                res.put(k, freq);
             }
         }
         return res;
     }
 
     @Override
-    public Object union(DCollection rhs) {
-        Multiset rhsMultiset = (Multiset) rhs;
-        Map<Expression, Integer> lhsm = multiset;
-        Map<Expression, Integer> rhsm = rhsMultiset.multiset;
+    public Object union(Object lhsV, Object rhsV) {
+        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
+        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
 
-        Map<Expression, Integer> res = new HashMap<>();
-        for (Expression e : lhsm.keySet()) {
-            res.put(e, lhsm.get(e));
+        Map<Object, Integer> res = new HashMap<>();
+        for (Object k : lhsVM.keySet()) {
+            res.put(k, lhsVM.get(k));
         }
-
-        for (Expression e : rhsm.keySet()) {
-            res.put(e, rhsm.get(e) + res.getOrDefault(e, 0));
+        for (Object k : rhsVM.keySet()) {
+            res.put(k, rhsVM.get(k) + res.getOrDefault(k, 0));
         }
-
         return res;
     }
 
     @Override
-    public boolean lessThanOrEqual(Type rhsT) {
-        Multiset rhsM = (Multiset) rhsT;
-        Map<Expression, Integer> rhsMultiset = rhsM.multiset;
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
+        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
 
-        return rhsMultiset.keySet().containsAll(multiset.keySet())
-            && multiset.entrySet().stream().allMatch(x -> x.getValue() <= rhsMultiset.getOrDefault(x.getKey(), 0));
+        boolean atLeastOneSmaller = false;
+        for (Object k : lhsVM.keySet()) {
+            if (!rhsVM.containsKey(k)) {
+                return false;
+            }
+            if (lhsVM.get(k) < rhsVM.get(k)) {
+                atLeastOneSmaller = true;
+            }
+        }
+        return atLeastOneSmaller || !lhsVM.keySet().containsAll(rhsVM.keySet());
     }
 
     @Override
-    public boolean lessThan(Type rhsT) {
-        Multiset rhsM = (Multiset) rhsT;
-        Map<Expression, Integer> rhsMultiset = rhsM.multiset;
+    public Boolean equal(Object lhsV, Object rhsV) {
+        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
+        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
 
-        return rhsMultiset.keySet().containsAll(multiset.keySet())
-            && (multiset.entrySet().stream().anyMatch(x -> x.getValue() < rhsMultiset.getOrDefault(x.getKey(), 0))
-            || !multiset.keySet().containsAll(rhsMultiset.keySet()));
-    }
-
-    @Override
-    public boolean equal(Type rhsT) {
-        Multiset rhsM = (Multiset) rhsT;
-        Map<Expression, Integer> rhsMultiset = rhsM.multiset;
-
-        return rhsMultiset.keySet().containsAll(multiset.keySet())
-            && multiset.entrySet().stream().allMatch(x -> x.getValue().equals(rhsMultiset.getOrDefault(x.getKey(), 0)))
-            && multiset.keySet().containsAll(rhsMultiset.keySet());
+        for (Object k : lhsVM.keySet()) {
+            if (!rhsVM.containsKey(k) || !Objects.equals(lhsVM.get(k), rhsVM.get(k))) {
+                return false;
+            }
+        }
+        return lhsVM.keySet().containsAll(rhsVM.keySet());
     }
 }

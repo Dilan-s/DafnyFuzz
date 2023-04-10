@@ -2,6 +2,7 @@ package AST.Program;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomStatementGenerator;
+import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;

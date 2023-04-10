@@ -4,7 +4,9 @@ import AST.Errors.SemanticException;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class CharLiteral implements Expression {

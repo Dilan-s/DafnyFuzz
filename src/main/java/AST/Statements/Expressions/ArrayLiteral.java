@@ -10,6 +10,7 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -29,9 +30,7 @@ public class ArrayLiteral implements Expression {
 
         if (toAssign) {
             this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-            statement = new AssignmentStatement(symbolTable);
-            statement.addAssignment(List.of(variable), new ArrayInitValues(values));
-            statement.addAssignmentsToSymbolTable();
+            statement = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues(values));
         }
     }
 

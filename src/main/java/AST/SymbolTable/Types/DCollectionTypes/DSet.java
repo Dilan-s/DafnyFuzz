@@ -6,22 +6,19 @@ import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.DSetLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.AbstractType;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DSet extends AbstractType implements DCollection{
+public class DSet implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 10;
-    private Set<Expression> set;
     private Type type;
 
     public DSet(Type type) {
         this.type = type;
-        this.set = null;
     }
 
     public DSet() {
@@ -71,18 +68,14 @@ public class DSet extends AbstractType implements DCollection{
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        this.set = new HashSet<>();
         int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < noOfElems; i++) {
             Type t = type.concrete(symbolTable);
-
             Expression exp = expressionGenerator.generateExpression(t, symbolTable);
-            Expression expLiteral = t.generateLiteral(symbolTable, exp, t.getValue());
-
             values.add(exp);
-            set.add(expLiteral);
         }
+
         DSetLiteral expression = new DSetLiteral(symbolTable, this, values);
         return expression;
     }
@@ -90,7 +83,6 @@ public class DSet extends AbstractType implements DCollection{
     @Override
     public Expression generateLiteral(SymbolTable symbolTable, Object value) {
         Type t = this.concrete(symbolTable);
-        t.setValue(value);
         return new DSetLiteral(symbolTable, t, new ArrayList<>((Set<Expression>) value));
     }
 
@@ -113,34 +105,52 @@ public class DSet extends AbstractType implements DCollection{
     }
 
     @Override
-    public Object getValue() {
-        return set;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        this.set = (Set<Expression>) value;
-    }
-
-    @Override
     public boolean operatorExists() {
         return true;
     }
 
     @Override
-    public int getSize() {
-        return set.size();
+    public Boolean disjoint(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        return !lhsVS.containsAll(rhsVS);
     }
 
     @Override
-    public boolean contains(Expression val) {
-        return set.contains(val);
+    public Object difference(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        Set<Object> ret = new HashSet<>(lhsVS);
+        ret.removeAll(rhsVS);
+        return ret;
     }
 
     @Override
-    public boolean disjoint(DCollection rhs) {
-        DSet rhsSet = (DSet) rhs;
-        return rhsSet.set.stream().noneMatch(this::contains);
+    public Object intersection(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        Set<Object> ret = new HashSet<>(lhsVS);
+        ret.retainAll(rhsVS);
+        return ret;
+    }
+
+    @Override
+    public Boolean contains(Object lhsV, Object rhsV) {
+        Set<Object> rhsVL = (Set<Object>) rhsV;
+        return rhsVL.contains(lhsV);
+    }
+
+    @Override
+    public Object union(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        Set<Object> ret = new HashSet<>(lhsVS);
+        ret.addAll(rhsVS);
+        return ret;
     }
 
     @Override
@@ -148,41 +158,20 @@ public class DSet extends AbstractType implements DCollection{
         return false;
     }
 
-    public Set<Expression> intersection(DSet rhsSet) {
-        Set<Expression> s = new HashSet<>(set);
-        s.retainAll(rhsSet.set);
-        return s;
-    }
 
-    public Set<Expression> difference(DSet rhsSet) {
-        Set<Expression> s = new HashSet<>(set);
-        s.retainAll(rhsSet.set);
-        return s;
+    @Override
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        return rhsVS.containsAll(lhsVS) && !lhsVS.containsAll(rhsVS);
     }
 
     @Override
-    public Object union(DCollection rhs) {
-        DSet rhsSet = (DSet) rhs;
-        Set<Expression> s = new HashSet<>(set);
-        s.addAll(rhsSet.set);
-        return s;
-    }
+    public Boolean equal(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
 
-    @Override
-    public boolean lessThan(Type rhsT) {
-        DSet rhsDset = (DSet) rhsT;
-        return rhsDset.set.containsAll(set) && !set.containsAll(rhsDset.set);
-    }
-
-    @Override
-    public boolean lessThanOrEqual(Type rhsT) {
-        DSet rhsDset = (DSet) rhsT;
-        return rhsDset.set.containsAll(set);
-    }
-
-    @Override
-    public boolean equal(Type rhsT) {
-        DSet rhsDset = (DSet) rhsT;
-        return rhsDset.set.containsAll(set) && set.containsAll(rhsDset.set);
+        return rhsVS.containsAll(lhsVS) && lhsVS.containsAll(rhsVS);
     }
 }

@@ -6,9 +6,12 @@ import AST.Statements.Expressions.Operator.Operator;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,7 +33,6 @@ public class OperatorExpression implements Expression {
         this.convertToCall = convertToCall;
         this.type = type;
         this.args = args;
-        operator.apply(type, args);
         generateMethodCallReplacement();
     }
 

@@ -24,7 +24,7 @@ public class VariableNameGenerator {
     public static String generateArgumentName(String method) {
         Integer i = parameterValues.getOrDefault(method, 1);
         parameterValues.put(method, i + 1);
-        return String.format("p_%d", i);
+        return String.format("p_%s_%d", method, i);
     }
 
     public static String generateVariableValueName(Type type, SymbolTable symbolTable) {

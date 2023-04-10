@@ -1,7 +1,6 @@
 package AST.Statements;
 
 import AST.Errors.SemanticException;
-import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
@@ -20,36 +19,23 @@ public class AssignmentStatement implements Statement {
     private final List<Expression> values;
     private boolean declared;
 
-    public AssignmentStatement(SymbolTable symbolTable) {
+    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables, List<Expression> values) {
         this.symbolTable = symbolTable;
-        this.variables = new ArrayList<>();
-        this.values = new ArrayList<>();
-        declared = false;
+        this.variables = variables;
+        this.values = values;
+        declared = variables.stream().allMatch(Variable::isDeclared);
+        declareVariables();
     }
 
-    public void addAssignment(Expression e) {
-        List<Variable> variables = new ArrayList<>();
-        for (Type t : e.getTypes()) {
-            variables.add(new Variable(VariableNameGenerator.generateVariableValueName(t, symbolTable), t));
-        }
-        addAssignment(variables, e);
+    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables, Expression value) {
+        this(symbolTable, variables, List.of(value));
     }
 
-    public void addAssignment(List<Variable> variablesToAssign, Expression expression) {
-        declared = declared || variablesToAssign.stream().anyMatch(Variable::isDeclared);
-        variables.addAll(variablesToAssign);
-        values.add(expression);
-
-        for (int i = 0; i < variablesToAssign.size(); i++) {
-            Type t = variablesToAssign.get(i).getType();
-            t.setExpressionAndIndAndDependencies(expression, i, new ArrayList<>());
-        }
-    }
-
-    public void addAssignmentsToSymbolTable() {
-        for (Variable variable : variables) {
-            symbolTable.addVariable(variable);
-            variable.setDeclared();
+    private void declareVariables() {
+        for (int i = 0, variablesSize = variables.size(); i < variablesSize; i++) {
+            Variable v = variables.get(i);
+            v.setDeclared();
+            symbolTable.addVariable(v);
         }
     }
 
@@ -57,6 +43,7 @@ public class AssignmentStatement implements Statement {
     public void semanticCheck(Method method) throws SemanticException {
         List<Type> assignmentTypes = variables.stream().map(Variable::getType)
             .collect(Collectors.toList());
+
         List<Type> valueTypes = values.stream()
             .map(Expression::getTypes)
             .flatMap(Collection::stream)

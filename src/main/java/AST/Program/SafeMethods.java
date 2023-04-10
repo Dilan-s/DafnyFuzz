@@ -56,10 +56,8 @@ public class SafeMethods {
 
         CallExpression iSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p2VarExp));
 
-        AssignmentStatement asI = new AssignmentStatement(symbolTable);
+        AssignmentStatement asI = new AssignmentStatement(symbolTable, List.of(iVar), iSafeIndex);
         statement.addStatement(asI);
-        asI.addAssignment(List.of(iVar), iSafeIndex);
-        asI.addAssignmentsToSymbolTable();
 
         Int jT = new Int();
         String j = VariableNameGenerator.generateVariableValueName(jT, symbolTable);
@@ -68,10 +66,8 @@ public class SafeMethods {
 
         CallExpression jSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p3VarExp));
 
-        AssignmentStatement asJ = new AssignmentStatement(symbolTable);
+        AssignmentStatement asJ = new AssignmentStatement(symbolTable, List.of(jVar), jSafeIndex);
         statement.addStatement(asJ);
-        asJ.addAssignment(List.of(jVar), jSafeIndex);
-        asJ.addAssignmentsToSymbolTable();
 
 
         OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Less_Than, List.of(iVarExp, jVarExp));

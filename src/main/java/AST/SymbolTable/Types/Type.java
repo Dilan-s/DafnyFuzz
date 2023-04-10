@@ -23,30 +23,6 @@ public interface Type extends Identifier {
 
     boolean isCollection();
 
-    default boolean greaterThan(Type rhsT) {
-        return rhsT.lessThan(this);
-    }
-
-    default boolean greaterThanOrEqual(Type rhsT) {
-        return rhsT.lessThanOrEqual(this);
-    }
-
-    default boolean lessThanOrEqual(Type rhsT) {
-        return false;
-    }
-
-    default boolean lessThan(Type rhsT) {
-        return false;
-    }
-
-    default boolean equal(Type rhsT) {
-        return greaterThanOrEqual(rhsT) && lessThanOrEqual(rhsT);
-    }
-
-    void setValue(Object value);
-
-    Object getValue();
-
     Expression generateLiteral(SymbolTable symbolTable, Object value);
 
     default Expression generateLiteral(SymbolTable symbolTable, Expression exp, Object value) {
@@ -56,5 +32,20 @@ public interface Type extends Identifier {
         return generateLiteral(symbolTable, value);
     }
 
-    void setExpressionAndIndAndDependencies(Expression expression, int ind, List<Expression> dependencies);
+    Boolean lessThan(Object lhsV, Object rhsV);
+
+    Boolean equal(Object lhsV, Object rhsV);
+
+    default Boolean lessThanOrEqual(Object lhsV, Object rhsV) {
+        return lessThan(lhsV, rhsV) || equal(lhsV, rhsV);
+    }
+
+    default Boolean greaterThan(Object lhsV, Object rhsV) {
+        return lessThan(rhsV, lhsV);
+    }
+
+    default Boolean greaterThanOrEqual(Object lhsV, Object rhsV) {
+        return greaterThan(lhsV, rhsV) || equal(lhsV, rhsV);
+    }
+
 }
