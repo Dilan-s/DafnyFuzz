@@ -12,61 +12,394 @@ import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public enum BinaryOperator implements Operator {
-    Equivalence("<==>", List.of(Args.BOOL_BOOL), new Bool()),
-    Implies("==>", List.of(Args.BOOL_BOOL), new Bool()),
-    ReverseImplies("<==", List.of(Args.BOOL_BOOL), new Bool()),
-    And("&&", List.of(Args.BOOL_BOOL), new Bool()),
-    Or("||", List.of(Args.BOOL_BOOL), new Bool()),
-    Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()),
-    Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()),
-    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()),
-    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()),
-    Greater_Than(">", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()),
-    Greater_Than_Or_Equal(">=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()),
-    Plus("+", List.of(Args.INT_INT), new Int()),
-    Minus("-", List.of(Args.INT_INT), new Int()),
-    Times("*", List.of(Args.INT_INT), new Int()),
-    Divide("/", List.of(Args.INT_INT), new Int()),
-    Modulus("%", List.of(Args.INT_INT), new Int()),
-    Disjoint("!!", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()),
-    Union("+", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Seq(), new Multiset())) {
+    Equivalence("<==>", List.of(Args.BOOL_BOOL), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return lhsVB == rhsVB;
+            }
+            return null;
+        }
+    },
+    Implies("==>", List.of(Args.BOOL_BOOL), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return !(lhsVB && !rhsVB);
+            }
+            return null;
+        }
+    },
+    ReverseImplies("<==", List.of(Args.BOOL_BOOL), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return !(!lhsVB && rhsVB);
+            }
+            return null;
+        }
+    },
+    And("&&", List.of(Args.BOOL_BOOL), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return lhsVB && rhsVB;
+            }
+            return null;
+        }
+    },
+    Or("||", List.of(Args.BOOL_BOOL), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Boolean lhsVB = (Boolean) lhsV;
+                Boolean rhsVB = (Boolean) rhsV;
+                return lhsVB || rhsVB;
+            }
+            return null;
+        }
+    },
+    Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+            if (lhsV != null && rhsV != null) {
+                return type.equal(lhsV, rhsV);
+            }
+            return null;
+        }
+    },
+    Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+            if (lhsV != null && rhsV != null) {
+                return !type.equal(lhsV, rhsV);
+            }
+            return null;
+        }
+    },
+    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.lessThan(lhsV, rhsV);
+            }
+            return null;
+        }
+    },
+    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.lessThanOrEqual(lhsV, rhsV);
+            }
+            return null;
+        }
+    },
+    Greater_Than(">", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.greaterThan(lhsV, rhsV);
+            }
+            return null;
+        }
+    },
+    Greater_Than_Or_Equal(">=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            Type type = lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.greaterThanOrEqual(lhsV, rhsV);
+            }
+            return null;
+        }
+    },
+    Plus("+", List.of(Args.INT_INT), new Int()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI + rhsVI;
+            }
+            return null;
+        }
+    },
+    Minus("-", List.of(Args.INT_INT), new Int()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI - rhsVI;
+            }
+            return null;
+        }
+    },
+    Times("*", List.of(Args.INT_INT), new Int()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI * rhsVI;
+            }
+            return null;
+        }
+    },
+    Divide("/", List.of(Args.INT_INT), new Int()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI / rhsVI;
+            }
+            return null;
+        }
+    },
+    Modulus("%", List.of(Args.INT_INT), new Int()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                Integer lhsVI = (Integer) lhsV;
+                Integer rhsVI = (Integer) rhsV;
+                return lhsVI % rhsVI;
+            }
+            return null;
+        }
+    },
+    Disjoint("!!", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.disjoint(lhsV, rhsV);
+            }
+            return null;
+        }
+    },
+    Union("+", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), List.of(new DSet(), new Seq(), new Multiset())) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.union(lhsV, rhsV);
+            }
+            return null;
+        }
+
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             List<Type> ret = new ArrayList<>();
             for (Type ignored : types) {
-                ret.add(expected);
+                ret.add(expected.concrete(symbolTable));
             }
             return ret;
         }
     },
     Difference("-", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
         @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.difference(lhsV, rhsV);
+            }
+            return null;
+        }
+
+        @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             List<Type> ret = new ArrayList<>();
             for (Type ignored : types) {
-                ret.add(expected);
+                ret.add(expected.concrete(symbolTable));
             }
             return ret;
         }
     },
     Intersection("*", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
         @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.intersection(lhsV, rhsV);
+            }
+            return null;
+        }
+
+        @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             List<Type> ret = new ArrayList<>();
             for (Type ignored : types) {
-                ret.add(expected);
+                ret.add(expected.concrete(symbolTable));
             }
             return ret;
         }
     },
     Membership("in", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) rhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                return type.contains(lhsV, rhsV);
+            }
+            return null;
+        }
+
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
@@ -80,6 +413,20 @@ public enum BinaryOperator implements Operator {
         }
     },
     NotMembership("!in", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Bool()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DCollection type = (DCollection) rhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                return !type.contains(lhsV, rhsV);
+            }
+            return null;
+        }
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
@@ -141,5 +488,4 @@ public enum BinaryOperator implements Operator {
     public int getNumberOfArgs() {
         return 2;
     }
-
 }

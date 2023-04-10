@@ -1,6 +1,7 @@
 package AST.Statements.util;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.PrintStatement;
 import AST.Statements.Statement;
@@ -9,6 +10,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class PrintAll implements Statement {
 
@@ -18,23 +20,39 @@ public class PrintAll implements Statement {
         this.symbolTable = symbolTable;
     }
 
-
-
     @Override
     public void semanticCheck(Method method) throws SemanticException {
 
     }
 
     @Override
-    public List<String> toCode() {
+    public String toString() {
         List<String> code = new ArrayList<>();
+
         List<Variable> allVariablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope();
         PrintStatement statement = new PrintStatement(symbolTable);
+
         for (Variable v : allVariablesInCurrentScope) {
-            VariableExpression expression = new VariableExpression(symbolTable, v);
+            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
             statement.addValue(expression);
         }
-        code.addAll(statement.toCode());
-        return code;
+
+        code.add(statement.toString());
+        return String.join("\n", code);
+    }
+
+    @Override
+    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
+        return currStatus;
+    }
+
+    @Override
+    public List<Object> execute(Map<Variable, Variable> paramMap) {
+        return null;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return new ArrayList<>();
     }
 }

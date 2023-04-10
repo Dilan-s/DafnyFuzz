@@ -8,8 +8,11 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public interface Operator {
@@ -82,18 +85,26 @@ public interface Operator {
 
     default List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-        Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+
+        boolean hasCollection = types.stream().anyMatch(Type::isCollection);
+
+        Type t;
+        if (hasCollection) {
+            t = typeGenerator.generateBaseTypes(1, symbolTable).get(0);
+        } else {
+            t = typeGenerator.generateTypes(1, symbolTable).get(0);
+        }
         List<Type> ret = new ArrayList<>();
         for (Type type: types) {
             if (type.isCollection()) {
                 DCollection collection = (DCollection) type;
-                ret.add(collection.setInnerType(t));
+                ret.add(collection.setInnerType(t.concrete(symbolTable)).concrete(symbolTable));
             } else {
-                ret.add(type);
+                ret.add(type.concrete(symbolTable));
             }
         }
         return ret;
     }
 
-
+    Object apply(List<Expression> args, Map<Variable, Variable> paramsMap);
 }

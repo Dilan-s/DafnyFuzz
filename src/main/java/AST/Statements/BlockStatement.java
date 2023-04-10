@@ -1,10 +1,17 @@
 package AST.Statements;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Expressions.Expression;
+import AST.Statements.util.ReturnStatus;
+import AST.StringUtils;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BlockStatement implements Statement {
 
@@ -40,12 +47,47 @@ public class BlockStatement implements Statement {
     }
 
     @Override
-    public List<String> toCode() {
+    public boolean couldReturn() {
+        return body.stream().anyMatch(Statement::couldReturn);
+    }
+
+    @Override
+    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
+        ReturnStatus curr = currStatus;
+        for (int i = 0; curr != ReturnStatus.ASSIGNED && curr != ReturnStatus.UNABLE && i < body.size(); i++) {
+            Statement s = body.get(i);
+            curr = s.assignReturnIfPossible(method, curr, dependencies);
+        }
+        return curr;
+    }
+
+    @Override
+    public List<Object> execute(Map<Variable, Variable> paramMap) {
+        for (Statement statement : body) {
+            List<Object> retValues = statement.execute(paramMap);
+            if (retValues != null) {
+                return retValues;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return body.stream()
+            .map(Statement::expand)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public String toString() {
         List<String> code = new ArrayList<>();
         for (Statement s : body) {
-            code.addAll(s.toCode());
+            String val = s.toString();
+            code.add(val);
         }
-        return code;
+        return StringUtils.intersperse("\n", code);
     }
 
 

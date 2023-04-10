@@ -3,30 +3,42 @@ package AST.Statements;
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.PrintAll;
+import AST.Statements.util.ReturnStatus;
+import AST.StringUtils;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ReturnStatement implements Statement {
 
     private final SymbolTable symbolTable;
     private final List<Expression> values;
+    private boolean printAll;
 
-    public ReturnStatement(SymbolTable symbolTable) {
+    public ReturnStatement(SymbolTable symbolTable, List<Expression> values) {
         this.symbolTable = symbolTable;
-        this.values = new ArrayList<>();
+        this.values = values;
+        this.printAll = true;
+
     }
 
-    public void addValue(Expression expression) {
-        values.add(expression);
+    public void setPrintAll(boolean printAll) {
+        this.printAll = printAll;
     }
 
     @Override
     public boolean isReturn() {
+        return true;
+    }
+
+    @Override
+    public boolean couldReturn() {
         return true;
     }
 
@@ -63,23 +75,54 @@ public class ReturnStatement implements Statement {
     }
 
     @Override
-    public List<String> toCode() {
+    public String toString() {
         List<String> code = new ArrayList<>();
-
-        code.addAll(values.stream()
-            .map(Expression::toCode)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList()));
 
         String returnValues = values.stream()
             .map(Expression::toString)
             .collect(Collectors.joining(", "));
 
-        PrintAll printAll = new PrintAll(symbolTable);
-        code.addAll(printAll.toCode());
-
-        code.add(String.format("return %s;\n", returnValues));
-        return code;
+        code.add(String.format("return %s;", returnValues));
+        return StringUtils.intersperse("\n", code);
     }
 
+    public List<Expression> getReturnValues() {
+        return values;
+    }
+
+    @Override
+    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
+        method.setReturnValues(values, dependencies);
+        return ReturnStatus.ASSIGNED;
+    }
+
+    @Override
+    public List<Object> execute(Map<Variable, Variable> paramMap) {
+        List<Object> list = new ArrayList<>();
+        for (Expression x : values) {
+            List<Object> value = x.getValue(paramMap);
+            for (Object object : value) {
+                list.add(object);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
+        List<Statement> list = new ArrayList<>();
+        for (Expression value : values) {
+            List<Statement> expand = value.expand();
+            for (Statement statement : expand) {
+                list.add(statement);
+            }
+        }
+        r.addAll(list);
+        if (printAll) {
+            r.add(new PrintAll(symbolTable));
+        }
+        r.add(this);
+        return r;
+    }
 }

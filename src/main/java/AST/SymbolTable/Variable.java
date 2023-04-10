@@ -1,17 +1,24 @@
 package AST.SymbolTable;
 
+import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Types.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Variable implements Identifier {
 
     private final String name;
     private final Type type;
     private boolean isDeclared;
+    private Object value;
 
     public Variable(String name, Type type) {
         this.name = name;
         this.type = type;
         this.isDeclared = false;
+        this.value = null;
     }
 
     @Override
@@ -34,5 +41,19 @@ public class Variable implements Identifier {
 
     public boolean isDeclared() {
         return isDeclared;
+    }
+
+    public List<Object> getValue() {
+        return getValue(new HashMap<>());
+    }
+
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> l = new ArrayList<>();
+        l.add(value);
+        return l;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
     }
 }

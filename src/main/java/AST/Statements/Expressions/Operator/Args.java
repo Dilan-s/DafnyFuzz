@@ -22,4 +22,5 @@ public class Args {
     public static final List<Type> SEQ = List.of(new Seq());
     public static final List<Type> DSET = List.of(new DSet());
     public static final List<Type> MULTISET = List.of(new Multiset());
+    public static final List<Type> BOOL = List.of(new Bool());
 }

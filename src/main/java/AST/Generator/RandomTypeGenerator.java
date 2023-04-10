@@ -16,11 +16,19 @@ import java.util.List;
 
 public class RandomTypeGenerator {
 
-    public static final int MAX_TYPE_DEPTH = 3;
+    public static final int MAX_TYPE_DEPTH = 2;
     public static final ArrayList<Type> PRIMITIVE_TYPES = new ArrayList<>(List.of(new Int(), new Bool(), new Char(), new Real()));
     public static final List<DCollection> COLLECTION_TYPES = List.of(new DSet(), new Seq(), new Multiset(), new DArray());
     private static int typeDepth = 0;
 
+
+
+    public List<Type> generateBaseTypes(int noOfTypes, SymbolTable symbolTable) {
+        typeDepth += MAX_TYPE_DEPTH;
+        List<Type> types = generateTypes(noOfTypes, symbolTable);
+        typeDepth -= MAX_TYPE_DEPTH;
+        return types;
+    }
     public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
         typeDepth++;
         List<Type> types = new ArrayList<>();
@@ -30,14 +38,6 @@ public class RandomTypeGenerator {
             option.addAll(COLLECTION_TYPES);
         }
 
-//        if (typeDepth < MAX_TYPE_DEPTH) {
-//            List<Type> collections = new ArrayList<>();
-//            collections.addAll(option.stream().map(DSet::new).collect(Collectors.toList()));
-//            collections.addAll(option.stream().map(Seq::new).collect(Collectors.toList()));
-//            collections.addAll(option.stream().map(Multiset::new).collect(Collectors.toList()));
-//            collections.addAll(option.stream().map(DArray::new).collect(Collectors.toList()));
-//            option.addAll(collections);
-//        }
         for (int i = 0; i < noOfTypes; i++) {
             int randType = GeneratorConfig.getRandom().nextInt(option.size());
             Type t = option.get(randType);

@@ -7,17 +7,14 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.SeqLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Seq implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 10;
     private Type type;
-
-    public int getLength() {
-        return length;
-    }
-
-    private int length;
 
     public Seq(Type type) {
         this.type = type;
@@ -70,12 +67,20 @@ public class Seq implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
-        SeqLiteral expression = new SeqLiteral(symbolTable,this);
+        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+        List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
-            expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
+            Type concrete = type.concrete(symbolTable);
+            values.add(expressionGenerator.generateExpression(concrete, symbolTable));
         }
+        SeqLiteral expression = new SeqLiteral(symbolTable,this, values);
         return expression;
+    }
+
+    @Override
+    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
+        Type t = this.concrete(symbolTable);
+        return new SeqLiteral(symbolTable, t, (List<Expression>) value);
     }
 
     @Override
@@ -93,7 +98,7 @@ public class Seq implements DCollection {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             return new Seq(t);
         }
-        return this;
+        return new Seq(type.concrete(symbolTable));
     }
 
     @Override
@@ -102,7 +107,75 @@ public class Seq implements DCollection {
     }
 
     @Override
+    public Boolean contains(Object lhsV, Object rhsV) {
+        List<Object> rhsVL = (List<Object>) rhsV;
+        return rhsVL.contains(lhsV);
+    }
+
+    @Override
+    public Boolean disjoint(Object lhsV, Object rhsV) {
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
+
+        return !lhsVL.containsAll(rhsVL);
+    }
+
+    @Override
     public boolean isPrintable() {
         return type != null && type.isPrintable();
+    }
+
+    @Override
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
+
+        if (lhsVL.size() > rhsVL.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < lhsVL.size(); i++) {
+            if (!Objects.equals(lhsVL.get(i), rhsVL.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public Boolean equal(Object lhsV, Object rhsV) {
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
+
+        if (lhsVL.size() != rhsVL.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < lhsVL.size(); i++) {
+            if (!Objects.equals(lhsVL.get(i), rhsVL.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public Object union(Object lhsV, Object rhsV) {
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
+
+        List<Object> res = new ArrayList<>(lhsVL);
+        res.addAll(rhsVL);
+        return res;
+    }
+
+    @Override
+    public Object difference(Object lhsV, Object rhsV) {
+        return null;
+    }
+
+    @Override
+    public Object intersection(Object lhsV, Object rhsV) {
+        return null;
     }
 }

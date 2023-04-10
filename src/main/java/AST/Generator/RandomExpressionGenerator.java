@@ -1,6 +1,5 @@
 package AST.Generator;
 
-import AST.Errors.InvalidArgumentException;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
@@ -41,6 +40,7 @@ public class RandomExpressionGenerator {
 
     private static int expressionDepth = 0;
 
+    public static boolean allowNullValues = true;
 
     public Expression generateExpression(Type type, SymbolTable symbolTable) {
         Expression ret = null;
@@ -84,72 +84,92 @@ public class RandomExpressionGenerator {
     }
 
     private Expression generateReassignSeqExpression(Type type, SymbolTable symbolTable) {
-        Seq t = (Seq) type;
+        Seq seqT = (Seq) type.concrete(symbolTable);
+        Expression seq = generateExpression(seqT, symbolTable);
 
-        Expression seq = generateExpression(type, symbolTable);
-        Expression ind = generateLiteral(new Int(), symbolTable);
-        Expression exp = generateExpression(t.getInnerType(), symbolTable);
+        Int indT = new Int();
+        Expression ind = generateLiteral(indT, symbolTable);
+
+        Type expT = seqT.getInnerType().concrete(symbolTable);
+        Expression exp = generateExpression(expT, symbolTable);
 
         ReassignSeqExpression expression = new ReassignSeqExpression(symbolTable, seq, ind, exp);
         VariableExpression seqVar = expression.getSequenceVariableExpression();
 
-        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals);
+        OperatorExpression size = new OperatorExpression(symbolTable, new Int(), UnaryOperator.Cardinality, List.of(seqVar));
 
-        OperatorExpression size = new OperatorExpression(symbolTable, UnaryOperator.Cardinality);
-        size.addArgument(seqVar);
+        IntLiteral zero = new IntLiteral(new Int(), symbolTable, 0);
+        OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Greater_Than, List.of(size, zero));
 
-        test.addArgument(size);
-        test.addArgument(new IntLiteral(symbolTable, 0));
-        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, test, expression, seqVar);
+        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, type, test, expression, seqVar);
 
         return ifElseExpression;
     }
 
     private Expression generateSubsequenceExpression(Type type, SymbolTable symbolTable) {
-        Seq t = (Seq) type;
+        Seq seqT = (Seq) type.concrete(symbolTable);
+        Expression seq = generateExpression(seqT, symbolTable);
 
-        Expression seq = generateExpression(t, symbolTable);
+        Int indIT = new Int();
+        Expression indI = generateExpression(indIT, symbolTable);
 
-        Expression i = generateLiteral(new Int(), symbolTable);
-
-        SubsequenceExpression expression = new SubsequenceExpression(symbolTable, seq);
+        Expression indJ;
+        Int indJT = new Int();
         if (GeneratorConfig.getRandom().nextDouble() < PROB_HI_AND_LO_SUBSEQUENCE) {
-            Expression j = generateLiteral(new Int(), symbolTable);
-            expression.addIndexes(i, j);
+            indJ = generateExpression(indJT, symbolTable);
         } else {
-            expression.addIndexes(i);
+            indJ = new IntLiteral(indJT, symbolTable, 0);
         }
+        SubsequenceExpression expression = new SubsequenceExpression(symbolTable, seq, indI, indJ);
         VariableExpression seqVar = expression.getSequenceVariableExpression();
 
-        OperatorExpression test = new OperatorExpression(symbolTable, BinaryOperator.Not_Equals);
+        OperatorExpression size = new OperatorExpression(symbolTable, new Int(), UnaryOperator.Cardinality, List.of(seqVar));
 
-        OperatorExpression size = new OperatorExpression(symbolTable, UnaryOperator.Cardinality);
-        size.addArgument(seqVar);
+        IntLiteral zero = new IntLiteral(new Int(), symbolTable, 0);
+        OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Greater_Than, List.of(size, zero));
 
-        test.addArgument(size);
-        test.addArgument(new IntLiteral(symbolTable, 0));
-        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, test, expression, seqVar);
+        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, type, test, expression, seqVar);
 
         return ifElseExpression;
     }
 
 
-    private IndexExpression generateSeqIndexExpression(Type type, SymbolTable symbolTable) {
-        Seq t = new Seq(type);
-        Expression seq = t.generateLiteral(symbolTable);
+    private Expression generateSeqIndexExpression(Type type, SymbolTable symbolTable) {
+        Seq seqT = new Seq(type.concrete(symbolTable));
+        Expression seq = seqT.generateLiteral(symbolTable);
 
-        IntLiteral ind = new IntLiteral(symbolTable, GeneratorConfig.getRandom().nextInt(t.getLength()));
+        Int indT = new Int();
+        Expression ind = generateExpression(indT, symbolTable);
 
-        IndexExpression expression = new IndexExpression(symbolTable);
-        expression.setSeqAndInd(seq, ind);
-        return expression;
+        IndexExpression expression = new IndexExpression(symbolTable, type, seq, ind);
+
+        VariableExpression seqVar = expression.getSequenceVariableExpression();
+
+        OperatorExpression size = new OperatorExpression(symbolTable, new Int(), UnaryOperator.Cardinality, List.of(seqVar));
+
+        IntLiteral zero = new IntLiteral(new Int(), symbolTable, 0);
+        OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Greater_Than, List.of(size, zero));
+
+        Type defT = type.concrete(symbolTable);
+        Expression def = generateExpression(defT, symbolTable);
+        IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, type, test, expression, def);
+
+        return ifElseExpression;
     }
 
     private VariableExpression generateVariableExpression(Type type, SymbolTable symbolTable) {
         List<Variable> variables = symbolTable.getAllVariables(type);
+
+        if (!allowNullValues) {
+            variables = variables.stream()
+                .filter(v -> v.getValue() != null)
+                .collect(Collectors.toList());
+        }
+
         if (!variables.isEmpty()) {
             int index = GeneratorConfig.getRandom().nextInt(variables.size());
-            VariableExpression expression = new VariableExpression(symbolTable, variables.get(index));
+            Variable variable = variables.get(index);
+            VariableExpression expression = new VariableExpression(symbolTable, variable, type);
             return expression;
         }
         return null;
@@ -160,7 +180,6 @@ public class RandomExpressionGenerator {
         if (operator == null) {
             return null;
         }
-        OperatorExpression expression = new OperatorExpression(symbolTable, operator);
 
         List<List<Type>> typeArgs = operator.getTypeArgs();
         int randType = GeneratorConfig.getRandom().nextInt(typeArgs.size());
@@ -168,21 +187,28 @@ public class RandomExpressionGenerator {
 
         types = operator.concreteType(types, symbolTable, type);
 
+        List<Expression> args = new ArrayList<>();
         for (Type t : types) {
             Expression arg = generateExpression(t, symbolTable);
-            expression.addArgument(arg);
+            args.add(arg);
         }
 
-        expression.setType(type);
+        OperatorExpression expression = new OperatorExpression(symbolTable, type, operator, args);
 
         return expression;
     }
 
     private IfElseExpression generateIfElseExpression(Type type, SymbolTable symbolTable) {
-        Expression test = generateExpression(new Bool(), symbolTable);
-        Expression ifExp = generateExpression(type, symbolTable);
-        Expression elseExp = generateExpression(type, symbolTable);
-        IfElseExpression expression = new IfElseExpression(symbolTable, test, ifExp, elseExp);
+        Bool testT = new Bool();
+        Expression test = generateExpression(testT, symbolTable);
+
+        Type ifT = type.concrete(symbolTable);
+        Expression ifExp = generateExpression(ifT, symbolTable);
+
+        Type elseT = type.concrete(symbolTable);
+        Expression elseExp = generateExpression(elseT, symbolTable);
+        IfElseExpression expression = new IfElseExpression(symbolTable, type, test, ifExp, elseExp);
+
         return expression;
     }
 
@@ -214,20 +240,22 @@ public class RandomExpressionGenerator {
             return null;
         }
 
-        CallExpression expression = new CallExpression(symbolTable, m);
         List<Type> argTypes = m.getArgTypes();
         int i = 0;
+        List<Expression> args = new ArrayList<>();
+        boolean prevNull = allowNullValues;
+        allowNullValues = false;
         while (i < argTypes.size()) {
             Type t = argTypes.get(i);
-            try {
-                Type concrete = t.concrete(symbolTable);
-                Expression exp = generateExpression(concrete, symbolTable);
-                expression.addArg(exp);
-                i++;
-            } catch (InvalidArgumentException e) {
-                System.err.println("Could not generate argument");
-            }
+            Type concrete = t.concrete(symbolTable);
+            Expression exp = generateExpression(concrete, symbolTable);
+            args.add(exp);
+            i++;
         }
+        allowNullValues = prevNull;
+        CallExpression expression = new CallExpression(symbolTable, m, args);
+
+
         return expression;
     }
 

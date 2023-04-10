@@ -1,6 +1,5 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.InvalidArgumentException;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
@@ -11,54 +10,70 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CallExpression implements Expression {
 
     private SymbolTable symbolTable;
-    private final Method method;
-    private final List<Variable> variables;
-    private final List<Statement> assignments;
+    private Method method;
+    private List<Variable> variables;
+    private List<Statement> assignments;
     private List<Variable> assignedVariables;
+    private CallMethodExpression callExpr;
+    private AssignmentStatement assignStat;
 
-    public CallExpression(SymbolTable symbolTable, Method method) {
+    public CallExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
         this.symbolTable = symbolTable;
         this.method = method;
         this.variables = new ArrayList<>();
         this.assignments = new ArrayList<>();
         this.assignedVariables = new ArrayList<>();
+        addArg(args);
+        generateReturnAssignment();
     }
 
-    public void addArg(List<Expression> expressions) throws InvalidArgumentException {
+    private void addArg(List<Expression> expressions) {
         for (Expression e : expressions) {
             addArg(e);
         }
     }
 
-    public void addArg(Expression expression) throws InvalidArgumentException {
-
-        if (expression.getTypes().size() != 1) {
-            throw new InvalidArgumentException("Cannot add argument with more than 1 return value");
-        }
-
+    private void addArg(Expression expression) {
         Type type = expression.getTypes().get(0);
-        String var = VariableNameGenerator.generateVariableValueName(type);
+        String var = VariableNameGenerator.generateVariableValueName(type, symbolTable);
         Variable variable = new Variable(var, type);
         variables.add(variable);
 
-        AssignmentStatement stat = new AssignmentStatement(symbolTable);
-        stat.addAssignment(List.of(variable), expression);
-        stat.addAssignmentsToSymbolTable();
-
+        AssignmentStatement stat = new AssignmentStatement(symbolTable, List.of(variable), expression);
         assignments.add(stat);
     }
 
+
+    private void generateReturnAssignment() {
+        assignedVariables = new ArrayList<>();
+
+        for (Type returnType : method.getReturnTypes()) {
+            Type rt = returnType.concrete(symbolTable);
+            String var = VariableNameGenerator.generateVariableValueName(rt, symbolTable);
+            Variable variable = new Variable(var, rt);
+            assignedVariables.add(variable);
+        }
+
+        callExpr = new CallMethodExpression(method, variables);
+
+        assignStat = new AssignmentStatement(symbolTable, assignedVariables, callExpr);
+//        assignments.add(assignStat);
+    }
 
     @Override
     public List<Type> getTypes() {
         return method.getReturnTypes();
     }
+
 
     @Override
     public void semanticCheck(Method method) throws SemanticException {
@@ -80,30 +95,22 @@ public class CallExpression implements Expression {
                         methodType.getName(), varType.getName()));
             }
         }
-
     }
 
     @Override
-    public List<String> toCode() {
-        AssignmentStatement stat = new AssignmentStatement(symbolTable);
-        assignedVariables = new ArrayList<>();
-        for (Type returnType : method.getReturnTypes()) {
-            String var = VariableNameGenerator.generateVariableValueName(returnType);
-            Variable variable = new Variable(var, returnType);
-            assignedVariables.add(variable);
-            symbolTable.addVariable(variable);
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
+
+        List<Statement> list = new ArrayList<>();
+        for (Statement assignment : assignments) {
+            List<Statement> expand = assignment.expand();
+            for (Statement statement : expand) {
+                list.add(statement);
+            }
         }
-
-        CallMethodExpression callMethodExpression = new CallMethodExpression(method, variables);
-        stat.addAssignment(assignedVariables, callMethodExpression);
-        stat.addAssignmentsToSymbolTable();
-
-        assignments.add(stat);
-
-        return assignments.stream()
-            .map(Statement::toCode)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+        r.addAll(list);
+        r.add(assignStat);
+        return r;
     }
 
     @Override
@@ -118,8 +125,49 @@ public class CallExpression implements Expression {
             .collect(Collectors.joining(", "));
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(method, variables, assignedVariables);
+    }
 
-    private static class CallMethodExpression implements Expression {
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CallExpression)) {
+            return false;
+        }
+        CallExpression other = (CallExpression) obj;
+        if (!other.method.equals(method)) {
+            return false;
+        }
+
+        if (other.variables.size() != variables.size()) {
+            return false;
+        }
+
+        if (other.assignedVariables.size() != assignedVariables.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < variables.size(); i++) {
+            if (!other.variables.get(i).equals(variables.get(i))) {
+                return false;
+            }
+        }
+
+        for (int i = 0; i < assignedVariables.size(); i++) {
+            if (!other.assignedVariables.get(i).equals(assignedVariables.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        return callExpr.getValue(paramsMap);
+    }
+
+    private class CallMethodExpression implements Expression {
 
         private Method method;
         private List<Variable> args;
@@ -144,6 +192,40 @@ public class CallExpression implements Expression {
             return String.format("%s(%s)", method.getName(), args.stream()
                 .map(Variable::getName)
                 .collect(Collectors.joining(", ")));
+        }
+
+        @Override
+        public List<Statement> expand() {
+            List<Statement> r = new ArrayList<>();
+
+            List<Statement> list = new ArrayList<>();
+            for (Statement assignment : assignments) {
+                List<Statement> expand = assignment.expand();
+                for (Statement statement : expand) {
+                    list.add(statement);
+                }
+            }
+            r.addAll(list);
+            r.add(assignStat);
+            return r;
+        }
+
+        @Override
+        public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+            List<Object> r = new ArrayList<>();
+
+            List<Object> l = new ArrayList<>();
+            for (Variable arg : args) {
+                List<Object> value = arg.getValue(paramsMap);
+                for (Object v : value) {
+                    if (v == null) {
+                        method.getReturnTypes().forEach(t -> r.add(null));
+                        return r;
+                    }
+                    l.add(v);
+                }
+            }
+            return method.execute(args);
         }
     }
 }

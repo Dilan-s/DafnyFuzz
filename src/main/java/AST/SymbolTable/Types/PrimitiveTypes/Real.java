@@ -5,11 +5,17 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.RealLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.Objects;
 
 public class Real implements BaseType {
 
     private static final int MAX_DOUBLE = 30;
     public static final double PROB_NEGATION = 0.5;
+    private Double value;
+
+    public Real() {
+        this.value = null;
+    }
 
     @Override
     public String getName() {
@@ -32,9 +38,29 @@ public class Real implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        double value = GeneratorConfig.getRandom().nextDouble() * MAX_DOUBLE;
+        value = GeneratorConfig.getRandom().nextDouble() * MAX_DOUBLE;
         value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
-        return new RealLiteral(symbolTable, value);
+        return new RealLiteral(this, symbolTable, value);
+    }
+
+    @Override
+    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
+        Type t = this.concrete(symbolTable);
+        return new RealLiteral(t, symbolTable, (Double) value);
+    }
+
+    @Override
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        Double lhs = (Double) lhsV;
+        Double rhs = (Double) rhsV;
+        return lhs < rhs;
+    }
+
+    @Override
+    public Boolean equal(Object lhsV, Object rhsV) {
+        Double lhs = (Double) lhsV;
+        Double rhs = (Double) rhsV;
+        return Objects.equals(lhs, rhs);
     }
 
     @Override
@@ -49,6 +75,6 @@ public class Real implements BaseType {
 
     @Override
     public Type concrete(SymbolTable symbolTable) {
-        return new Bool();
+        return new Real();
     }
 }

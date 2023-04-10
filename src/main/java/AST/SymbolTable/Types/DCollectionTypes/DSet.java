@@ -7,6 +7,10 @@ import AST.Statements.Expressions.DSetLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DSet implements DCollection {
 
@@ -65,11 +69,21 @@ public class DSet implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
-        DSetLiteral expression = new DSetLiteral(symbolTable, type);
+        List<Expression> values = new ArrayList<>();
         for (int i = 0; i < noOfElems; i++) {
-            expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
+            Type t = type.concrete(symbolTable);
+            Expression exp = expressionGenerator.generateExpression(t, symbolTable);
+            values.add(exp);
         }
+
+        DSetLiteral expression = new DSetLiteral(symbolTable, this, values);
         return expression;
+    }
+
+    @Override
+    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
+        Type t = this.concrete(symbolTable);
+        return new DSetLiteral(symbolTable, t, new ArrayList<>((Set<Expression>) value));
     }
 
     @Override
@@ -87,9 +101,8 @@ public class DSet implements DCollection {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             return new DSet(t);
         }
-        return this;
+        return new DSet(type.concrete(symbolTable));
     }
-
 
     @Override
     public boolean operatorExists() {
@@ -97,7 +110,68 @@ public class DSet implements DCollection {
     }
 
     @Override
+    public Boolean disjoint(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        return !lhsVS.containsAll(rhsVS);
+    }
+
+    @Override
+    public Object difference(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        Set<Object> ret = new HashSet<>(lhsVS);
+        ret.removeAll(rhsVS);
+        return ret;
+    }
+
+    @Override
+    public Object intersection(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        Set<Object> ret = new HashSet<>(lhsVS);
+        ret.retainAll(rhsVS);
+        return ret;
+    }
+
+    @Override
+    public Boolean contains(Object lhsV, Object rhsV) {
+        Set<Object> rhsVL = (Set<Object>) rhsV;
+        return rhsVL.contains(lhsV);
+    }
+
+    @Override
+    public Object union(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        Set<Object> ret = new HashSet<>(lhsVS);
+        ret.addAll(rhsVS);
+        return ret;
+    }
+
+    @Override
     public boolean isPrintable() {
         return false;
+    }
+
+
+    @Override
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        return rhsVS.containsAll(lhsVS) && !lhsVS.containsAll(rhsVS);
+    }
+
+    @Override
+    public Boolean equal(Object lhsV, Object rhsV) {
+        Set<Object> rhsVS = (Set<Object>) rhsV;
+        Set<Object> lhsVS = (Set<Object>) lhsV;
+
+        return rhsVS.containsAll(lhsVS) && lhsVS.containsAll(rhsVS);
     }
 }

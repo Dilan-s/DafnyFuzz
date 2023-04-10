@@ -8,6 +8,12 @@ import AST.SymbolTable.Types.Type;
 
 public class Bool implements BaseType {
 
+    private Boolean value;
+
+    public Bool() {
+        this.value = null;
+    }
+
     @Override
     public String getName() {
         return "bool";
@@ -29,7 +35,14 @@ public class Bool implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        return new BoolLiteral(symbolTable, GeneratorConfig.getRandom().nextBoolean());
+        value = GeneratorConfig.getRandom().nextBoolean();
+        return new BoolLiteral(this, symbolTable, value);
+    }
+
+    @Override
+    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
+        Type t = this.concrete(symbolTable);
+        return new BoolLiteral(t, symbolTable, (Boolean) value);
     }
 
     @Override
@@ -40,5 +53,15 @@ public class Bool implements BaseType {
     @Override
     public Type concrete(SymbolTable symbolTable) {
         return new Bool();
+    }
+
+    @Override
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        return false;
+    }
+
+    @Override
+    public Boolean equal(Object lhsV, Object rhsV) {
+        return false;
     }
 }

@@ -7,6 +7,8 @@ import AST.Statements.Expressions.ArrayLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DArray implements DCollection {
 
@@ -71,11 +73,32 @@ public class DArray implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
-        ArrayLiteral expression = new ArrayLiteral(symbolTable, this);
+
+        List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
-            expression.addValue(expressionGenerator.generateExpression(type, symbolTable));
+            Type t = type.concrete(symbolTable);
+            Expression exp = expressionGenerator.generateExpression(t, symbolTable);
+
+            values.add(exp);
         }
+        ArrayLiteral expression = new ArrayLiteral(symbolTable, this, values);
         return expression;
+    }
+
+    @Override
+    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
+        Type t = this.concrete(symbolTable);
+        return new ArrayLiteral(symbolTable, t, (List<Expression>) value, false);
+    }
+
+    @Override
+    public Boolean lessThan(Object lhsV, Object rhsV) {
+        return null;
+    }
+
+    @Override
+    public Boolean equal(Object lhsV, Object rhsV) {
+        return null;
     }
 
     @Override
@@ -93,12 +116,37 @@ public class DArray implements DCollection {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             return new DArray(t);
         }
-        return this;
+        return new DArray(type.concrete(symbolTable));
     }
 
     @Override
     public boolean operatorExists() {
         return false;
+    }
+
+    @Override
+    public Boolean disjoint(Object lhsV, Object rhsV) {
+        return null;
+    }
+
+    @Override
+    public Object union(Object lhsV, Object rhsV) {
+        return null;
+    }
+
+    @Override
+    public Object difference(Object lhsV, Object rhsV) {
+        return null;
+    }
+
+    @Override
+    public Object intersection(Object lhsV, Object rhsV) {
+        return null;
+    }
+
+    @Override
+    public Boolean contains(Object lhsV, Object rhsV) {
+        return null;
     }
 
     @Override

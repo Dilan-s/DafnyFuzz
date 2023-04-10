@@ -1,10 +1,14 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface Expression {
 
@@ -16,8 +20,11 @@ public interface Expression {
         return true;
     }
 
-    default List<String> toCode() {
-        return new ArrayList<>();
+    default List<Object> getValue() {
+        return getValue(new HashMap<>());
     }
 
+    List<Object> getValue(Map<Variable, Variable> paramsMap);
+
+    List<Statement> expand();
 }
