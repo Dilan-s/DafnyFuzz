@@ -39,10 +39,13 @@ public class AssignmentStatement implements Statement {
             symbolTable.addVariable(v);
         }
 
-        List<Object> expValues = values.stream()
-            .map(Expression::getValue)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+        List<Object> expValues = new ArrayList<>();
+        for (Expression value : values) {
+            List<Object> expressionValue = value.getValue();
+            for (Object object : expressionValue) {
+                expValues.add(object);
+            }
+        }
 
         for (int i = 0; i < variables.size(); i++) {
             Object expV = expValues.get(i);
@@ -94,34 +97,24 @@ public class AssignmentStatement implements Statement {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = new ArrayList<>();
-
-        List<String> codeForExpressions = values.stream()
-            .map(Expression::toCode)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-
-        code.addAll(codeForExpressions);
+    public String toString() {
         String rhs = values.stream()
             .map(Expression::toString)
             .collect(Collectors.joining(", "));
-
         if (declared) {
             String lhs = variables.stream()
                 .map(Variable::getName)
                 .collect(Collectors.joining(", "));
 
-            code.add(String.format("%s := %s;\n", lhs, rhs));
+            return String.format("%s := %s;", lhs, rhs);
         } else {
             String lhs = variables.stream()
                 .map(Variable::toString)
                 .collect(Collectors.joining(", "));
 
 
-            code.add(String.format("var %s := %s;\n", lhs, rhs));
+            return String.format("var %s := %s;", lhs, rhs);
         }
-        return code;
     }
 
     @Override
@@ -131,15 +124,34 @@ public class AssignmentStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap) {
-//        values.stream().
+        List<Object> expValues = new ArrayList<>();
+        for (Expression value : values) {
+            List<Object> expressionValue = value.getValue(paramMap);
+            for (Object object : expressionValue) {
+                expValues.add(object);
+            }
+        }
+
+        for (int i = 0; i < variables.size(); i++) {
+            Object expV = expValues.get(i);
+            Variable v = variables.get(i);
+            v.setValue(expV);
+        }
         return null;
     }
 
     @Override
     public List<Statement> expand() {
-        return values.stream()
-            .map(Expression::expand)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+        List<Statement> r = new ArrayList<>();
+        List<Statement> list = new ArrayList<>();
+        for (Expression value : values) {
+            List<Statement> expand = value.expand();
+            for (Statement statement : expand) {
+                list.add(statement);
+            }
+        }
+        r.addAll(list);
+        r.add(this);
+        return r;
     }
 }

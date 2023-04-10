@@ -3,6 +3,7 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
@@ -66,13 +67,13 @@ public class SubsequenceExpression implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = new ArrayList<>();
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
 
-        code.addAll(statSeq.toCode());
-        code.addAll(statLoHi.toCode());
+        r.addAll(statSeq.expand());
+        r.addAll(statLoHi.expand());
 
-        return code;
+        return r;
     }
 
     @Override

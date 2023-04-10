@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -55,5 +56,10 @@ public class BoolLiteral implements Expression {
         List<Object> r = new ArrayList<>();
         r.add(value);
         return r;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return new ArrayList<>();
     }
 }

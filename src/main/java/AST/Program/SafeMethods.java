@@ -57,7 +57,7 @@ public class SafeMethods {
         CallExpression iSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p2VarExp));
 
         AssignmentStatement asI = new AssignmentStatement(symbolTable, List.of(iVar), iSafeIndex);
-        statement.addStatement(asI);
+        statement.addStatement(asI.expand());
 
         Int jT = new Int();
         String j = VariableNameGenerator.generateVariableValueName(jT, symbolTable);
@@ -67,7 +67,7 @@ public class SafeMethods {
         CallExpression jSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p3VarExp));
 
         AssignmentStatement asJ = new AssignmentStatement(symbolTable, List.of(jVar), jSafeIndex);
-        statement.addStatement(asJ);
+        statement.addStatement(asJ.expand());
 
 
         OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Less_Than, List.of(iVarExp, jVarExp));
@@ -79,11 +79,11 @@ public class SafeMethods {
         elseRet.setPrintAll(false);
 
         IfElseStatement ifElseStatement = new IfElseStatement(symbolTable);
-        statement.addStatement(ifElseStatement);
         ifElseStatement.setTest(test);
         ifElseStatement.setIfStat(ifRet);
         ifElseStatement.setElseStat(elseRet);
 
+        statement.addStatement(ifElseStatement.expand());
         safe_subsequence.assignReturn();
         System.out.println(safe_subsequence);
         return safe_subsequence.getSimpleMethod();
@@ -91,6 +91,9 @@ public class SafeMethods {
 
     public static Method safe_index_seq() {
         Method safe_index_seq = new Method(new Int(), "safe_index_seq");
+        SymbolTable symbolTable = safe_index_seq.getSymbolTable();
+        BlockStatement statement = new BlockStatement(symbolTable);
+        safe_index_seq.setBody(statement);
 
         String p1 = VariableNameGenerator.generateArgumentName(safe_index_seq);
         Seq p1T = new Seq();
@@ -101,8 +104,6 @@ public class SafeMethods {
         Int p2T = new Int();
         Variable p2Var = new Variable(p2, p2T);
         safe_index_seq.addArgument(p2Var);
-
-        SymbolTable symbolTable = safe_index_seq.getSymbolTable();
 
         VariableExpression p1VarExp = new VariableExpression(symbolTable, p1Var, p1T);
 
@@ -119,10 +120,10 @@ public class SafeMethods {
 
         IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, new Int(), test, p2VarExp, new IntLiteral(new Int(), symbolTable, 0));
 
-        ReturnStatement statement = new ReturnStatement(symbolTable, List.of(ifElseExpression));
-        statement.setPrintAll(false);
+        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(ifElseExpression));
+        returnStatement.setPrintAll(false);
 
-        safe_index_seq.setBody(statement);
+        statement.addStatement(returnStatement.expand());
 
         safe_index_seq.assignReturn();
         System.out.println(safe_index_seq);
@@ -131,6 +132,9 @@ public class SafeMethods {
 
     static Method safe_division() {
         Method safe_div = new Method(new Int(), "safe_division");
+        SymbolTable symbolTable = safe_div.getSymbolTable();
+        BlockStatement statement = new BlockStatement(symbolTable);
+        safe_div.setBody(statement);
 
         Int p1T = new Int();
         String p1 = VariableNameGenerator.generateArgumentName(safe_div);
@@ -142,7 +146,6 @@ public class SafeMethods {
         Variable p2Var = new Variable(p2, p2T);
         safe_div.addArgument(p2Var);
 
-        SymbolTable symbolTable = safe_div.getSymbolTable();
 
         VariableExpression lhsTest = new VariableExpression(symbolTable, p2Var, p2T);
         IntLiteral rhsTest = new IntLiteral(new Int(), symbolTable, 0);
@@ -157,10 +160,10 @@ public class SafeMethods {
 
         IfElseExpression expression = new IfElseExpression(symbolTable, new Int(), test, ifDiv, elseDiv);
 
-        ReturnStatement statement = new ReturnStatement(symbolTable, List.of(expression));
-        statement.setPrintAll(false);
+        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(expression));
+        returnStatement.setPrintAll(false);
 
-        safe_div.setBody(statement);
+        statement.addStatement(returnStatement.expand());
 
         safe_div.assignReturn();
         System.out.println(safe_div);
@@ -169,6 +172,9 @@ public class SafeMethods {
 
     static Method safe_modulus() {
         Method safe_mod = new Method(new Int(), "safe_modulus");
+        SymbolTable symbolTable = safe_mod.getSymbolTable();
+        BlockStatement statement = new BlockStatement(symbolTable);
+        safe_mod.setBody(statement);
 
         Int p1T = new Int();
         String p1 = VariableNameGenerator.generateArgumentName(safe_mod);
@@ -180,7 +186,6 @@ public class SafeMethods {
         Variable p2Var = new Variable(p2, p2T);
         safe_mod.addArgument(p2Var);
 
-        SymbolTable symbolTable = safe_mod.getSymbolTable();
 
         VariableExpression lhsTest = new VariableExpression(symbolTable, p2Var, p2T);
         IntLiteral rhsTest = new IntLiteral(new Int(), symbolTable, 0);
@@ -194,10 +199,11 @@ public class SafeMethods {
 
         IfElseExpression expression = new IfElseExpression(symbolTable, new Int(), test, ifDiv, elseDiv);
 
-        ReturnStatement statement = new ReturnStatement(symbolTable, List.of(expression));
-        statement.setPrintAll(false);
+        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(expression));
+        returnStatement.setPrintAll(false);
 
-        safe_mod.setBody(statement);
+
+        statement.addStatement(returnStatement.expand());
 
         safe_mod.assignReturn();
         System.out.println(safe_mod);

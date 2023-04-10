@@ -77,20 +77,19 @@ public class IfElseStatement implements Statement {
     }
 
     @Override
-    public List<String> toCode() {
+    public String toString() {
         List<String> code = new ArrayList<>();
-        code.addAll(test.toCode());
 
-        code.add(String.format("if %s {\n", test));
-        code.addAll(StringUtils.indent(ifStat.toCode()));
+        code.add(String.format("if %s {", test));
+        code.add(StringUtils.indent(ifStat.toString()));
 
         if (elseStat.isPresent()) {
-            code.add("} else {\n");
-            code.addAll(StringUtils.indent(elseStat.get().toCode()));
+            code.add("} else {");
+            code.add(StringUtils.indent(elseStat.get().toString()));
         }
 
-        code.add("}\n");
-        return code;
+        code.add("}");
+        return StringUtils.intersperse("\n", code);
     }
 
     @Override
@@ -135,6 +134,13 @@ public class IfElseStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap) {
+        Object testValue = test.getValue(paramMap).get(0);
+        Boolean testB = (Boolean) testValue;
+        if (testB) {
+            return ifStat.execute(paramMap);
+        } else if (elseStat.isPresent()) {
+            return elseStat.get().execute(paramMap);
+        }
         return null;
     }
 
@@ -142,8 +148,7 @@ public class IfElseStatement implements Statement {
     public List<Statement> expand() {
         List<Statement> r = new ArrayList<>();
         r.addAll(test.expand());
-        r.addAll(ifStat.expand());
-        r.addAll(elseStat.isPresent() ? elseStat.get().expand() : new ArrayList<>());
+        r.add(this);
         return r;
     }
 }

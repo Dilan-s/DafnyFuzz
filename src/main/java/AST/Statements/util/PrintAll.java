@@ -26,16 +26,19 @@ public class PrintAll implements Statement {
     }
 
     @Override
-    public List<String> toCode() {
+    public String toString() {
         List<String> code = new ArrayList<>();
+
         List<Variable> allVariablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope();
         PrintStatement statement = new PrintStatement(symbolTable);
+
         for (Variable v : allVariablesInCurrentScope) {
             VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
             statement.addValue(expression);
         }
-        code.addAll(statement.toCode());
-        return code;
+
+        code.add(statement.toString());
+        return String.join("\n", code);
     }
 
     @Override

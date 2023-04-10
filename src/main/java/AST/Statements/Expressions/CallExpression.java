@@ -24,6 +24,7 @@ public class CallExpression implements Expression {
     private List<Statement> assignments;
     private List<Variable> assignedVariables;
     private CallMethodExpression callExpr;
+    private AssignmentStatement assignStat;
 
     public CallExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
         this.symbolTable = symbolTable;
@@ -64,8 +65,8 @@ public class CallExpression implements Expression {
 
         callExpr = new CallMethodExpression(method, variables);
 
-        AssignmentStatement stat = new AssignmentStatement(symbolTable, assignedVariables, callExpr);
-        assignments.add(stat);
+        assignStat = new AssignmentStatement(symbolTable, assignedVariables, callExpr);
+//        assignments.add(assignStat);
     }
 
     @Override
@@ -97,11 +98,19 @@ public class CallExpression implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        return assignments.stream()
-            .map(Statement::toCode)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
+
+        List<Statement> list = new ArrayList<>();
+        for (Statement assignment : assignments) {
+            List<Statement> expand = assignment.expand();
+            for (Statement statement : expand) {
+                list.add(statement);
+            }
+        }
+        r.addAll(list);
+        r.add(assignStat);
+        return r;
     }
 
     @Override
@@ -158,7 +167,7 @@ public class CallExpression implements Expression {
         return callExpr.getValue(paramsMap);
     }
 
-    private static class CallMethodExpression implements Expression {
+    private class CallMethodExpression implements Expression {
 
         private Method method;
         private List<Variable> args;
@@ -186,6 +195,22 @@ public class CallExpression implements Expression {
         }
 
         @Override
+        public List<Statement> expand() {
+            List<Statement> r = new ArrayList<>();
+
+            List<Statement> list = new ArrayList<>();
+            for (Statement assignment : assignments) {
+                List<Statement> expand = assignment.expand();
+                for (Statement statement : expand) {
+                    list.add(statement);
+                }
+            }
+            r.addAll(list);
+            r.add(assignStat);
+            return r;
+        }
+
+        @Override
         public List<Object> getValue(Map<Variable, Variable> paramsMap) {
             List<Object> r = new ArrayList<>();
 
@@ -195,7 +220,7 @@ public class CallExpression implements Expression {
                 for (Object v : value) {
                     if (v == null) {
                         method.getReturnTypes().forEach(t -> r.add(null));
-                        return null;
+                        return r;
                     }
                     l.add(v);
                 }

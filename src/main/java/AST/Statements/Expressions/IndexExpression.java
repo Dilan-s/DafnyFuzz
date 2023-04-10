@@ -3,6 +3,7 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Statement;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
@@ -64,13 +65,11 @@ public class IndexExpression implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = new ArrayList<>();
-
-        code.addAll(asStatSeq.toCode());
-        code.addAll(asStatInd.toCode());
-
-        return code;
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
+        r.addAll(asStatSeq.expand());
+        r.addAll(asStatInd.expand());
+        return r;
     }
 
     @Override

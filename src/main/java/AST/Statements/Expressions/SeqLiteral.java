@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -26,14 +27,6 @@ public class SeqLiteral implements Expression {
     @Override
     public List<Type> getTypes() {
         return List.of(type);
-    }
-
-    @Override
-    public List<String> toCode() {
-        return values.stream()
-            .map(Expression::toCode)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
     }
 
     @Override
@@ -88,5 +81,13 @@ public class SeqLiteral implements Expression {
         }
         r.add(l);
         return r;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return values.stream()
+            .map(Expression::expand)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -62,19 +63,18 @@ public class OperatorExpression implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = new ArrayList<>();
-
+    public List<Statement> expand() {
         if (replacementExpression.isPresent()) {
-            return replacementExpression.get().toCode();
+            return replacementExpression.get().expand();
         }
-
-        code.addAll(args.stream()
-            .map(Expression::toCode)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList()));
-
-        return code;
+        List<Statement> list = new ArrayList<>();
+        for (Expression arg : args) {
+            List<Statement> expand = arg.expand();
+            for (Statement statement : expand) {
+                list.add(statement);
+            }
+        }
+        return list;
     }
 
     private void generateMethodCallReplacement() {
@@ -124,6 +124,10 @@ public class OperatorExpression implements Expression {
     @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap) {
         List<Object> r = new ArrayList<>();
+
+        if (replacementExpression.isPresent()) {
+            return replacementExpression.get().getValue(paramsMap);
+        }
 
         for (Expression e : args) {
             List<Object> value = e.getValue(paramsMap);

@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -31,9 +32,9 @@ public class DSetLiteral implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
+    public List<Statement> expand() {
         return values.stream()
-            .map(Expression::toCode)
+            .map(Expression::expand)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
     }

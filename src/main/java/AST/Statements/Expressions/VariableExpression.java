@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -61,5 +62,10 @@ public class VariableExpression implements Expression {
             return paramsMap.get(variable).getValue(paramsMap);
         }
         return variable.getValue(paramsMap);
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return new ArrayList<>();
     }
 }

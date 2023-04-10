@@ -3,6 +3,7 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -60,14 +61,13 @@ public class ReassignSeqExpression implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = new ArrayList<>();
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
 
-        code.addAll(seqAssign.toCode());
-        code.addAll(indAssign.toCode());
-        code.addAll(exp.toCode());
-
-        return code;
+        r.addAll(seqAssign.expand());
+        r.addAll(indAssign.expand());
+        r.addAll(exp.expand());
+        return r;
     }
 
     @Override

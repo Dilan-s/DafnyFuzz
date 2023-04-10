@@ -108,7 +108,7 @@ public class Method implements Identifier {
         }
 
         code.add(declarationLine());
-        code.addAll(StringUtils.indent(body.toCode()));
+        code.add(StringUtils.indent(body.toString()));
         code.add("}\n");
         return code;
     }
@@ -122,7 +122,7 @@ public class Method implements Identifier {
             .map(Type::getVariableType)
             .map(x -> String.format("%s: %s", VariableNameGenerator.generateReturnVariableName(getName()), x))
             .collect(Collectors.joining(", "));
-        return String.format("method %s(%s) returns (%s) { \n", getName(), arguments, types);
+        return String.format("method %s(%s) returns (%s) { ", getName(), arguments, types);
     }
 
     public void addMethod(Method method) {
@@ -132,7 +132,7 @@ public class Method implements Identifier {
     @Override
     public String toString() {
         List<String> code = toCode(false);
-        return code.stream().collect(Collectors.joining(""));
+        return String.join("\n",code);
     }
 
     public Method getSimpleMethod() {

@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
@@ -86,17 +87,6 @@ public class IfElseExpression implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = new ArrayList<>();
-
-        code.addAll(test.toCode());
-        code.addAll(ifExp.toCode());
-        code.addAll(elseExp.toCode());
-
-        return code;
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(test, ifExp, elseExp);
     }
@@ -125,6 +115,15 @@ public class IfElseExpression implements Expression {
             }
         }
         r.add(null);
+        return r;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
+        r.addAll(test.expand());
+        r.addAll(ifExp.expand());
+        r.addAll(elseExp.expand());
         return r;
     }
 }

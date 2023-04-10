@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -45,6 +46,11 @@ public class IntLiteral implements Expression {
             return String.format("0x%X", value);
         }
         return String.valueOf(value);
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return new ArrayList<>();
     }
 
     @Override

@@ -20,19 +20,11 @@ public interface Expression {
         return true;
     }
 
-    default List<String> toCode() {
-        return new ArrayList<>();
-    }
-
     default List<Object> getValue() {
         return getValue(new HashMap<>());
     }
 
-    default List<Object> getValue(Map<Variable, Variable> paramsMap) {
-        List<Object> l = new ArrayList<>();
-        l.add(null);
-        return l;
-    }
+    List<Object> getValue(Map<Variable, Variable> paramsMap);
 
     List<Statement> expand();
 }

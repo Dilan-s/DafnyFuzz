@@ -3,6 +3,7 @@ package AST.Statements;
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
+import AST.StringUtils;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Variable;
@@ -62,6 +63,12 @@ public class BlockStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap) {
+        for (Statement statement : body) {
+            List<Object> retValues = statement.execute(paramMap);
+            if (retValues != null) {
+                return retValues;
+            }
+        }
         return null;
     }
 
@@ -74,12 +81,13 @@ public class BlockStatement implements Statement {
     }
 
     @Override
-    public List<String> toCode() {
+    public String toString() {
         List<String> code = new ArrayList<>();
         for (Statement s : body) {
-            code.addAll(s.toCode());
+            String val = s.toString();
+            code.add(val);
         }
-        return code;
+        return StringUtils.intersperse("\n", code);
     }
 
 

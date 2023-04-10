@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
@@ -44,30 +45,35 @@ public class MultisetLiteral implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = values.stream()
-            .map(Expression::toCode)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-        code.addAll(collection.isEmpty() ? new ArrayList<>() : collection.get().toCode());
-        return code;
-    }
-
-    @Override
     public void semanticCheck(Method method) throws SemanticException {
     }
 
     @Override
     public String toString() {
-        if (collection.isEmpty()) {
+        if (collection.isPresent()) {
+            return String.format("multiset(%s)", collection.get());
+        } else {
             String value = values.stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", "));
 
             return String.format("multiset{%s}", value);
-        } else {
-            return String.format("multiset(%s)", collection.get());
         }
+    }
+
+    @Override
+    public List<Statement> expand() {
+        if (collection.isPresent()) {
+            return collection.get().expand();
+        }
+        List<Statement> list = new ArrayList<>();
+        for (Expression value : values) {
+            List<Statement> expand = value.expand();
+            for (Statement statement : expand) {
+                list.add(statement);
+            }
+        }
+        return list;
     }
 
     @Override

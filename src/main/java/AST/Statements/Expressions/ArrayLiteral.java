@@ -3,6 +3,7 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Statement;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -23,11 +24,13 @@ public class ArrayLiteral implements Expression {
     private Variable variable;
     private List<Expression> values;
     private AssignmentStatement statement;
+    private boolean toAssign;
 
     public ArrayLiteral(SymbolTable symbolTable, Type type, List<Expression> values, boolean toAssign) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
+        this.toAssign = toAssign;
 
         if (toAssign) {
             this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
@@ -49,15 +52,16 @@ public class ArrayLiteral implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = values.stream()
-            .map(Expression::toCode)
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
+        r.addAll(values.stream()
+            .map(Expression::expand)
             .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-
-
-        code.addAll(statement.toCode());
-        return code;
+            .collect(Collectors.toList()));
+        if (toAssign) {
+            r.addAll(statement.expand());
+        }
+        return r;
     }
 
     @Override
@@ -111,12 +115,36 @@ public class ArrayLiteral implements Expression {
         }
 
         @Override
+        public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+            List<Object> r = new ArrayList<>();
+
+            List<Object> l = new ArrayList<>();
+            for (Expression exp : values) {
+                List<Object> value = exp.getValue(paramsMap);
+                for (Object v : value) {
+                    if (v == null) {
+                        r.add(null);
+                        return r;
+                    }
+                    l.add(v);
+                }
+            }
+            r.add(l);
+            return r;
+        }
+
+        @Override
         public String toString() {
             String value = values.stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", "));
             DCollection t = (DCollection) type;
             return String.format("new %s[] [%s]", t.getInnerType().getName(), value);
+        }
+
+        @Override
+        public List<Statement> expand() {
+            return new ArrayList<>();
         }
     }
 
