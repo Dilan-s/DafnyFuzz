@@ -62,19 +62,19 @@ while [ true ]; do
     cp "$file" test.dfy
   # GO
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy # > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ]
     then
       echo "Created Go files"
       mkdir test-go-run
       cp -R test-go/* test-go-run/
       cd test-go-run/src
-      go mod init src  # > tmp.txt 2>&1
+      go mod init src  > tmp.txt 2>&1
       cd ..
-      find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_System "System_"/_System "src\/System_"/g'  # > tmp.txt 2>&1
-      find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_dafny "dafny"/_dafny "src\/dafny"/g'  # > tmp.txt 2>&1
+      find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_System "System_"/_System "src\/System_"/g'  > tmp.txt 2>&1
+      find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_dafny "dafny"/_dafny "src\/dafny"/g'  > tmp.txt 2>&1
       cd src
-      go build test.go  # > tmp.txt 2>&1
+      go build test.go  > tmp.txt 2>&1
       if [ $? -eq 0 ]
       then
         cd ../..
@@ -90,7 +90,7 @@ while [ true ]; do
 
     # js
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /spillTargetCode:3 test.dfy # > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /spillTargetCode:3 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ]
     then
       echo "Created JS files"
@@ -101,11 +101,11 @@ while [ true ]; do
 
     # java
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /spillTargetCode:3 test.dfy # > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /spillTargetCode:3 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ]
     then
       echo "Created Java files"
-      javac -cp src/main/dafny_compiler/dafny/Binaries/DafnyRuntime.jar test-java/test.java test-java/*/*.java # > tmp.txt 2>&1
+      javac -cp src/main/dafny_compiler/dafny/Binaries/DafnyRuntime.jar test-java/test.java test-java/*/*.java > tmp.txt 2>&1
       if [ $? -eq 0 ]
       then
         cd test-java
@@ -120,7 +120,7 @@ while [ true ]; do
 
     # py
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /spillTargetCode:3 test.dfy # > tmp.txt  2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /spillTargetCode:3 test.dfy > tmp.txt  2>&1
     if [ $? -eq 0 ]
     then
       echo "Created Python files"
