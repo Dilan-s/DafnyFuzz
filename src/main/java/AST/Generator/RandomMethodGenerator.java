@@ -46,7 +46,6 @@ public class RandomMethodGenerator {
         methodDepth--;
         m.setBody(statement);
 
-        System.out.println(m);
         m.assignReturn();
 
         Method msimple = m.getSimpleMethod();

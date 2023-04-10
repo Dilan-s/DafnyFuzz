@@ -131,7 +131,7 @@ public class Method implements Identifier {
 
     @Override
     public String toString() {
-        List<String> code = toCode(false);
+        List<String> code = toCode(true);
         return String.join("\n",code);
     }
 

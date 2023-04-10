@@ -6,6 +6,12 @@ import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 
 public class DafnyProgram {
@@ -21,6 +27,8 @@ public class DafnyProgram {
     }
 
     public void generateProgram() {
+        StringBuilder program = new StringBuilder();
+
         GeneratorConfig.setRandom(random);
         RandomStatementGenerator randomStatementGenerator = new RandomStatementGenerator();
         Method main = new Method(new Void(), "Main");
@@ -39,7 +47,22 @@ public class DafnyProgram {
 
         Statement statement = randomStatementGenerator.generateBody(main);
         main.setBody(statement);
-        System.out.println(main);
+
+        program.append(main);
+
+        try {
+            Path path = Paths.get("./tests");
+            if (!Files.exists(path)) {
+                Files.createDirectory(path);
+            }
+            for (int i = 0; i < 1; i++) {
+                FileWriter p = new FileWriter(String.format("%s/test%d.dfy", path.toAbsolutePath(), i));
+                p.write(program.toString());
+                p.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

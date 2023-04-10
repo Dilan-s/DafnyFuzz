@@ -85,7 +85,6 @@ public class SafeMethods {
 
         statement.addStatement(ifElseStatement.expand());
         safe_subsequence.assignReturn();
-        System.out.println(safe_subsequence);
         return safe_subsequence.getSimpleMethod();
     }
 
@@ -126,7 +125,6 @@ public class SafeMethods {
         statement.addStatement(returnStatement.expand());
 
         safe_index_seq.assignReturn();
-        System.out.println(safe_index_seq);
         return safe_index_seq.getSimpleMethod();
     }
 
@@ -166,7 +164,6 @@ public class SafeMethods {
         statement.addStatement(returnStatement.expand());
 
         safe_div.assignReturn();
-        System.out.println(safe_div);
         return safe_div.getSimpleMethod();
     }
 
@@ -206,7 +203,6 @@ public class SafeMethods {
         statement.addStatement(returnStatement.expand());
 
         safe_mod.assignReturn();
-        System.out.println(safe_mod);
         return safe_mod.getSimpleMethod();
     }
 }
