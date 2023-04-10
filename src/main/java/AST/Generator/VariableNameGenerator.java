@@ -1,6 +1,7 @@
 package AST.Generator;
 
 import AST.SymbolTable.Method;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +24,10 @@ public class VariableNameGenerator {
     public static String generateArgumentName(String method) {
         Integer i = parameterValues.getOrDefault(method, 1);
         parameterValues.put(method, i + 1);
-        return String.format("p_%d", i);
+        return String.format("p_%s_%d", method, i);
     }
 
-    public static String generateVariableValueName(Type type) {
+    public static String generateVariableValueName(Type type, SymbolTable symbolTable) {
         String typeName = type.getName();
         Integer i = variableValues.getOrDefault(typeName, 1);
         variableValues.put(typeName, i + 1);

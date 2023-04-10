@@ -1,6 +1,5 @@
 package AST.SymbolTable.Types.PrimitiveTypes;
 
-import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 
 public interface BaseType extends Type {

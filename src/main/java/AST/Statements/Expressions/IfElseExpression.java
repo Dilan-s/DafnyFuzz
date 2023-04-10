@@ -1,24 +1,30 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class IfElseExpression implements Expression {
 
+    private Type type;
     private final Expression test;
     private final Expression ifExp;
     private final Expression elseExp;
     private SymbolTable symbolTable;
 
-    public IfElseExpression(SymbolTable symbolTable, Expression test, Expression ifExp, Expression elseExp) {
+    public IfElseExpression(SymbolTable symbolTable, Type type, Expression test, Expression ifExp, Expression elseExp) {
         this.symbolTable = symbolTable;
+        this.type = type;
         this.test = test;
         this.ifExp = ifExp;
         this.elseExp = elseExp;
@@ -26,7 +32,7 @@ public class IfElseExpression implements Expression {
 
     @Override
     public List<Type> getTypes() {
-        return ifExp.getTypes();
+        return List.of(type);
     }
 
     @Override
@@ -81,13 +87,43 @@ public class IfElseExpression implements Expression {
     }
 
     @Override
-    public List<String> toCode() {
-        List<String> code = new ArrayList<>();
+    public int hashCode() {
+        return Objects.hash(test, ifExp, elseExp);
+    }
 
-        code.addAll(test.toCode());
-        code.addAll(ifExp.toCode());
-        code.addAll(elseExp.toCode());
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IfElseExpression)) {
+            return false;
+        }
+        IfElseExpression other = (IfElseExpression) obj;
+        return other.test.equals(test) && other.ifExp.equals(ifExp) && other.elseExp.equals(elseExp);
+    }
 
-        return code;
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        Object testValue = test.getValue(paramsMap).get(0);
+
+        if (testValue != null) {
+            Boolean testB = (Boolean) testValue;
+            if (testB) {
+                return ifExp.getValue(paramsMap);
+            } else {
+                return elseExp.getValue(paramsMap);
+            }
+        }
+        r.add(null);
+        return r;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
+        r.addAll(test.expand());
+        r.addAll(ifExp.expand());
+        r.addAll(elseExp.expand());
+        return r;
     }
 }

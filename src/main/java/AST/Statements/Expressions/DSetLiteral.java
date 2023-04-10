@@ -1,13 +1,17 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DSetLiteral implements Expression {
@@ -16,25 +20,21 @@ public class DSetLiteral implements Expression {
     private final List<Expression> values;
     private SymbolTable symbolTable;
 
-    public DSetLiteral(SymbolTable symbolTable, Type type) {
+    public DSetLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
-        this.values = new ArrayList<>();
+        this.values = values;
     }
 
     @Override
     public List<Type> getTypes() {
-        return List.of(new DSet(type));
-    }
-
-    public void addValue(Expression expression) {
-        values.add(expression);
+        return List.of(type);
     }
 
     @Override
-    public List<String> toCode() {
+    public List<Statement> expand() {
         return values.stream()
-            .map(Expression::toCode)
+            .map(Expression::expand)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
     }
@@ -51,4 +51,46 @@ public class DSetLiteral implements Expression {
         return String.format("{%s}", value);
     }
 
+    @Override
+    public int hashCode() {
+        return values.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DSetLiteral)) {
+            return false;
+        }
+        DSetLiteral other = (DSetLiteral) obj;
+        if (values.size() != other.values.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < values.size(); i++) {
+            if (!values.get(i).equals(other.values.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        Set<Object> s = new HashSet<>();
+        for (Expression e : values) {
+            List<Object> value = e.getValue(paramsMap);
+            for (Object v : value) {
+                if (v == null) {
+                    r.add(null);
+                    return r;
+                }
+                s.add(v);
+            }
+        }
+
+        r.add(s);
+        return r;
+    }
 }

@@ -1,13 +1,18 @@
 package AST.SymbolTable;
 
 import AST.Generator.VariableNameGenerator;
+import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Method implements Identifier {
@@ -16,19 +21,19 @@ public class Method implements Identifier {
     private final List<Type> returnTypes;
     private final List<Variable> args;
     private final SymbolTable symbolTable;
-    private List<Statement> body;
+    private Statement body;
+    private List<PotentialValue> returnValues;
 
-    public Method(List<Type> returnTypes, String name, SymbolTable symbolTable,
-        List<Variable> args) {
+    public Method(List<Type> returnTypes, String name, SymbolTable symbolTable, List<Variable> args, List<PotentialValue> returnValues) {
         this.returnTypes = returnTypes;
         this.name = name;
         this.symbolTable = symbolTable;
         this.args = args;
-        this.body = new ArrayList<>();
+        this.returnValues = returnValues;
     }
 
     public Method(List<Type> returnTypes, String name, SymbolTable symbolTable) {
-        this(returnTypes, name, symbolTable, new ArrayList<>());
+        this(returnTypes, name, symbolTable, new ArrayList<>(), new ArrayList<>());
     }
 
     public Method(Type returnTypes, String name, SymbolTable symbolTable) {
@@ -80,7 +85,7 @@ public class Method implements Identifier {
     }
 
     public void setBody(Statement body) {
-        this.body.add(body);
+        this.body = body;
     }
 
     @Override
@@ -103,9 +108,7 @@ public class Method implements Identifier {
         }
 
         code.add(declarationLine());
-        for (Statement s : body) {
-            code.addAll(StringUtils.indent(s.toCode()));
-        }
+        code.add(StringUtils.indent(body.toString()));
         code.add("}\n");
         return code;
     }
@@ -119,7 +122,7 @@ public class Method implements Identifier {
             .map(Type::getVariableType)
             .map(x -> String.format("%s: %s", VariableNameGenerator.generateReturnVariableName(getName()), x))
             .collect(Collectors.joining(", "));
-        return String.format("method %s(%s) returns (%s) { \n", getName(), arguments, types);
+        return String.format("method %s(%s) returns (%s) { ", getName(), arguments, types);
     }
 
     public void addMethod(Method method) {
@@ -128,11 +131,42 @@ public class Method implements Identifier {
 
     @Override
     public String toString() {
-        List<String> code = toCode(false);
-        return code.stream().collect(Collectors.joining(""));
+        List<String> code = toCode(true);
+        return String.join("\n",code);
     }
 
     public Method getSimpleMethod() {
-        return new Method(returnTypes, name, getSymbolTable(), args);
+        return this;
+    }
+
+    public void assignReturn() {
+        if (hasReturn()) {
+            body.assignReturnIfPossible(this, ReturnStatus.UNASSIGNED, new ArrayList<>());
+        }
+    }
+
+    public void setReturnValues(List<Expression> expression, List<Expression> dependencies) {
+        this.returnValues.add(new PotentialValue(expression, dependencies));
+    }
+
+    public List<Object> execute(List<Variable> params) {
+        Map<Variable, Variable> paramMap = new HashMap<>();
+        for (int i = 0, argsSize = args.size(); i < argsSize; i++) {
+            Variable arg = args.get(i);
+            Variable param = params.get(i);
+            paramMap.put(arg, param);
+        }
+        return body.execute(paramMap);
+    }
+
+
+    private static class PotentialValue {
+        List<Expression> expression;
+        List<Expression> dependencies;
+
+        public PotentialValue(List<Expression> expression, List<Expression> dependencies) {
+            this.expression = expression;
+            this.dependencies = dependencies;
+        }
     }
 }
