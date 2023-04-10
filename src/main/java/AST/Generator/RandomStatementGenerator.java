@@ -86,7 +86,7 @@ public class RandomStatementGenerator {
 
             } else if (probTypeOfStatement < PROB_PRINT_STAT) {
                 //Print
-//                ret = generatePrintStatement(symbolTable);
+                ret = generatePrintStatement(symbolTable);
             } else if (probTypeOfStatement < PROB_IF_ELSE_STAT) {
                 //IfElse
                 ret = generateIfElseStatement(method, symbolTable);
