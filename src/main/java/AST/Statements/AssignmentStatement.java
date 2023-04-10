@@ -10,6 +10,7 @@ import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AssignmentStatement implements Statement {
@@ -36,6 +37,17 @@ public class AssignmentStatement implements Statement {
             Variable v = variables.get(i);
             v.setDeclared();
             symbolTable.addVariable(v);
+        }
+
+        List<Object> expValues = values.stream()
+            .map(Expression::getValue)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+
+        for (int i = 0; i < variables.size(); i++) {
+            Object expV = expValues.get(i);
+            Variable v = variables.get(i);
+            v.setValue(expV);
         }
     }
 
@@ -115,5 +127,19 @@ public class AssignmentStatement implements Statement {
     @Override
     public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
         return currStatus;
+    }
+
+    @Override
+    public List<Object> execute(Map<Variable, Variable> paramMap) {
+//        values.stream().
+        return null;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return values.stream()
+            .map(Expression::expand)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
     }
 }

@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
@@ -32,4 +33,6 @@ public interface Expression {
         l.add(null);
         return l;
     }
+
+    List<Statement> expand();
 }

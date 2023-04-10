@@ -120,4 +120,22 @@ public class OperatorExpression implements Expression {
             return false;
         }
     }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        for (Expression e : args) {
+            List<Object> value = e.getValue(paramsMap);
+            for (Object v : value) {
+                if (v == null) {
+                    r.add(null);
+                    return r;
+                }
+            }
+        }
+
+        r.add(operator.apply(args, paramsMap));
+        return r;
+    }
 }

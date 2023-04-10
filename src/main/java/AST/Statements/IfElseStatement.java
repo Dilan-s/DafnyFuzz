@@ -11,9 +11,11 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -94,17 +96,16 @@ public class IfElseStatement implements Statement {
     @Override
     public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
 
-//        Object testV = test.getValue().get(0);
+        Object testV = test.getValue().get(0);
 
 
-//        if (testV != null) {
-//            Boolean testVB = (Boolean) testV;
-//            if (testVB && ifStat.couldReturn()) {
-//                return ifStat.assignReturnIfPossible(method, currStatus, dependencies);
-//            } else if (!testVB && elseStat.isPresent() && elseStat.get().couldReturn()) {
-//                return elseStat.get().assignReturnIfPossible(method, currStatus, dependencies);
-//            }
-        if (false) {
+        if (testV != null) {
+            Boolean testVB = (Boolean) testV;
+            if (testVB && ifStat.couldReturn()) {
+                return ifStat.assignReturnIfPossible(method, currStatus, dependencies);
+            } else if (!testVB && elseStat.isPresent() && elseStat.get().couldReturn()) {
+                return elseStat.get().assignReturnIfPossible(method, currStatus, dependencies);
+            }
         } else {
             ReturnStatus rIf = currStatus;
             ReturnStatus rElse = currStatus;
@@ -130,5 +131,19 @@ public class IfElseStatement implements Statement {
             }
         }
         return currStatus;
+    }
+
+    @Override
+    public List<Object> execute(Map<Variable, Variable> paramMap) {
+        return null;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        List<Statement> r = new ArrayList<>();
+        r.addAll(test.expand());
+        r.addAll(ifStat.expand());
+        r.addAll(elseStat.isPresent() ? elseStat.get().expand() : new ArrayList<>());
+        return r;
     }
 }

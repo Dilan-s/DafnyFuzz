@@ -93,4 +93,24 @@ public class SubsequenceExpression implements Expression {
         SubsequenceExpression other = (SubsequenceExpression) obj;
         return other.seqVar.equals(seqVar) && other.loVar.equals(loVar) && other.hiVar.equals(hiVar);
     }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        Object seqVarValue = seqVar.getValue(paramsMap).get(0);
+        Object loVarValue = loVar.getValue(paramsMap).get(0);
+        Object hiVarValue = hiVar.getValue(paramsMap).get(0);
+
+        List<Object> r = new ArrayList<>();
+        if (seqVarValue != null && loVarValue != null && hiVarValue != null) {
+            List<Object> seqVarL = (List<Object>) seqVarValue;
+            Integer loVarI = (Integer) loVarValue;
+            Integer hiVarI = (Integer) hiVarValue;
+
+            r.add(seqVarL.subList(loVarI, hiVarI));
+            return r;
+
+        }
+        r.add(null);
+        return r;
+    }
 }

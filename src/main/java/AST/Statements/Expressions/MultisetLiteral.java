@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
 public class MultisetLiteral implements Expression {
@@ -62,8 +61,8 @@ public class MultisetLiteral implements Expression {
     public String toString() {
         if (collection.isEmpty()) {
             String value = values.stream()
-                            .map(Expression::toString)
-                            .collect(Collectors.joining(", "));
+                .map(Expression::toString)
+                .collect(Collectors.joining(", "));
 
             return String.format("multiset{%s}", value);
         } else {
@@ -103,5 +102,55 @@ public class MultisetLiteral implements Expression {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        if (collection.isPresent()) {
+            Expression col = collection.get();
+            Type type = col.getTypes().get(0);
+            Object colValue = col.getValue(paramsMap).get(0);
+
+            if (colValue != null) {
+
+                Map<Object, Integer> m = new HashMap<>();
+                if (type.equals(new Seq())) {
+                    List<Object> colVL = (List<Object>) colValue;
+
+                    for (Object v : colVL) {
+                        m.put(v, m.getOrDefault(v, 0) + 1);
+                    }
+                    r.add(m);
+                    return r;
+                } else if (type.equals(new DSet())) {
+                    Set<Object> colVS = (Set<Object>) colValue;
+
+                    for (Object v : colVS) {
+                        m.put(v, 1);
+                    }
+                    r.add(m);
+                    return r;
+                }
+            }
+            r.add(null);
+
+        } else {
+            Map<Object, Integer> m = new HashMap<>();
+
+            for (Expression e : values) {
+                List<Object> value = e.getValue(paramsMap);
+                for (Object v : value) {
+                    if (v == null) {
+                        r.add(null);
+                        return r;
+                    }
+                    m.put(v, m.getOrDefault(v, 0) + 1);
+                }
+            }
+            r.add(m);
+        }
+        return r;
     }
 }

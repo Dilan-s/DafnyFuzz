@@ -91,6 +91,30 @@ public class ReassignSeqExpression implements Expression {
         }
         ReassignSeqExpression other = (ReassignSeqExpression) obj;
         return other.seqVar.equals(seqVar) && other.indVar.equals(indVar) && other.exp.equals(exp);
+    }
 
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        Object seqVarValue = seqVar.getValue(paramsMap).get(0);
+        Object indVarValue = indVar.getValue(paramsMap).get(0);
+        Object expValue = exp.getValue(paramsMap).get(0);
+
+        if (seqVarValue != null && indVarValue != null && expValue != null) {
+            List<Object> seqVarL = (List<Object>) seqVarValue;
+            Integer indVarI = (Integer) indVarValue;
+
+            List<Object> l = new ArrayList<>();
+            l.addAll(seqVarL.subList(0, indVarI));
+            l.add(expValue);
+            l.addAll(seqVarL.subList(indVarI + 1, seqVarL.size()));
+
+            r.add(l);
+            return r;
+        }
+
+        r.add(null);
+        return r;
     }
 }

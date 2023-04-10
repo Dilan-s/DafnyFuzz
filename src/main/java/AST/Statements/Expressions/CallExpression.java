@@ -153,6 +153,11 @@ public class CallExpression implements Expression {
         return true;
     }
 
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        return callExpr.getValue(paramsMap);
+    }
+
     private static class CallMethodExpression implements Expression {
 
         private Method method;
@@ -178,6 +183,24 @@ public class CallExpression implements Expression {
             return String.format("%s(%s)", method.getName(), args.stream()
                 .map(Variable::getName)
                 .collect(Collectors.joining(", ")));
+        }
+
+        @Override
+        public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+            List<Object> r = new ArrayList<>();
+
+            List<Object> l = new ArrayList<>();
+            for (Variable arg : args) {
+                List<Object> value = arg.getValue(paramsMap);
+                for (Object v : value) {
+                    if (v == null) {
+                        method.getReturnTypes().forEach(t -> r.add(null));
+                        return null;
+                    }
+                    l.add(v);
+                }
+            }
+            return method.execute(args);
         }
     }
 }

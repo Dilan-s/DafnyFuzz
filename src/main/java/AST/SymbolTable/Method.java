@@ -10,6 +10,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -146,6 +147,16 @@ public class Method implements Identifier {
 
     public void setReturnValues(List<Expression> expression, List<Expression> dependencies) {
         this.returnValues.add(new PotentialValue(expression, dependencies));
+    }
+
+    public List<Object> execute(List<Variable> params) {
+        Map<Variable, Variable> paramMap = new HashMap<>();
+        for (int i = 0, argsSize = args.size(); i < argsSize; i++) {
+            Variable arg = args.get(i);
+            Variable param = params.get(i);
+            paramMap.put(arg, param);
+        }
+        return body.execute(paramMap);
     }
 
 

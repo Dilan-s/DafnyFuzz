@@ -91,4 +91,22 @@ public class IndexExpression implements Expression {
         IndexExpression other = (IndexExpression) obj;
         return other.seqVar.equals(seqVar) && other.indVar.equals(indVar);
     }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        Object seqVarValue = seqVar.getValue(paramsMap).get(0);
+        Object indVarValue = indVar.getValue(paramsMap).get(0);
+
+        if (seqVarValue != null && indVarValue != null) {
+            List<Object> seqVarL = (List<Object>) seqVarValue;
+            Integer indVarI = (Integer) indVarValue;
+
+            r.add(seqVarL.get(indVarI));
+            return r;
+        }
+        r.add(null);
+        return r;
+    }
 }

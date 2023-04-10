@@ -10,6 +10,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class PrintAll implements Statement {
 
@@ -40,5 +41,15 @@ public class PrintAll implements Statement {
     @Override
     public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
         return currStatus;
+    }
+
+    @Override
+    public List<Object> execute(Map<Variable, Variable> paramMap) {
+        return null;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return new ArrayList<>();
     }
 }

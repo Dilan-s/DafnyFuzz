@@ -5,6 +5,7 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -70,5 +71,25 @@ public class DSetLiteral implements Expression {
             }
         }
         return true;
+    }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        Set<Object> s = new HashSet<>();
+        for (Expression e : values) {
+            List<Object> value = e.getValue(paramsMap);
+            for (Object v : value) {
+                if (v == null) {
+                    r.add(null);
+                    return r;
+                }
+                s.add(v);
+            }
+        }
+
+        r.add(s);
+        return r;
     }
 }

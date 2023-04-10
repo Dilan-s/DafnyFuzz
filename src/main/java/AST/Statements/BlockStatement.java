@@ -5,8 +5,12 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BlockStatement implements Statement {
 
@@ -54,6 +58,19 @@ public class BlockStatement implements Statement {
             curr = s.assignReturnIfPossible(method, curr, dependencies);
         }
         return curr;
+    }
+
+    @Override
+    public List<Object> execute(Map<Variable, Variable> paramMap) {
+        return null;
+    }
+
+    @Override
+    public List<Statement> expand() {
+        return body.stream()
+            .map(Statement::expand)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
     }
 
     @Override

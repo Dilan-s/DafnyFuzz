@@ -54,4 +54,12 @@ public class VariableExpression implements Expression {
         VariableExpression other = (VariableExpression) obj;
         return other.variable.equals(variable);
     }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        if (paramsMap.containsKey(variable)) {
+            return paramsMap.get(variable).getValue(paramsMap);
+        }
+        return variable.getValue(paramsMap);
+    }
 }

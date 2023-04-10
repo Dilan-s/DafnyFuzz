@@ -4,7 +4,9 @@ import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
+import AST.SymbolTable.Variable;
 import java.util.List;
+import java.util.Map;
 
 public interface Statement {
 
@@ -21,4 +23,8 @@ public interface Statement {
     }
 
     ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies);
+
+    List<Object> execute(Map<Variable, Variable> paramMap);
+
+    List<Statement> expand();
 }

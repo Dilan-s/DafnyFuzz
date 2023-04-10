@@ -109,4 +109,22 @@ public class IfElseExpression implements Expression {
         IfElseExpression other = (IfElseExpression) obj;
         return other.test.equals(test) && other.ifExp.equals(ifExp) && other.elseExp.equals(elseExp);
     }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        Object testValue = test.getValue(paramsMap).get(0);
+
+        if (testValue != null) {
+            Boolean testB = (Boolean) testValue;
+            if (testB) {
+                return ifExp.getValue(paramsMap);
+            } else {
+                return elseExp.getValue(paramsMap);
+            }
+        }
+        r.add(null);
+        return r;
+    }
 }

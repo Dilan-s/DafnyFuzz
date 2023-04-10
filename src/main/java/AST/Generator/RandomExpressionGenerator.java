@@ -162,7 +162,7 @@ public class RandomExpressionGenerator {
 
         if (!allowNullValues) {
             variables = variables.stream()
-                .filter(v -> v.getValue() == null)
+                .filter(v -> v.getValue() != null)
                 .collect(Collectors.toList());
         }
 
@@ -243,6 +243,8 @@ public class RandomExpressionGenerator {
         List<Type> argTypes = m.getArgTypes();
         int i = 0;
         List<Expression> args = new ArrayList<>();
+        boolean prevNull = allowNullValues;
+        allowNullValues = false;
         while (i < argTypes.size()) {
             Type t = argTypes.get(i);
             Type concrete = t.concrete(symbolTable);
@@ -250,6 +252,7 @@ public class RandomExpressionGenerator {
             args.add(exp);
             i++;
         }
+        allowNullValues = prevNull;
         CallExpression expression = new CallExpression(symbolTable, m, args);
 
 

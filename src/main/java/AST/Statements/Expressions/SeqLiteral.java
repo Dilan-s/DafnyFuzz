@@ -5,8 +5,8 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,5 +69,24 @@ public class SeqLiteral implements Expression {
             }
         }
         return true;
+    }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        List<Object> r = new ArrayList<>();
+
+        List<Object> l = new ArrayList<>();
+        for (Expression exp : values) {
+            List<Object> value = exp.getValue(paramsMap);
+            for (Object v : value) {
+                if (v == null) {
+                    r.add(null);
+                    return r;
+                }
+                l.add(v);
+            }
+        }
+        r.add(l);
+        return r;
     }
 }
