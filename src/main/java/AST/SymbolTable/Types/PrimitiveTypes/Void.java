@@ -46,6 +46,11 @@ public class Void implements BaseType {
     }
 
     @Override
+    public String formatPrint(Object object) {
+        return "";
+    }
+
+    @Override
     public boolean operatorExists() {
         return false;
     }

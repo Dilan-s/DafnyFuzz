@@ -24,7 +24,10 @@ public interface Expression {
         return getValue(new HashMap<>());
     }
 
-    List<Object> getValue(Map<Variable, Variable> paramsMap);
+    default List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        return getValue(paramsMap, new StringBuilder());
+    }
+    List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s);
 
     List<Statement> expand();
 }

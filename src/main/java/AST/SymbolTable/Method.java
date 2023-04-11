@@ -150,13 +150,20 @@ public class Method implements Identifier {
     }
 
     public List<Object> execute(List<Variable> params) {
+        return execute(params, new StringBuilder());
+    }
+    public List<Object> execute(List<Variable> params, StringBuilder s) {
         Map<Variable, Variable> paramMap = new HashMap<>();
         for (int i = 0, argsSize = args.size(); i < argsSize; i++) {
             Variable arg = args.get(i);
             Variable param = params.get(i);
             paramMap.put(arg, param);
         }
-        return body.execute(paramMap);
+        return body.execute(paramMap, s);
+    }
+
+    public void executeWithOutput(StringBuilder s) {
+        execute(new ArrayList<>(), s);
     }
 
 

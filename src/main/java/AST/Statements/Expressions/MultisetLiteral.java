@@ -111,13 +111,13 @@ public class MultisetLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
 
         if (collection.isPresent()) {
             Expression col = collection.get();
             Type type = col.getTypes().get(0);
-            Object colValue = col.getValue(paramsMap).get(0);
+            Object colValue = col.getValue(paramsMap, s).get(0);
 
             if (colValue != null) {
 
@@ -146,7 +146,7 @@ public class MultisetLiteral implements Expression {
             Map<Object, Integer> m = new HashMap<>();
 
             for (Expression e : values) {
-                List<Object> value = e.getValue(paramsMap);
+                List<Object> value = e.getValue(paramsMap, s);
                 for (Object v : value) {
                     if (v == null) {
                         r.add(null);

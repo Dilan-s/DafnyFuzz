@@ -114,7 +114,8 @@ public class DSet implements DCollection {
         Set<Object> rhsVS = (Set<Object>) rhsV;
         Set<Object> lhsVS = (Set<Object>) lhsV;
 
-        return !lhsVS.containsAll(rhsVS);
+
+        return lhsVS.isEmpty() || rhsVS.isEmpty() || rhsVS.stream().noneMatch(lhsVS::contains);
     }
 
     @Override
@@ -156,6 +157,11 @@ public class DSet implements DCollection {
     @Override
     public boolean isPrintable() {
         return false;
+    }
+
+    @Override
+    public String formatPrint(Object object) {
+        return "";
     }
 
 

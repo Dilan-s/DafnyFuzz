@@ -97,10 +97,10 @@ public class ReturnStatement implements Statement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap) {
+    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
         List<Object> list = new ArrayList<>();
         for (Expression x : values) {
-            List<Object> value = x.getValue(paramMap);
+            List<Object> value = x.getValue(paramMap, s);
             for (Object object : value) {
                 list.add(object);
             }
@@ -120,7 +120,7 @@ public class ReturnStatement implements Statement {
         }
         r.addAll(list);
         if (printAll) {
-            r.add(new PrintAll(symbolTable));
+            r.addAll(new PrintAll(symbolTable).expand());
         }
         r.add(this);
         return r;

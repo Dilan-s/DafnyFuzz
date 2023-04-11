@@ -65,12 +65,12 @@ public class SeqLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
 
         List<Object> l = new ArrayList<>();
         for (Expression exp : values) {
-            List<Object> value = exp.getValue(paramsMap);
+            List<Object> value = exp.getValue(paramsMap, s);
             for (Object v : value) {
                 if (v == null) {
                     r.add(null);

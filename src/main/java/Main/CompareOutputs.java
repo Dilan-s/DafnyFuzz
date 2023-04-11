@@ -1,13 +1,12 @@
 package Main;
 
 import ErrorDetector.ReadOutput;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class CompareOutputs {
 
@@ -16,7 +15,8 @@ public class CompareOutputs {
         readOutput.readAllFiles();
         if (readOutput.containsDifference()) {
             System.out.println("ERROR FOUND IN TEST CASE " + args[0]);
-            copyTest(args[0], readOutput);
+            copyTest(readOutput, "tests/", "errors/" + args[0]);
+            copyTest(readOutput, "outputs/", "errors/" + args[0]);
         } else {
             deleteTest(args[0], readOutput);
         }
@@ -26,21 +26,23 @@ public class CompareOutputs {
 
     }
 
-    private static void copyTest(String arg, ReadOutput readOutput) {
+    private static void copyTest(ReadOutput readOutput, String s, String d) {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader("test.dfy"));
-            StringBuilder sb = new StringBuilder();
-            String st;
-            while ((st = bufferedReader.readLine()) != null) {
-                sb.append(st);
-                sb.append("\n");
+            File source = new File(s);
+            File dest = new File(d);
+            dest.mkdir();
+
+            for (String f : source.list()) {
+                File sourceFile = new File(source, f);
+                File destinationFile = new File(dest, f);
+                InputStream in = new FileInputStream(sourceFile);
+                OutputStream out = new FileOutputStream(destinationFile);
+                byte[] buf = new byte[1024];
+                int length;
+                while ((length = in.read(buf)) > 0) {
+                    out.write(buf, 0, length);
+                }
             }
-            String dir = "errors/" + arg;
-            new File(dir).mkdir();
-            BufferedWriter writer = new BufferedWriter(new FileWriter(dir + "/testCase" + arg + ".dfy", true));
-            readOutput.copyFiles(dir);
-            writer.append(sb);
-            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

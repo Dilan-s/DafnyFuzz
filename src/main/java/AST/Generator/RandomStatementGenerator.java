@@ -66,7 +66,7 @@ public class RandomStatementGenerator {
 
         if (statement != null && !statement.isReturn()) {
             PrintAll printAll = new PrintAll(body.getSymbolTable());
-            body.addStatement(printAll);
+            body.addStatement(printAll.expand());
         }
 
         return body;

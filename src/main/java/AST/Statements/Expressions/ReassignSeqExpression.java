@@ -94,12 +94,12 @@ public class ReassignSeqExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
 
         Object seqVarValue = seqVar.getValue(paramsMap).get(0);
         Object indVarValue = indVar.getValue(paramsMap).get(0);
-        Object expValue = exp.getValue(paramsMap).get(0);
+        Object expValue = exp.getValue(paramsMap, s).get(0);
 
         if (seqVarValue != null && indVarValue != null && expValue != null) {
             List<Object> seqVarL = (List<Object>) seqVarValue;

@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class CharLiteral implements Expression {
+public class StringLiteral implements Expression {
 
-    private final char value;
+    private final String value;
     private final Type type;
     private SymbolTable symbolTable;
 
-    public CharLiteral(Type type, SymbolTable symbolTable, char value) {
+    public StringLiteral(Type type, SymbolTable symbolTable, String value) {
         this.type = type;
         this.symbolTable = symbolTable;
         this.value = value;
@@ -34,7 +34,7 @@ public class CharLiteral implements Expression {
 
     @Override
     public String toString() {
-        return String.format("'%c'", value);
+        return String.format("\"%s\"", value);
     }
 
     @Override
@@ -44,11 +44,11 @@ public class CharLiteral implements Expression {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof CharLiteral)) {
+        if (!(obj instanceof StringLiteral)) {
             return false;
         }
-        CharLiteral other = (CharLiteral) obj;
-        return value == other.value;
+        StringLiteral other = (StringLiteral) obj;
+        return value.equals(other.value);
     }
 
     @Override

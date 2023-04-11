@@ -2,11 +2,13 @@ package AST.Statements.util;
 
 import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.StringLiteral;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.PrintStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,18 +29,7 @@ public class PrintAll implements Statement {
 
     @Override
     public String toString() {
-        List<String> code = new ArrayList<>();
-
-        List<Variable> allVariablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope();
-        PrintStatement statement = new PrintStatement(symbolTable);
-
-        for (Variable v : allVariablesInCurrentScope) {
-            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
-            statement.addValue(expression);
-        }
-
-        code.add(statement.toString());
-        return String.join("\n", code);
+        return "";
     }
 
     @Override
@@ -47,12 +38,22 @@ public class PrintAll implements Statement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap) {
+    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
         return null;
     }
 
     @Override
     public List<Statement> expand() {
-        return new ArrayList<>();
+
+        List<Variable> allVariablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope();
+        PrintStatement statement = new PrintStatement(symbolTable);
+
+        for (Variable v : allVariablesInCurrentScope) {
+            StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
+            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
+            statement.addValue(stringLiteral);
+            statement.addValue(expression);
+        }
+        return statement.expand();
     }
 }

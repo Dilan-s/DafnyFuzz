@@ -6,10 +6,12 @@ import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.SeqLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Seq implements DCollection {
 
@@ -157,6 +159,17 @@ public class Seq implements DCollection {
             }
         }
         return true;
+    }
+
+    @Override
+    public String formatPrint(Object object) {
+        if (type.equals(new Char())) {
+            List<Object> value = (List<Object>) object;
+            return value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(""));
+        } else {
+            List<Object> value = (List<Object>) object;
+            return "[" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", ")) + "]";
+        }
     }
 
     @Override

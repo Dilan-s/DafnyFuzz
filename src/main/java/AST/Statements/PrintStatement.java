@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class PrintStatement implements Statement {
@@ -56,7 +58,26 @@ public class PrintStatement implements Statement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap) {
+    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        StringJoiner joiner = new StringJoiner(" ");
+        for (Expression exp : values) {
+            List<Type> types = exp.getTypes();
+            if (types.stream().allMatch(Type::isPrintable)) {
+                List<Object> value = exp.getValue(paramMap, s);
+                for (int i = 0, valueSize = value.size(); i < valueSize; i++) {
+                    Object object = value.get(i);
+                    Type t = types.get(i);
+                    String str = t.formatPrint(object);
+                    joiner.add(str);
+                }
+            }
+        }
+        String printValues = joiner.toString();
+
+        if (!printValues.isEmpty()) {
+            s.append(printValues);
+            s.append("\n");
+        }
         return null;
     }
 

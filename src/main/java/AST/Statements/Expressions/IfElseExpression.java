@@ -101,17 +101,17 @@ public class IfElseExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
 
-        Object testValue = test.getValue(paramsMap).get(0);
+        Object testValue = test.getValue(paramsMap, s).get(0);
 
         if (testValue != null) {
             Boolean testB = (Boolean) testValue;
             if (testB) {
-                return ifExp.getValue(paramsMap);
+                return ifExp.getValue(paramsMap, s);
             } else {
-                return elseExp.getValue(paramsMap);
+                return elseExp.getValue(paramsMap, s);
             }
         }
         r.add(null);

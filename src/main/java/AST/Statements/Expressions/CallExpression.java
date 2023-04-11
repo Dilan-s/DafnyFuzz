@@ -162,8 +162,9 @@ public class CallExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
-        return callExpr.getValue(paramsMap);
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+//        return callExpr.getValue(paramsMap, s);
+        return callExpr.getValue(paramsMap, new StringBuilder());
     }
 
     private class CallMethodExpression implements Expression {
@@ -210,7 +211,7 @@ public class CallExpression implements Expression {
         }
 
         @Override
-        public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();
@@ -224,7 +225,7 @@ public class CallExpression implements Expression {
                     l.add(v);
                 }
             }
-            return method.execute(args);
+            return method.execute(args, s);
         }
     }
 }

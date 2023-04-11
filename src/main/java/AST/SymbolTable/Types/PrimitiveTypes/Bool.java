@@ -5,6 +5,7 @@ import AST.Statements.Expressions.BoolLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.Objects;
 
 public class Bool implements BaseType {
 
@@ -62,6 +63,13 @@ public class Bool implements BaseType {
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        return false;
+        Boolean l = (Boolean) lhsV;
+        Boolean r = (Boolean) rhsV;
+        return Objects.equals(l, r);
+    }
+
+    @Override
+    public String formatPrint(Object object) {
+        return object.toString();
     }
 }

@@ -13,12 +13,10 @@ public class Int implements BaseType {
     private static final double PROB_HEX = 0.2;
     public static final double PROB_NEGATION = 0.1;
     private int max;
-    private Integer value;
     private boolean asHex;
 
     public Int(int max) {
         this.max = max;
-        this.value = null;
     }
 
     public Int() {
@@ -46,7 +44,7 @@ public class Int implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        value = GeneratorConfig.getRandom().nextInt(max);
+        Integer value = GeneratorConfig.getRandom().nextInt(max);
         value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
         asHex = value > 0 && GeneratorConfig.getRandom().nextDouble() < PROB_HEX;
         return new IntLiteral(this, symbolTable, value, asHex);
@@ -80,5 +78,10 @@ public class Int implements BaseType {
         Integer lhs = (Integer) lhsV;
         Integer rhs = (Integer) rhsV;
         return Objects.equals(lhs, rhs);
+    }
+
+    @Override
+    public String formatPrint(Object object) {
+        return String.valueOf(object);
     }
 }

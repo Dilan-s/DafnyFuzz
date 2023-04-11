@@ -139,6 +139,11 @@ public class Multiset implements DCollection {
     }
 
     @Override
+    public String formatPrint(Object object) {
+        return "";
+    }
+
+    @Override
     public boolean operatorExists() {
         return true;
     }

@@ -153,4 +153,9 @@ public class DArray implements DCollection {
     public boolean isPrintable() {
         return false;
     }
+
+    @Override
+    public String formatPrint(Object object) {
+        return "";
+    }
 }

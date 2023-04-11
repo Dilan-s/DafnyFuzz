@@ -57,7 +57,7 @@ public class VariableExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         if (paramsMap.containsKey(variable)) {
             return paramsMap.get(variable).getValue(paramsMap);
         }

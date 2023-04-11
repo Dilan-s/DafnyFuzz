@@ -1,24 +1,22 @@
 package AST.SymbolTable.Types.PrimitiveTypes;
 
 import AST.Generator.GeneratorConfig;
-import AST.Statements.Expressions.CharLiteral;
+import AST.Statements.Expressions.BoolLiteral;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.StringLiteral;
+import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import java.util.Objects;
+import java.util.Random;
 
-public class Char implements BaseType {
+public class DString implements BaseType {
 
-    private static final double PROB_UPPERCASE = 0.5;
-    private Character value;
-
-    public Char() {
-        this.value = null;
+    public DString() {
     }
 
     @Override
     public String getName() {
-        return "char";
+        return "bool";
     }
 
     @Override
@@ -32,50 +30,42 @@ public class Char implements BaseType {
             return false;
         }
         Type other = (Type) obj;
-        return other instanceof Char;
+        return other instanceof DString;
     }
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        value = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
-        if (GeneratorConfig.getRandom().nextDouble() < PROB_UPPERCASE) {
-            value = Character.toUpperCase(value);
-        }
-        return new CharLiteral(this, symbolTable, value);
+        return new StringLiteral(this, symbolTable, "");
     }
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable, Object value) {
         Type t = this.concrete(symbolTable);
-        return new CharLiteral(t, symbolTable, (Character) value);
+        return new StringLiteral(t, symbolTable, (String) value);
     }
 
     @Override
     public boolean operatorExists() {
-        return true;
+        return false;
     }
 
     @Override
     public Type concrete(SymbolTable symbolTable) {
-        return new Char();
+        return new DString();
     }
 
     @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
-        Character lhs = (Character) lhsV;
-        Character rhs = (Character) rhsV;
-        return lhs < rhs;
+        return false;
     }
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        Character lhs = (Character) lhsV;
-        Character rhs = (Character) rhsV;
-        return Objects.equals(lhs, rhs);
+        return false;
     }
 
     @Override
     public String formatPrint(Object object) {
-        return String.valueOf(object);
+        return object.toString();
     }
 }

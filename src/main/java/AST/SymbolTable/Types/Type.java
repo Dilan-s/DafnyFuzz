@@ -48,4 +48,5 @@ public interface Type extends Identifier {
         return greaterThan(lhsV, rhsV) || equal(lhsV, rhsV);
     }
 
+    String formatPrint(Object object);
 }

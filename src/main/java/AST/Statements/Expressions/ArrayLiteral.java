@@ -97,6 +97,25 @@ public class ArrayLiteral implements Expression {
         return true;
     }
 
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+        List<Object> r = new ArrayList<>();
+
+        List<Object> l = new ArrayList<>();
+        for (Expression exp : values) {
+            List<Object> value = exp.getValue(paramsMap, s);
+            for (Object v : value) {
+                if (v == null) {
+                    r.add(null);
+                    return r;
+                }
+                l.add(v);
+            }
+        }
+        r.add(l);
+        return r;
+    }
+
     private class ArrayInitValues implements Expression {
 
         private final List<Expression> values;
@@ -115,12 +134,12 @@ public class ArrayLiteral implements Expression {
         }
 
         @Override
-        public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();
             for (Expression exp : values) {
-                List<Object> value = exp.getValue(paramsMap);
+                List<Object> value = exp.getValue(paramsMap, s);
                 for (Object v : value) {
                     if (v == null) {
                         r.add(null);
@@ -146,24 +165,6 @@ public class ArrayLiteral implements Expression {
         public List<Statement> expand() {
             return new ArrayList<>();
         }
-    }
 
-    @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
-        List<Object> r = new ArrayList<>();
-
-        List<Object> l = new ArrayList<>();
-        for (Expression exp : values) {
-            List<Object> value = exp.getValue(paramsMap);
-            for (Object v : value) {
-                if (v == null) {
-                    r.add(null);
-                    return r;
-                }
-                l.add(v);
-            }
-        }
-        r.add(l);
-        return r;
     }
 }

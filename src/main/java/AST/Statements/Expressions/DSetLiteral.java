@@ -75,22 +75,22 @@ public class DSetLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
 
-        Set<Object> s = new HashSet<>();
+        Set<Object> set = new HashSet<>();
         for (Expression e : values) {
-            List<Object> value = e.getValue(paramsMap);
+            List<Object> value = e.getValue(paramsMap, s);
             for (Object v : value) {
                 if (v == null) {
                     r.add(null);
                     return r;
                 }
-                s.add(v);
+                set.add(v);
             }
         }
 
-        r.add(s);
+        r.add(set);
         return r;
     }
 }

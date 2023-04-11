@@ -122,15 +122,15 @@ public class OperatorExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
 
         if (replacementExpression.isPresent()) {
-            return replacementExpression.get().getValue(paramsMap);
+            return replacementExpression.get().getValue(paramsMap, s);
         }
 
         for (Expression e : args) {
-            List<Object> value = e.getValue(paramsMap);
+            List<Object> value = e.getValue(paramsMap, s);
             for (Object v : value) {
                 if (v == null) {
                     r.add(null);

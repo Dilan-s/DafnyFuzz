@@ -13,7 +13,6 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -133,13 +132,13 @@ public class IfElseStatement implements Statement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap) {
-        Object testValue = test.getValue(paramMap).get(0);
+    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        Object testValue = test.getValue(paramMap, s).get(0);
         Boolean testB = (Boolean) testValue;
         if (testB) {
-            return ifStat.execute(paramMap);
+            return ifStat.execute(paramMap, s);
         } else if (elseStat.isPresent()) {
-            return elseStat.get().execute(paramMap);
+            return elseStat.get().execute(paramMap, s);
         }
         return null;
     }

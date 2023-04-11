@@ -62,9 +62,10 @@ public class BlockStatement implements Statement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap) {
-        for (Statement statement : body) {
-            List<Object> retValues = statement.execute(paramMap);
+    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        for (int i = 0, bodySize = body.size(); i < bodySize; i++) {
+            Statement statement = body.get(i);
+            List<Object> retValues = statement.execute(paramMap, s);
             if (retValues != null) {
                 return retValues;
             }

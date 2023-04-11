@@ -123,10 +123,10 @@ public class AssignmentStatement implements Statement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap) {
+    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
         List<Object> expValues = new ArrayList<>();
         for (Expression value : values) {
-            List<Object> expressionValue = value.getValue(paramMap);
+            List<Object> expressionValue = value.getValue(paramMap, s);
             for (Object object : expressionValue) {
                 expValues.add(object);
             }

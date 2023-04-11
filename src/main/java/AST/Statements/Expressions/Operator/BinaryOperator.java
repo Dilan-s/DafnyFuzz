@@ -264,7 +264,17 @@ public enum BinaryOperator implements Operator {
             if (lhsV != null && rhsV != null) {
                 Integer lhsVI = (Integer) lhsV;
                 Integer rhsVI = (Integer) rhsV;
-                return lhsVI / rhsVI;
+
+                int x = lhsVI;
+                int y = rhsVI;
+
+                int r = x / y;
+
+                if (x < 0 && r * y != x) {
+                    r -= y > 0 ? 1 : -1;
+                }
+                return r;
+
             }
             return null;
         }
@@ -281,7 +291,10 @@ public enum BinaryOperator implements Operator {
             if (lhsV != null && rhsV != null) {
                 Integer lhsVI = (Integer) lhsV;
                 Integer rhsVI = (Integer) rhsV;
-                return lhsVI % rhsVI;
+
+                Integer r = (Integer) Divide.apply(args, paramsMap);
+                return lhsVI - r * rhsVI;
+//                return lhsVI % rhsVI;
             }
             return null;
         }

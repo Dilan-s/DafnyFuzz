@@ -96,7 +96,7 @@ public class SubsequenceExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         Object seqVarValue = seqVar.getValue(paramsMap).get(0);
         Object loVarValue = loVar.getValue(paramsMap).get(0);
         Object hiVarValue = hiVar.getValue(paramsMap).get(0);

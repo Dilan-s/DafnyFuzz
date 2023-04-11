@@ -22,7 +22,7 @@ public interface Statement {
 
     ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies);
 
-    List<Object> execute(Map<Variable, Variable> paramMap);
+    List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s);
 
     List<Statement> expand();
 }
