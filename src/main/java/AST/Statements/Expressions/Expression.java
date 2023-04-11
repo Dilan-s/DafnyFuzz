@@ -30,4 +30,8 @@ public interface Expression {
     List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s);
 
     List<Statement> expand();
+
+    default List<String> toOutput() {
+        return List.of(toString());
+    }
 }

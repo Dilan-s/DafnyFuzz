@@ -25,4 +25,6 @@ public interface Statement {
     List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s);
 
     List<Statement> expand();
+
+    List<String> toOutput();
 }

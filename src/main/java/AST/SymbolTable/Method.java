@@ -1,5 +1,6 @@
 package AST.SymbolTable;
 
+import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
@@ -10,9 +11,12 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Method implements Identifier {
@@ -93,24 +97,75 @@ public class Method implements Identifier {
         return name;
     }
 
-    public List<String> toCode() {
+    public String toCode() {
         return toCode(true);
     }
 
-    public List<String> toCode(boolean printMethods) {
+    public String toCode(boolean printMethods) {
         List<String> code = new ArrayList<>();
 
         if (printMethods) {
             List<Method> allMethods = symbolTable.getAllMethods();
             for (Method m : allMethods) {
-                code.addAll(m.toCode(false));
+                code.add(m.toCode(false));
             }
         }
 
         code.add(declarationLine());
         code.add(StringUtils.indent(body.toString()));
         code.add("}\n");
-        return code;
+        return String.join("\n", code);
+    }
+
+    @Override
+    public String toString() {
+        return toCode(true);
+    }
+
+    public List<String> toOutput(boolean printMethods) {
+        Set<String> res = new HashSet<>();
+        List<String> temp = new ArrayList<>();
+
+        res.add("");
+        if (printMethods) {
+            List<Method> allMethods = symbolTable.getAllMethods();
+
+            for (Method m : allMethods) {
+                List<String> methodBodyOptions = m.toOutput(false);
+                temp = new ArrayList<>();
+                for (String f : res) {
+                    for (String mBody : methodBodyOptions) {
+                        String curr = f + mBody;
+                        temp.add(curr);
+                    }
+                }
+                res = new HashSet(temp);
+
+                List<String> r = new ArrayList<>(res);
+                Collections.shuffle(r, GeneratorConfig.getRandom());
+                res = new HashSet<>(r.subList(0, Math.min(5, res.size())));
+            }
+        }
+
+        temp = new ArrayList<>();
+        for (String f : res) {
+            for (String b : body.toOutput()) {
+                String func = declarationLine() + "\n";
+                String curr = StringUtils.indent(b);
+                curr = func + curr + "\n}\n\n";
+                curr = f + curr;
+                temp.add(curr);
+            }
+        }
+        res = new HashSet(temp);
+
+        List<String> r = new ArrayList<>(res);
+        Collections.shuffle(r, GeneratorConfig.getRandom());
+        return r.subList(0, Math.min(5, res.size()));
+    }
+
+    public List<String> toOutput() {
+        return toOutput(true);
     }
 
     public String declarationLine() {
@@ -129,12 +184,6 @@ public class Method implements Identifier {
         symbolTable.addMethod(method);
     }
 
-    @Override
-    public String toString() {
-        List<String> code = toCode(true);
-        return String.join("\n",code);
-    }
-
     public Method getSimpleMethod() {
         return this;
     }
@@ -148,10 +197,10 @@ public class Method implements Identifier {
     public void setReturnValues(List<Expression> expression, List<Expression> dependencies) {
         this.returnValues.add(new PotentialValue(expression, dependencies));
     }
-
     public List<Object> execute(List<Variable> params) {
         return execute(params, new StringBuilder());
     }
+
     public List<Object> execute(List<Variable> params, StringBuilder s) {
         Map<Variable, Variable> paramMap = new HashMap<>();
         for (int i = 0, argsSize = args.size(); i < argsSize; i++) {

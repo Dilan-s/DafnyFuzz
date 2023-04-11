@@ -1,6 +1,7 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
@@ -14,8 +15,11 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public enum BinaryOperator implements Operator {
     Equivalence("<==>", List.of(Args.BOOL_BOOL), new Bool()) {
@@ -33,6 +37,27 @@ public enum BinaryOperator implements Operator {
                 return lhsVB == rhsVB;
             }
             return null;
+        }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+
+            for (String l : args.get(0).toOutput()) {
+                for (String r : args.get(1).toOutput()) {
+                    res.add(String.format("(%s <==> %s)", l, r));
+                }
+            }
+
+            for (String l : args.get(1).toOutput()) {
+                for (String r : args.get(0).toOutput()) {
+                    res.add(String.format("(%s <==> %s)", l, r));
+                }
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
         }
     },
     Implies("==>", List.of(Args.BOOL_BOOL), new Bool()) {
@@ -85,6 +110,27 @@ public enum BinaryOperator implements Operator {
             }
             return null;
         }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+
+            for (String l : args.get(0).toOutput()) {
+                for (String r : args.get(1).toOutput()) {
+                    res.add(String.format("(%s && %s)", l, r));
+                }
+            }
+
+            for (String l : args.get(1).toOutput()) {
+                for (String r : args.get(0).toOutput()) {
+                    res.add(String.format("(%s && %s)", l, r));
+                }
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
+        }
     },
     Or("||", List.of(Args.BOOL_BOOL), new Bool()) {
         @Override
@@ -102,6 +148,27 @@ public enum BinaryOperator implements Operator {
             }
             return null;
         }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+
+            for (String l : args.get(0).toOutput()) {
+                for (String r : args.get(1).toOutput()) {
+                    res.add(String.format("(%s || %s)", l, r));
+                }
+            }
+
+            for (String l : args.get(1).toOutput()) {
+                for (String r : args.get(0).toOutput()) {
+                    res.add(String.format("(%s || %s)", l, r));
+                }
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
+        }
     },
     Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
         @Override
@@ -117,6 +184,27 @@ public enum BinaryOperator implements Operator {
             }
             return null;
         }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+
+            for (String l : args.get(0).toOutput()) {
+                for (String r : args.get(1).toOutput()) {
+                    res.add(String.format("(%s == %s)", l, r));
+                }
+            }
+
+            for (String l : args.get(1).toOutput()) {
+                for (String r : args.get(0).toOutput()) {
+                    res.add(String.format("(%s == %s)", l, r));
+                }
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
+        }
     },
     Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
         @Override
@@ -131,6 +219,27 @@ public enum BinaryOperator implements Operator {
                 return !type.equal(lhsV, rhsV);
             }
             return null;
+        }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+
+            for (String l : args.get(0).toOutput()) {
+                for (String r : args.get(1).toOutput()) {
+                    res.add(String.format("(%s != %s)", l, r));
+                }
+            }
+
+            for (String l : args.get(1).toOutput()) {
+                for (String r : args.get(0).toOutput()) {
+                    res.add(String.format("(%s != %s)", l, r));
+                }
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
         }
     },
     Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
@@ -217,6 +326,27 @@ public enum BinaryOperator implements Operator {
             }
             return null;
         }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+
+            for (String l : args.get(0).toOutput()) {
+                for (String r : args.get(1).toOutput()) {
+                    res.add(String.format("(%s + %s)", l, r));
+                }
+            }
+
+            for (String l : args.get(1).toOutput()) {
+                for (String r : args.get(0).toOutput()) {
+                    res.add(String.format("(%s + %s)", l, r));
+                }
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
+        }
     },
     Minus("-", List.of(Args.INT_INT), new Int()) {
         @Override
@@ -251,6 +381,27 @@ public enum BinaryOperator implements Operator {
             }
             return null;
         }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+
+            for (String l : args.get(0).toOutput()) {
+                for (String r : args.get(1).toOutput()) {
+                    res.add(String.format("(%s * %s)", l, r));
+                }
+            }
+
+            for (String l : args.get(1).toOutput()) {
+                for (String r : args.get(0).toOutput()) {
+                    res.add(String.format("(%s * %s)", l, r));
+                }
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
+        }
     },
     Divide("/", List.of(Args.INT_INT), new Int()) {
         @Override
@@ -274,7 +425,6 @@ public enum BinaryOperator implements Operator {
                     r -= y > 0 ? 1 : -1;
                 }
                 return r;
-
             }
             return null;
         }
@@ -294,7 +444,6 @@ public enum BinaryOperator implements Operator {
 
                 Integer r = (Integer) Divide.apply(args, paramsMap);
                 return lhsVI - r * rhsVI;
-//                return lhsVI % rhsVI;
             }
             return null;
         }
@@ -314,6 +463,27 @@ public enum BinaryOperator implements Operator {
                 return type.disjoint(lhsV, rhsV);
             }
             return null;
+        }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+
+            for (String l : args.get(0).toOutput()) {
+                for (String r : args.get(1).toOutput()) {
+                    res.add(String.format("(%s !! %s)", l, r));
+                }
+            }
+
+            for (String l : args.get(1).toOutput()) {
+                for (String r : args.get(0).toOutput()) {
+                    res.add(String.format("(%s !! %s)", l, r));
+                }
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
         }
     },
     Union("+", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), List.of(new DSet(), new Seq(), new Multiset())) {
@@ -481,6 +651,21 @@ public enum BinaryOperator implements Operator {
 
         }
         return res;
+    }
+
+    @Override
+    public List<String> formOutput(List<Expression> args) {
+        List<String> res = new ArrayList<>();
+
+        for (String l : args.get(0).toOutput()) {
+            for (String r : args.get(1).toOutput()) {
+                res.add(String.format("(%s %s %s)", l, operator, r));
+            }
+        }
+
+        List<String> r = new ArrayList<>(res);
+        Collections.shuffle(r, GeneratorConfig.getRandom());
+        return r.subList(0, Math.min(5, res.size()));
     }
 
     @Override

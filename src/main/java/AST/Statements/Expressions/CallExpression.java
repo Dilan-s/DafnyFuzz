@@ -163,7 +163,6 @@ public class CallExpression implements Expression {
 
     @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
-//        return callExpr.getValue(paramsMap, s);
         return callExpr.getValue(paramsMap, new StringBuilder());
     }
 

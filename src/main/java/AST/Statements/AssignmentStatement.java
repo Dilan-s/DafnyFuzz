@@ -1,6 +1,7 @@
 package AST.Statements;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
@@ -9,8 +10,12 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AssignmentStatement implements Statement {
@@ -115,6 +120,58 @@ public class AssignmentStatement implements Statement {
 
             return String.format("var %s := %s;", lhs, rhs);
         }
+    }
+
+    @Override
+    public List<String> toOutput() {
+        Set<String> res = new HashSet<>();
+        List<String> temp = new ArrayList<>();
+
+        if (declared) {
+            String lhs = variables.stream()
+                .map(Variable::getName)
+                .collect(Collectors.joining(", "));
+
+            res.add(String.format("%s := ", lhs));
+        } else {
+            String lhs = variables.stream()
+                .map(Variable::toString)
+                .collect(Collectors.joining(", "));
+
+
+            res.add(String.format("var %s := ", lhs));
+        }
+
+        boolean first = true;
+        for (Expression exp : values) {
+            List<String> expOptions = exp.toOutput();
+            temp = new ArrayList<>();
+            for (String f : res) {
+                for (String expOption : expOptions) {
+                    if (!first) {
+                        expOption = ", " + expOption;
+                    }
+                    String curr = f + expOption;
+                    temp.add(curr);
+                }
+            }
+
+            if (expOptions.isEmpty()) {
+                temp.addAll(res);
+            }
+            first = false;
+            res = new HashSet<>(temp);
+        }
+
+        temp = new ArrayList<>();
+        for (String f : res) {
+            temp.add(f + ";");
+        }
+        res = new HashSet<>(temp);
+
+        List<String> r = new ArrayList<>(res);
+        Collections.shuffle(r, GeneratorConfig.getRandom());
+        return r.subList(0, Math.min(5, res.size()));
     }
 
     @Override

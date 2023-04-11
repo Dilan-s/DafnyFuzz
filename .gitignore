@@ -21,6 +21,7 @@ test.cs
 test-py
 test.js
 outputs
+tests
 package-lock.json
 DafnyRuntime.h
 errors
@@ -28,6 +29,8 @@ errors
 node_modules
 
 tmp.txt
+
+.gradle
 
 **/gen/**
 **/antlr_config/DafnyLexer.tokens

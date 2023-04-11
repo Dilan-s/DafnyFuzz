@@ -13,7 +13,6 @@ public class Int implements BaseType {
     private static final double PROB_HEX = 0.2;
     public static final double PROB_NEGATION = 0.1;
     private int max;
-    private boolean asHex;
 
     public Int(int max) {
         this.max = max;
@@ -46,14 +45,13 @@ public class Int implements BaseType {
     public Expression generateLiteral(SymbolTable symbolTable) {
         Integer value = GeneratorConfig.getRandom().nextInt(max);
         value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
-        asHex = value > 0 && GeneratorConfig.getRandom().nextDouble() < PROB_HEX;
-        return new IntLiteral(this, symbolTable, value, asHex);
+        return new IntLiteral(this, symbolTable, value);
     }
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable, Object value) {
         Type t = this.concrete(symbolTable);
-        return new IntLiteral(t, symbolTable, (Integer) value, asHex);
+        return new IntLiteral(t, symbolTable, (Integer) value);
     }
 
     @Override

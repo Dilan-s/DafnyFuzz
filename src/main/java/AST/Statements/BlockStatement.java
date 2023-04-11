@@ -1,6 +1,7 @@
 package AST.Statements;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
@@ -9,8 +10,11 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BlockStatement implements Statement {
@@ -91,5 +95,40 @@ public class BlockStatement implements Statement {
         return StringUtils.intersperse("\n", code);
     }
 
+    @Override
+    public List<String> toOutput() {
+        Set<String> res = new HashSet<>();
+        List<String> temp = new ArrayList<>();
 
+        res.add("");
+
+        boolean first = true;
+        for (Statement stat : body) {
+            List<String> statOptions = stat.toOutput();
+            temp = new ArrayList<>();
+            for (String f : res) {
+                for (String statOption : statOptions) {
+                    if (!first) {
+                        statOption = "\n" + statOption;
+                    }
+                    String curr = f + statOption;
+                    temp.add(curr);
+                }
+
+            }
+            if (statOptions.isEmpty()) {
+                temp.addAll(res);
+            }
+            first = false;
+            res = new HashSet(temp);
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            res = new HashSet<>(r.subList(0, Math.min(5, temp.size())));
+        }
+
+        List<String> r = new ArrayList<>(res);
+        Collections.shuffle(r, GeneratorConfig.getRandom());
+        return r.subList(0, Math.min(5, res.size()));
+    }
 }

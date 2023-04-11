@@ -107,4 +107,6 @@ public interface Operator {
     }
 
     Object apply(List<Expression> args, Map<Variable, Variable> paramsMap);
+
+    List<String> formOutput(List<Expression> args);
 }

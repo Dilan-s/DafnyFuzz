@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Random;
 
 public class DafnyProgram {
@@ -27,7 +28,6 @@ public class DafnyProgram {
     }
 
     public void generateProgram() {
-        StringBuilder program = new StringBuilder();
 
         GeneratorConfig.setRandom(random);
         RandomStatementGenerator randomStatementGenerator = new RandomStatementGenerator();
@@ -48,16 +48,16 @@ public class DafnyProgram {
         Statement statement = randomStatementGenerator.generateBody(main);
         main.setBody(statement);
 
-        program.append(main);
+        List<String> programOptions = main.toOutput();
 
         try {
             Path path = Paths.get("./tests");
             if (!Files.exists(path)) {
                 Files.createDirectory(path);
             }
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < programOptions.size(); i++) {
                 FileWriter p = new FileWriter(String.format("%s/test%d.dfy", path.toAbsolutePath(), i));
-                p.write(program.toString());
+                p.write(programOptions.get(i));
                 p.close();
             }
         } catch (IOException e) {

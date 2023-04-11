@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
@@ -11,9 +12,12 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ArrayLiteral implements Expression {
@@ -159,6 +163,45 @@ public class ArrayLiteral implements Expression {
                 .collect(Collectors.joining(", "));
             DCollection t = (DCollection) type;
             return String.format("new %s[] [%s]", t.getInnerType().getName(), value);
+        }
+
+        @Override
+        public List<String> toOutput() {
+            Set<String> res = new HashSet<>();
+            List<String> temp = new ArrayList<>();
+
+            DCollection t = (DCollection) type;
+            res.add(String.format("new %s[] [", t.getInnerType().getName()));
+
+            boolean first = true;
+            for (Expression exp : values) {
+                List<String> expOptions = exp.toOutput();
+                temp = new ArrayList<>();
+                for (String f : res) {
+                    for (String expOption : expOptions) {
+                        if (!first) {
+                            expOption = ", " + expOption;
+                        }
+                        String curr = f + expOption;
+                        temp.add(curr);
+                    }
+                }
+                if (expOptions.isEmpty()) {
+                    temp.addAll(res);
+                }
+                first = false;
+                res = new HashSet(temp);
+            }
+
+            temp = new ArrayList<>();
+            for (String f : res) {
+                temp.add(f + "]");
+            }
+            res = new HashSet(temp);
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
         }
 
         @Override

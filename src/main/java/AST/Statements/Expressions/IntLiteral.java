@@ -8,28 +8,23 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class IntLiteral implements Expression {
 
     private final int value;
-    private final boolean asHex;
     private final Type type;
     private SymbolTable symbolTable;
 
-    public IntLiteral(Type type, SymbolTable symbolTable, int value, boolean asHex) {
+    public IntLiteral(Type type, SymbolTable symbolTable, int value) {
         this.type = type;
         this.symbolTable = symbolTable;
         this.value = value;
-        this.asHex = asHex;
     }
-
-    public IntLiteral(Type type, SymbolTable symbolTable, int value) {
-        this(type, symbolTable, value, false);
-    }
-
 
     @Override
     public List<Type> getTypes() {
@@ -42,10 +37,17 @@ public class IntLiteral implements Expression {
 
     @Override
     public String toString() {
-        if (asHex) {
-            return String.format("0x%X", value);
-        }
         return String.valueOf(value);
+    }
+
+    @Override
+    public List<String> toOutput() {
+        Set<String> res = new HashSet<>();
+        res.add(String.valueOf(value));
+        if (value > 0) {
+            res.add(String.format("0x%X", value));
+        }
+        return new ArrayList<>(res);
     }
 
     @Override

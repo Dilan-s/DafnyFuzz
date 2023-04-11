@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
@@ -9,11 +10,15 @@ import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class ReassignSeqExpression implements Expression {
 
@@ -73,6 +78,36 @@ public class ReassignSeqExpression implements Expression {
     @Override
     public String toString() {
         return String.format("%s[%s := %s]", seqVar.getName(), indVar.getName(), exp);
+    }
+
+    @Override
+    public List<String> toOutput() {
+        Set<String> res = new HashSet<>();
+        List<String> temp = new ArrayList<>();
+        res.add(String.format("%s[%s := ", seqVar.getName(), indVar.getName()));
+
+        List<String> expOptions = exp.toOutput();
+        temp = new ArrayList<>();
+        for (String f : res) {
+            for (String expOption : expOptions) {
+                String curr = f + expOption;
+                temp.add(curr);
+            }
+        }
+        if (expOptions.isEmpty()) {
+            temp.addAll(res);
+        }
+        res = new HashSet(temp);
+
+        temp = new ArrayList<>();
+        for (String f : res) {
+            temp.add(f + "]");
+        }
+        res = new HashSet(temp);
+
+        List<String> r = new ArrayList<>(res);
+        Collections.shuffle(r, GeneratorConfig.getRandom());
+        return r.subList(0, Math.min(5, res.size()));
     }
 
     public VariableExpression getSequenceVariableExpression() {

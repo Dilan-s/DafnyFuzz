@@ -1,6 +1,7 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
 import AST.Statements.Statement;
@@ -10,6 +11,7 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,17 @@ public class OperatorExpression implements Expression {
             return replacementExpression.get().toString();
         }
         return operator.formExpression(args);
+    }
+
+    @Override
+    public List<String> toOutput() {
+        if (replacementExpression.isPresent()) {
+            return replacementExpression.get().toOutput();
+        }
+        List<String> res = operator.formOutput(args);
+        List<String> r = new ArrayList<>(res);
+        Collections.shuffle(r, GeneratorConfig.getRandom());
+        return r.subList(0, Math.min(5, res.size()));
     }
 
     @Override

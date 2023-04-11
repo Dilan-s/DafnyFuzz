@@ -1,6 +1,7 @@
 package AST.Statements;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.Operator.UnaryOperator;
 import AST.Statements.Expressions.OperatorExpression;
@@ -13,9 +14,13 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class IfElseStatement implements Statement {
@@ -90,6 +95,81 @@ public class IfElseStatement implements Statement {
         code.add("}");
         return StringUtils.intersperse("\n", code);
     }
+
+    @Override
+    public List<String> toOutput() {
+        Set<String> res = new HashSet<>();
+        List<String> temp = new ArrayList<>();
+
+        res.add("if ");
+
+        List<String> testOptions = test.toOutput();
+        temp = new ArrayList<>();
+        for (String f : res) {
+            for (String testOption : testOptions) {
+                String curr = f + testOption;
+                temp.add(curr);
+            }
+        }
+        if (testOptions.isEmpty()) {
+            temp.addAll(res);
+        }
+        res = new HashSet(temp);
+
+        temp = new ArrayList<>();
+        for (String f : res) {
+            temp.add(f + " {\n");
+        }
+        res = new HashSet(temp);
+
+        List<String> ifOptions = ifStat.toOutput();
+        temp = new ArrayList<>();
+        for (String f : res) {
+            for (String ifOption : ifOptions) {
+                String curr = StringUtils.indent(ifOption);
+                curr = f + curr;
+                temp.add(curr);
+            }
+        }
+        if (ifOptions.isEmpty()) {
+            temp.addAll(res);
+        }
+        res = new HashSet(temp);
+
+        if (elseStat.isPresent()) {
+
+            temp = new ArrayList<>();
+            for (String f : res) {
+                temp.add(f + "\n} else {\n");
+            }
+            res = new HashSet(temp);
+
+            List<String> elseOptions = elseStat.get().toOutput();
+            temp = new ArrayList<>();
+            for (String f : res) {
+                for (String elseOption : elseOptions) {
+                    String curr = StringUtils.indent(elseOption);
+                    curr = f + curr;
+                    temp.add(curr);
+                }
+            }
+            if (elseOptions.isEmpty()) {
+                temp.addAll(res);
+            }
+            res = new HashSet(temp);
+        }
+
+        temp = new ArrayList<>();
+        for (String f : res) {
+            temp.add(f + "\n}");
+        }
+        res = new HashSet(temp);
+
+        List<String> r = new ArrayList<>(res);
+        Collections.shuffle(r, GeneratorConfig.getRandom());
+        return r.subList(0, Math.min(5, res.size()));
+    }
+
 
     @Override
     public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {

@@ -11,6 +11,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,11 @@ public class PrintAll implements Statement {
     @Override
     public String toString() {
         return "";
+    }
+
+    @Override
+    public List<String> toOutput() {
+        return Collections.emptyList();
     }
 
     @Override

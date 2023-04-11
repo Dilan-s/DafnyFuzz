@@ -1,6 +1,7 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
@@ -13,6 +14,9 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.lang.invoke.MutableCallSite;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +28,18 @@ public enum UnaryOperator implements Operator {
         public String formExpression(List<Expression> args) {
             String res = args.get(0).toString();
             return String.format("|%s|", res);
+        }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+            for (String arg : args.get(0).toOutput()) {
+                res.add(String.format("|%s|", arg));
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
         }
 
         @Override
@@ -63,6 +79,17 @@ public enum UnaryOperator implements Operator {
         public String formExpression(List<Expression> args) {
             String res = args.get(0).toString();
             return String.format("!(%s)", res);
+        }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+            for (String arg : args.get(0).toOutput()) {
+                res.add(String.format("!(%s)", arg));
+            }
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
         }
 
         @Override
