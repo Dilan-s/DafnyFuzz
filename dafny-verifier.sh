@@ -91,7 +91,7 @@ while [ true ]; do
 
     # js
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy # > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ]
     then
       echo "Created JS files"
@@ -103,7 +103,7 @@ while [ true ]; do
 
     # java
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy  # > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy  > tmp.txt 2>&1
     if [ $? -eq 0 ]
     then
       echo "Created Java files"
@@ -116,7 +116,7 @@ while [ true ]; do
 
     # py
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy # > tmp.txt  2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>&1
     if [ $? -eq 0 ]
     then
       echo "Created Python files"
@@ -127,9 +127,9 @@ while [ true ]; do
     fi
 
     # cpp
-  #  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cpp /spillTargetCode:3 test.dfy # > tmp.txt 2>&1
+  #  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cpp /spillTargetCode:3 test.dfy > tmp.txt 2>&1
   #  echo "Created C++ files"
-  #  g++ test.cpp test.h DafnyRuntime.h  # > tmp.txt 2>&1
+  #  g++ test.cpp test.h DafnyRuntime.h  > tmp.txt 2>&1
   #  ./a.out > outputs/output-cpp.txt
     rm -rf test.dfy || true
     y=$(( $y + 1))
