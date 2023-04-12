@@ -221,11 +221,30 @@ public class Multiset implements DCollection {
             if (!rhsVM.containsKey(k)) {
                 return false;
             }
+            if (lhsVM.get(k) > rhsVM.get(k)) {
+                return false;
+            }
             if (lhsVM.get(k) < rhsVM.get(k)) {
                 atLeastOneSmaller = true;
             }
         }
-        return atLeastOneSmaller || !lhsVM.keySet().containsAll(rhsVM.keySet());
+        return atLeastOneSmaller || rhsVM.keySet().size() > lhsVM.keySet().size();
+    }
+
+    @Override
+    public Boolean lessThanOrEqual(Object lhsV, Object rhsV) {
+        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
+        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+
+        for (Object k : lhsVM.keySet()) {
+            if (!rhsVM.containsKey(k)) {
+                return false;
+            }
+            if (lhsVM.get(k) > rhsVM.get(k)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

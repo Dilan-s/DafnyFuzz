@@ -116,8 +116,38 @@ public class ArrayLiteral implements Expression {
                 l.add(v);
             }
         }
-        r.add(l);
+        r.add(new ArrayValue(variable.getName(), l));
         return r;
+    }
+
+    private class ArrayValue {
+        String name;
+        List<Object> contents;
+
+        public ArrayValue(String name, List<Object> contents) {
+            this.name = name;
+            this.contents = contents;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, contents);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ArrayValue)) {
+                return false;
+            }
+
+            ArrayValue other = (ArrayValue) obj;
+            return other.name.equals(name) && other.contents.equals(contents);
+        }
+
+        @Override
+        public String toString() {
+            return contents.toString();
+        }
     }
 
     private class ArrayInitValues implements Expression {
