@@ -12,6 +12,7 @@ import AST.Statements.util.PrintAll;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
@@ -20,46 +21,42 @@ import java.util.stream.Collectors;
 
 public class RandomStatementGenerator {
 
-    public static final double PROB_RETURN_STAT = 5.0;
-    public static final double PROB_ASSIGN_STAT = 2.0;
-    public static final double PROB_PRINT_STAT = 1.0;
-    public static final double PROB_IF_ELSE_STAT = 3.0;
-
-    public static final double RATIO_SUM = PROB_RETURN_STAT + PROB_ASSIGN_STAT + PROB_PRINT_STAT +
-        PROB_IF_ELSE_STAT;
+    public static final int MAX_PRINT_SIZE = 10;
+    public static double PROB_RETURN_STAT = 15.0;
+    public static double PROB_ASSIGN_STAT = 40.0;
+    public static double PROB_PRINT_STAT = 10.0;
+    public static double PROB_IF_ELSE_STAT = 30.0;
 
     public static final double PROB_METHOD_ASSIGN = 0.05;
     public static final double PROB_ELSE_STAT = 0.5;
 
-    public static final int MAX_STATEMENT_DEPTH = 5;
+    public static final int MAX_STATEMENT_DEPTH = 4;
     public static final double PROB_NEXT_STAT = 0.85;
     public static final double PROB_FORCE_RETURN = 0.05;
 
     private static int statementDepth = 0;
 
 
-    public Statement generateBody(Method method) {
-        BlockStatement body = new BlockStatement(method.getSymbolTable());
+    public Statement generateBody(Method method, SymbolTable symbolTable) {
+        BlockStatement body = new BlockStatement(symbolTable);
 
         int size = 0;
         double probContinue = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.CONTINUE_DECAY_FACTOR, size);
         boolean hasReturn = method.hasReturn();
         Statement statement = null;
         while (probContinue < PROB_NEXT_STAT || hasReturn) {
-            statement = generateStatement(method, body.getSymbolTable());
+            statement = generateStatement(method, symbolTable);
             List<Statement> stats = statement.expand();
             body.addStatement(stats);
             if (statement.isReturn()) {
                 break;
             }
-            double probForceReturn = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.CONTINUE_DECAY_FACTOR, size);
-            if (probForceReturn < PROB_FORCE_RETURN) {
-                if (hasReturn) {
-                    statement = generateReturnStatement(method, body.getSymbolTable());
-                    body.addStatement(statement.expand());
-                }
-                break;
-            }
+//            double probForceReturn = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.CONTINUE_DECAY_FACTOR, size);
+//            if (probForceReturn < PROB_FORCE_RETURN) {
+//                statement = generateReturnStatement(method, symbolTable);
+//                body.addStatement(statement.expand());
+//                break;
+//            }
             probContinue = GeneratorConfig.getRandom().nextDouble();
             size += stats.size();
         }
@@ -76,22 +73,26 @@ public class RandomStatementGenerator {
         statementDepth++;
         Statement ret = null;
         while (ret == null) {
-            double probTypeOfStatement =
-                GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.OPTION_DECAY_FACTOR, statementDepth - 1) * RATIO_SUM;
-            if ((statementDepth > MAX_STATEMENT_DEPTH || (probTypeOfStatement -= PROB_RETURN_STAT) < 0)
-                && method.hasReturn()) {
+            double ratioSum = PROB_RETURN_STAT + PROB_ASSIGN_STAT + PROB_PRINT_STAT +
+                PROB_IF_ELSE_STAT;
+            double probTypeOfStatement = GeneratorConfig.getRandom().nextDouble() * ratioSum;
+
+            if ((statementDepth > MAX_STATEMENT_DEPTH || (probTypeOfStatement -= PROB_RETURN_STAT) < 0)) {
                 //return
                 ret = generateReturnStatement(method, symbolTable);
 
             } else if (statementDepth > MAX_STATEMENT_DEPTH || (probTypeOfStatement -= PROB_PRINT_STAT) < 0) {
                 //Print
+                PROB_PRINT_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generatePrintStatement(symbolTable);
             } else if ((probTypeOfStatement -= PROB_ASSIGN_STAT) < 0) {
                 //Assign
+                PROB_ASSIGN_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateAssignmentStatement(symbolTable);
 
             } else if ((probTypeOfStatement -= PROB_IF_ELSE_STAT) < 0) {
                 //IfElse
+                PROB_IF_ELSE_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateIfElseStatement(method, symbolTable);
 
             }
@@ -107,7 +108,7 @@ public class RandomStatementGenerator {
         List<Type> types = method.getReturnTypes();
 
         List<Expression> values = new ArrayList<>();
-        for (Type type : types) {
+        for (Type type : types.stream().filter(x -> !x.equals(new Void())).collect(Collectors.toList())) {
             Type concrete = type.concrete(symbolTable);
             Expression expression = expressionGenerator.generateExpression(concrete, symbolTable);
             values.add(expression);
@@ -123,7 +124,7 @@ public class RandomStatementGenerator {
 
         PrintStatement statement = new PrintStatement(symbolTable);
 
-        int noOfValues = GeneratorConfig.getRandom().nextInt(10) + 1;
+        int noOfValues = GeneratorConfig.getRandom().nextInt(MAX_PRINT_SIZE) + 1;
         List<Type> types = typeGenerator.generateTypes(noOfValues, symbolTable);
 
         for (Type type : types) {
@@ -142,11 +143,11 @@ public class RandomStatementGenerator {
         Expression test = expressionGenerator.generateExpression(new Bool(), symbolTable);
         statement.setTest(test);
 
-        Statement ifStat = generateBody(method);
+        Statement ifStat = generateBody(method, new SymbolTable(symbolTable));
         statement.setIfStat(ifStat);
 
         if (GeneratorConfig.getRandom().nextDouble() < PROB_ELSE_STAT) {
-            Statement elseStat = generateBody(method);
+            Statement elseStat = generateBody(method, new SymbolTable(symbolTable));
             statement.setElseStat(elseStat);
         }
 

@@ -5,6 +5,7 @@ import AST.Generator.RandomStatementGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import java.io.File;
 import java.io.FileWriter;
@@ -45,7 +46,7 @@ public class DafnyProgram {
         Method safe_subsequence = SafeMethods.safe_subsequence();
         main.addMethod(safe_subsequence);
 
-        Statement statement = randomStatementGenerator.generateBody(main);
+        Statement statement = randomStatementGenerator.generateBody(main, main.getSymbolTable());
         main.setBody(statement);
 
         List<String> programOptions = main.toOutput();

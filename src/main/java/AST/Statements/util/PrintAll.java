@@ -55,10 +55,12 @@ public class PrintAll implements Statement {
         PrintStatement statement = new PrintStatement(symbolTable);
 
         for (Variable v : allVariablesInCurrentScope) {
-            StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
-            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
-            statement.addValue(stringLiteral);
-            statement.addValue(expression);
+            if (v.getType().isPrintable()) {
+                StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
+                VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
+                statement.addValue(stringLiteral);
+                statement.addValue(expression);
+            }
         }
         return statement.expand();
     }

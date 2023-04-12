@@ -10,7 +10,8 @@ import java.util.List;
 public class RandomMethodGenerator {
 
     public static final double PROB_REUSE_METHOD = 0.75;
-    public static final int MAX_METHOD_DEPTH = 3;
+    public static final int MAX_METHOD_DEPTH = 5;
+    public static final int MAX_NO_OF_ARGS = 4;
 
     private static int methodDepth = 0;
 
@@ -35,14 +36,14 @@ public class RandomMethodGenerator {
         String methodName = VariableNameGenerator.generateMethodName();
         Method m = new Method(returnTypes, methodName);
 
-        int noOfArgs = GeneratorConfig.getRandom().nextInt(5) + 1;
+        int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS) + 1;
         List<Type> args = typeGenerator.generateTypes(noOfArgs, symbolTable);
         for (Type t : args) {
             Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
             m.addArgument(var);
         }
 
-        Statement statement = statementGenerator.generateBody(m);
+        Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
         methodDepth--;
         m.setBody(statement);
 

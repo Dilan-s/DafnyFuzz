@@ -67,7 +67,11 @@ public class SymbolTable {
     }
 
     public List<Variable> getAllVariablesInCurrentScope() {
-        return new ArrayList<>(variables.values());
+        List<Variable> currST = new ArrayList<>(this.variables.values());
+        if (enclosingSymbolTable != GlobalSymbolTable.getGlobalSymbolTable()) {
+            currST.addAll(enclosingSymbolTable.getAllVariablesInCurrentScope());
+        }
+        return currST;
     }
 
     public List<Variable> getAllVariables(Type t) {
