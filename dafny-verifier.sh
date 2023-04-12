@@ -62,16 +62,31 @@ while [ true ]; do
     cp "$file" test.dfy
   # GO
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy # > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ]
     then
       echo "Created Go files"
-      ./test > "outputs/output-go-$y.txt"
-      rm -rf test-go || true
-      rm -rf test || true
+      mkdir test-go-run
+      cp -R test-go/* test-go-run/
+      cd test-go-run/src
+      go mod init src  > tmp.txt 2>&1
+      cd ..
+      find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_System "System_"/_System "src\/System_"/g'  > tmp.txt 2>&1
+      find ./src \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/_dafny "dafny"/_dafny "src\/dafny"/g'  > tmp.txt 2>&1
+      cd src
+      go build test.go  > tmp.txt 2>&1
+      if [ $? -eq 0 ]
+      then
+        cd ../..
+        ./test-go-run/src/test > "outputs/output-go-$y.txt"
+        rm -rf test-go-run || true
+      else
+        echo "Failed to generate Go program"
+      fi
     else
       echo "Failed to convert to GO in $t seconds"
     fi
+
 
 
     # js
