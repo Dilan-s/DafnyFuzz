@@ -182,7 +182,7 @@ public class ArrayLiteral implements Expression {
                     l.add(v);
                 }
             }
-            r.add(l);
+            r.add(new ArrayValue(variable.getName(), l));
             return r;
         }
 
