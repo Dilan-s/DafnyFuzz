@@ -117,7 +117,7 @@ while [ true ]; do
     rm -rf tmp.txt || true
     y=$(( $y + 1))
   done
-  java -cp out/ Main.CompareOutputs $x
+  java -cp out/ Main.CompareOutputs $x "./outputs"
   if [ $? -eq 1 ]
   then
     mkdir "errors/$x"
@@ -127,8 +127,8 @@ while [ true ]; do
     cp tests/* "errors/$x/tests"
   fi
 
-#  rm -rf tests/* || true
-#  rm -rf outputs/* || true
+  rm -rf tests/* || true
+  rm -rf outputs/* || true
   x=$(( $x + 1 ))
 
 done
