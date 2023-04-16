@@ -3,10 +3,12 @@ package AST.Statements;
 import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.StringLiteral;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ public class PrintStatement implements Statement {
         String printValues = values.stream()
             .filter(x -> x.getTypes().stream().allMatch(Type::isPrintable))
             .map(Expression::toString)
-            .collect(Collectors.joining(", ' ', "));
+            .collect(Collectors.joining(", \" \", "));
         if (!printValues.isEmpty()) {
             code.add(String.format("print %s, \"\\n\";", printValues));
         }
@@ -74,7 +76,7 @@ public class PrintStatement implements Statement {
                 for (String f : res) {
                     for (String expOption : expOptions) {
                         if (!first) {
-                            expOption = ", ' ', " + expOption;
+                            expOption = ", \" \", " + expOption;
                         }
                         String curr = f + expOption;
                         temp.add(curr);
@@ -105,7 +107,8 @@ public class PrintStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        StringJoiner joiner = new StringJoiner(" ");
+        List<String> joiner = new ArrayList<>();
+
         for (Expression exp : values) {
             List<Type> types = exp.getTypes();
             if (types.stream().allMatch(Type::isPrintable)) {
@@ -118,9 +121,9 @@ public class PrintStatement implements Statement {
                 }
             }
         }
-        String printValues = joiner.toString();
+        String printValues = String.join(" ", joiner);
 
-        if (!printValues.isEmpty()) {
+        if (!joiner.isEmpty()) {
             s.append(printValues);
             s.append("\n");
         }

@@ -76,6 +76,10 @@ public class Char implements BaseType {
 
     @Override
     public String formatPrint(Object object) {
-        return String.valueOf(object);
+        return "'" + object + "'";
+    }
+
+    public String formatPrintWithNoQuotes(Object v) {
+        return String.valueOf(v);
     }
 }

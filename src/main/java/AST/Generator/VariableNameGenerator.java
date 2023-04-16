@@ -37,6 +37,6 @@ public class VariableNameGenerator {
 
     public static String generateMethodName() {
         methodName++;
-        return String.format("method_%d", methodName);
+        return String.format("m_method_%d", methodName);
     }
 }

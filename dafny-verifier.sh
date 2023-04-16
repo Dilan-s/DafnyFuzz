@@ -3,27 +3,18 @@
 echo "PID: $$"
 trap 'kill -9 $$' SIGINT
 
-rm -rf test.dfy || true
-rm -rf test-go || true
-rm -rf test-java || true
-rm -rf test.cpp test.h DafnyRuntime.h || true
-rm -rf test.cs || true
-rm -rf test-py || true
-rm -rf test.js || true
-rm -rf outputs || true
-rm -rf test.a || true
-rm -rf errors || true
-rm -rf tmp.txt || true
-rm -rf out || true
-rm -rf tests || true
-
 npm install bignumber.js
 
 javac -cp src/main/java/ -d ./out/ src/main/java/Main/GenerateProgram.java src/main/java/Main/CompareOutputs.java
 
+rm -rf outputs || true
+rm -rf tests || true
+rm -rf errors || true
 
+mkdir tests || true
 mkdir outputs || true
 mkdir errors || true
+
 
 directory=$(pwd)
 
@@ -32,15 +23,6 @@ x=0
 while [ true ]; do
   cd "$directory"
 
-  rm -rf test-go test-go-run || true
-  rm -rf test-java || true
-  rm -rf test.cpp test.h DafnyRuntime.h test.h.gch DafnyRuntime.h.gch a.out || true
-  rm -rf test.cs || true
-  rm -rf test-py || true
-  rm -rf test.js || true
-  rm -rf test.a || true
-  rm -rf tmp.txt || true
-  rm -rf outputs/* || true
   echo "Test number $x"
 
   cd "$directory"
@@ -60,7 +42,8 @@ while [ true ]; do
   for file in tests/*.dfy
   do
     cp "$file" test.dfy
-  # GO
+
+    # GO
     cd "$directory"
     timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /spillTargetCode:3 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ]
@@ -68,6 +51,7 @@ while [ true ]; do
       echo "Created Go files"
       mkdir test-go-run
       cp -R test-go/* test-go-run/
+      rm -rf test-go || true
       cd test-go-run/src
       go mod init src  > tmp.txt 2>&1
       cd ..
@@ -79,15 +63,13 @@ while [ true ]; do
       then
         cd ../..
         ./test-go-run/src/test > "outputs/output-go-$y.txt"
-        rm -rf test-go-run || true
       else
         echo "Failed to generate Go program"
       fi
+      rm -rf test-go-run || true
     else
       echo "Failed to convert to GO in $t seconds"
     fi
-
-
 
     # js
     cd "$directory"
@@ -132,25 +114,22 @@ while [ true ]; do
   #  g++ test.cpp test.h DafnyRuntime.h  > tmp.txt 2>&1
   #  ./a.out > outputs/output-cpp.txt
     rm -rf test.dfy || true
+    rm -rf tmp.txt || true
     y=$(( $y + 1))
   done
   java -cp out/ Main.CompareOutputs $x
+  if [ $? -eq 1 ]
+  then
+    mkdir "errors/$x"
+    mkdir "errors/$x/outputs"
+    mkdir "errors/$x/tests"
+    cp outputs/* "errors/$x/outputs"
+    cp tests/* "errors/$x/tests"
+  fi
+
+#  rm -rf tests/* || true
+#  rm -rf outputs/* || true
   x=$(( $x + 1 ))
-
-  rm -rf test-go || true
-  rm -rf test-java || true
-  rm -rf test.jar || true
-  rm -rf test.cpp test.h DafnyRuntime.h test.h.gch DafnyRuntime.h.gch a.out || true
-  rm -rf test.cs || true
-  rm -rf test-py || true
-  rm -rf test.js || true
-  rm -rf test.a || true
-  rm -rf test || true
-  rm -rf tests || true
-  rm -rf tmp.txt || true
-  rm -rf outputs/* || true
-
-
 
 done
 

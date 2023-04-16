@@ -1,10 +1,15 @@
 package AST.Generator;
 
+import AST.Statements.BlockStatement;
+import AST.Statements.Expressions.StringLiteral;
+import AST.Statements.PrintStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
+import java.net.http.HttpResponse.BodySubscriber;
 import java.util.List;
 
 public class RandomMethodGenerator {

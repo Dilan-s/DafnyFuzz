@@ -17,6 +17,7 @@ public class Seq implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 10;
     private Type type;
+    private static int printDepth = 0;
 
     public Seq(Type type) {
         this.type = type;
@@ -141,7 +142,7 @@ public class Seq implements DCollection {
                 return false;
             }
         }
-        return true;
+        return lhsVL.isEmpty() && !rhsVL.isEmpty();
     }
 
     @Override
@@ -163,13 +164,20 @@ public class Seq implements DCollection {
 
     @Override
     public String formatPrint(Object object) {
-        if (type.equals(new Char())) {
-            List<Object> value = (List<Object>) object;
-            return value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(""));
+        printDepth ++;
+        String res;
+        List<Object> value = (List<Object>) object;
+        if (type.equals(new Char()) && printDepth < 2) {
+            res = value.stream()
+                .map(v -> ((Char) type).formatPrintWithNoQuotes(v))
+                .collect(Collectors.joining(""));
         } else {
-            List<Object> value = (List<Object>) object;
-            return "[" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", ")) + "]";
+            res =
+                "[" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", "))
+                    + "]";
         }
+        printDepth--;
+        return res;
     }
 
     @Override
