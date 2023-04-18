@@ -142,7 +142,7 @@ public class Seq implements DCollection {
                 return false;
             }
         }
-        return lhsVL.isEmpty() && !rhsVL.isEmpty();
+        return !(lhsVL.isEmpty() && rhsVL.isEmpty());
     }
 
     @Override
