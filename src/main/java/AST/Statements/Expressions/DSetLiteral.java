@@ -6,7 +6,7 @@ import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,10 +39,6 @@ public class DSetLiteral implements Expression {
             .map(Expression::expand)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
     }
 
     @Override

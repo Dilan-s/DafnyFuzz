@@ -3,15 +3,13 @@ package AST.Statements.Expressions;
 import AST.Errors.SemanticException;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class IntLiteral implements Expression {
@@ -29,10 +27,6 @@ public class IntLiteral implements Expression {
     @Override
     public List<Type> getTypes() {
         return List.of(type);
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
     }
 
     @Override

@@ -9,8 +9,7 @@ import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
-import AST.SymbolTable.Variable;
-import java.util.ArrayList;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +20,6 @@ public class PrintAll implements Statement {
 
     public PrintAll(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
-
     }
 
     @Override

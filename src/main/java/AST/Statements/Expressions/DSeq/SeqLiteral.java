@@ -7,7 +7,7 @@ import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,10 +32,6 @@ public class SeqLiteral implements Expression {
     @Override
     public List<Type> getTypes() {
         return List.of(type);
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
     }
 
     @Override

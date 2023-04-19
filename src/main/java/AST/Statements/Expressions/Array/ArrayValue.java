@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class ArrayValue {
-    String name;
-    List<Object> contents;
+    private String name;
+    private List<Object> contents;
 
     public ArrayValue(String name, List<Object> contents) {
         this.name = name;

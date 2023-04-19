@@ -4,13 +4,11 @@ import AST.Errors.SemanticException;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
 import java.util.Map;
 
 public interface Statement {
-
-    void semanticCheck(Method method) throws SemanticException;
 
     default boolean isReturn() {
         return false;

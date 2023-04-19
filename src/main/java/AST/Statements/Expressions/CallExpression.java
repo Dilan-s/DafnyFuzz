@@ -1,24 +1,16 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
-import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.DMap.DMapEntry;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CallExpression implements Expression {
@@ -78,29 +70,6 @@ public class CallExpression implements Expression {
         return method.getReturnTypes();
     }
 
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
-        List<Type> methodTypes = method.getArgTypes();
-
-        if (methodTypes.size() != variables.size()) {
-            throw new SemanticException(
-                String.format("Expected %d arguments but got %d arguments to method %s",
-                    methodTypes.size(), variables.size(), method.getName()));
-        }
-
-        for (int i = 0; i < methodTypes.size(); i++) {
-            Type methodType = methodTypes.get(i);
-            Type varType = variables.get(i).getType();
-
-            if (!methodType.equals(varType)) {
-                throw new SemanticException(
-                    String.format("Expected %dth argument to be %s, but actually was %s type", i,
-                        methodType.getName(), varType.getName()));
-            }
-        }
-    }
-
     @Override
     public List<Statement> expand() {
         List<Statement> r = new ArrayList<>();
@@ -145,11 +114,6 @@ public class CallExpression implements Expression {
         @Override
         public List<Type> getTypes() {
             return method.getReturnTypes();
-        }
-
-        @Override
-        public void semanticCheck(Method method) throws SemanticException {
-
         }
 
         @Override

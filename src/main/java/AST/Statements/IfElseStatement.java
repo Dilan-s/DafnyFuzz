@@ -12,7 +12,7 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -54,29 +54,6 @@ public class IfElseStatement implements Statement {
     @Override
     public boolean couldReturn() {
         return ifStat.couldReturn() || (elseStat.isPresent() && elseStat.get().couldReturn());
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
-        List<Type> testTypes = test.getTypes();
-
-        if (testTypes.size() != 1) {
-            throw new SemanticException(String.format("Test condition has multiple values: %s",
-                testTypes.stream().map(Identifier::getName).collect(
-                    Collectors.joining(", "))));
-        }
-
-        Type testType = testTypes.get(0);
-
-        if (!testType.equals(new Bool())) {
-            throw new SemanticException(String.format(
-                "Test condition expected to be a bool but actually is %s", testType.getName()));
-        }
-        test.semanticCheck(method);
-        ifStat.semanticCheck(method);
-        if (elseStat.isPresent()) {
-            elseStat.get().semanticCheck(method);
-        }
     }
 
     @Override

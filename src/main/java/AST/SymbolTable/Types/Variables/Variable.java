@@ -1,6 +1,6 @@
-package AST.SymbolTable;
+package AST.SymbolTable.Types.Variables;
 
-import AST.Statements.Expressions.Expression;
+import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.HashMap;

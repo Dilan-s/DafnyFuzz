@@ -7,7 +7,7 @@ import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,12 +37,6 @@ public class BlockStatement implements Statement {
 
     public void addStatement(List<Statement> statement) {
         body.addAll(statement);
-    }
-
-    public void semanticCheck(Method method) throws SemanticException {
-        for (Statement statement : body) {
-            statement.semanticCheck(method);
-        }
     }
 
     @Override

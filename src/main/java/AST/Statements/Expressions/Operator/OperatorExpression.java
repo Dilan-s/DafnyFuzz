@@ -8,12 +8,11 @@ import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 public class OperatorExpression implements Expression {
@@ -46,11 +45,6 @@ public class OperatorExpression implements Expression {
             return operator.getType();
         }
         return List.of(type);
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
-        operator.semanticCheck(method, args);
     }
 
     @Override

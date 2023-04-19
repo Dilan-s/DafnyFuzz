@@ -3,7 +3,8 @@ package AST.SymbolTable.Types.DCollectionTypes;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Statements.Expressions.Array.ArrayLiteral;
+import AST.Statements.Expressions.Array.DArrayLiteralByElements;
+import AST.Statements.Expressions.Array.DArrayLiteralInline;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -13,6 +14,7 @@ import java.util.List;
 public class DArray implements DCollection {
 
     public static final int MAX_SIZE_OF_ARRAY = 10;
+    public static final double PROB_EXPAND = 0.8;
     private Type type;
 
     public DArray(Type type) {
@@ -75,8 +77,15 @@ public class DArray implements DCollection {
 
             values.add(exp);
         }
-        ArrayLiteral expression = new ArrayLiteral(symbolTable, this, values);
-        return expression;
+
+        double probInlineInit = GeneratorConfig.getRandom().nextDouble();
+        if (probInlineInit < PROB_EXPAND) {
+            DArrayLiteralInline expression = new DArrayLiteralInline(symbolTable, this, values);
+            return expression;
+        } else {
+            DArrayLiteralByElements expression = new DArrayLiteralByElements(symbolTable, this, values);
+            return expression;
+        }
     }
 
     @Override

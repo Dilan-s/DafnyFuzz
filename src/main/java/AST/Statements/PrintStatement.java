@@ -3,14 +3,12 @@ package AST.Statements;
 import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.StringLiteral;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class PrintStatement implements Statement {
@@ -33,14 +30,6 @@ public class PrintStatement implements Statement {
 
     public void addValue(Expression expression) {
         values.add(expression);
-    }
-
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
-        for (Expression e : values) {
-            e.semanticCheck(method);
-        }
     }
 
     @Override

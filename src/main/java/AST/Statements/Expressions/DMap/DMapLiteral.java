@@ -6,10 +6,9 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.DMap.DMapEntry;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,11 +35,6 @@ public class DMapLiteral implements Expression {
     @Override
     public List<Type> getTypes() {
         return List.of(type);
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
-
     }
 
     @Override

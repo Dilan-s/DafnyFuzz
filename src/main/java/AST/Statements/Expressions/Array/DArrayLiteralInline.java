@@ -10,50 +10,54 @@ import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
+import AST.SymbolTable.Types.Variables.VariableIndex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ArrayLiteral implements Expression {
+public class DArrayLiteralInline implements Expression {
 
     private final Type type;
+    private final List<Variable> assignments;
     private SymbolTable symbolTable;
 
     private Variable variable;
     private List<Expression> values;
-    private AssignmentStatement statement;
-    private boolean toAssign;
+    private Statement statement;
 
-    public ArrayLiteral(SymbolTable symbolTable, Type type, List<Expression> values, boolean toAssign) {
+    public DArrayLiteralInline(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
-        this.toAssign = toAssign;
 
-        if (toAssign) {
-            this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-            statement = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues(values));
-        }
+        this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
+        this.statement = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues(values));
+        this.assignments = new ArrayList<>();
+
+        generateAssignments();
     }
 
-    public ArrayLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
-        this(symbolTable, type, values, true);
+    private void generateAssignments() {
+        DCollection t = (DCollection) this.type;
+        Type valType = t.getInnerType();
+
+        for (int i = 0; i < values.size(); i++) {
+            VariableIndex v = new VariableIndex(this.variable.getName(), valType, i);
+            v.setDeclared();
+            symbolTable.addVariable(v);
+            this.assignments.add(v);
+        }
     }
 
     @Override
     public List<Type> getTypes() {
         return List.of(type);
-    }
-
-    public void addValue(Expression expression) {
-        values.add(expression);
     }
 
     @Override
@@ -63,14 +67,8 @@ public class ArrayLiteral implements Expression {
             .map(Expression::expand)
             .flatMap(Collection::stream)
             .collect(Collectors.toList()));
-        if (toAssign) {
-            r.add(statement);
-        }
+        r.add(statement);
         return r;
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
     }
 
     @Override
@@ -82,8 +80,10 @@ public class ArrayLiteral implements Expression {
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
 
+
         List<Object> l = new ArrayList<>();
-        for (Expression exp : values) {
+        for (int i = 0; i < values.size(); i++) {
+            Expression exp = values.get(i);
             List<Object> value = exp.getValue(paramsMap, s);
             for (Object v : value) {
                 if (v == null) {
@@ -92,6 +92,8 @@ public class ArrayLiteral implements Expression {
                 }
                 l.add(v);
             }
+            Variable v = assignments.get(i);
+            v.setValue(value.get(0));
         }
         r.add(new ArrayValue(variable.getName(), l));
         return r;
@@ -109,11 +111,6 @@ public class ArrayLiteral implements Expression {
         public List<Type> getTypes() {
             return List.of(type);
         }
-
-        @Override
-        public void semanticCheck(Method method) throws SemanticException {
-        }
-
         @Override
         public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
             List<Object> r = new ArrayList<>();
@@ -139,7 +136,7 @@ public class ArrayLiteral implements Expression {
                 .map(Expression::toString)
                 .collect(Collectors.joining(", "));
             DCollection t = (DCollection) type;
-            return String.format("new %s[] [%s]", t.getInnerType().getName(), value);
+            return String.format("new %s[%d] [%s]", t.getInnerType().getName(), values.size(), value);
         }
 
         @Override
@@ -148,7 +145,7 @@ public class ArrayLiteral implements Expression {
             List<String> temp = new ArrayList<>();
 
             DCollection t = (DCollection) type;
-            res.add(String.format("new %s[] [", t.getInnerType().getName()));
+            res.add(String.format("new %s[%d] [", t.getInnerType().getName(), values.size()));
 
             boolean first = true;
             for (Expression exp : values) {

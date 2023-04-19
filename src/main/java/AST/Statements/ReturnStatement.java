@@ -9,7 +9,7 @@ import AST.StringUtils;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Variable;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,38 +44,6 @@ public class ReturnStatement implements Statement {
     @Override
     public boolean couldReturn() {
         return true;
-    }
-
-    @Override
-    public void semanticCheck(Method method) throws SemanticException {
-        List<Type> returnTypes = method.getReturnTypes();
-        List<Type> valueTypes = values.stream()
-            .map(Expression::getTypes)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-
-        int noValues = valueTypes.size();
-        int noReturnTypes = returnTypes.size();
-        if (noValues != noReturnTypes) {
-            throw new SemanticException(String.format(
-                "Expected %d arguments but actually got %d arguments in return statement",
-                noReturnTypes, noValues));
-        }
-
-        for (int i = 0; i < noValues; i++) {
-            Type expressionType = valueTypes.get(i);
-            Type returnType = returnTypes.get(i);
-
-            if (!returnType.equals(expressionType)) {
-                throw new SemanticException(
-                    String.format("Expected %dth argument to be %s but actually go %s", i,
-                        returnType.getName(), expressionType.getName()));
-            }
-        }
-
-        for (Expression e : values) {
-            e.semanticCheck(method);
-        }
     }
 
     @Override
