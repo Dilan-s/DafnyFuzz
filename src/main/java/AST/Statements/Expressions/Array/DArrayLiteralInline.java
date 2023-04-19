@@ -50,8 +50,7 @@ public class DArrayLiteralInline implements Expression {
         for (int i = 0; i < values.size(); i++) {
             VariableIndex v = new VariableIndex(this.variable.getName(), valType, i);
             v.setDeclared();
-            symbolTable.addVariable(v);
-            this.assignments.add(v);
+            new AssignmentStatement(symbolTable, List.of(v), values.get(i));
         }
     }
 
@@ -92,8 +91,6 @@ public class DArrayLiteralInline implements Expression {
                 }
                 l.add(v);
             }
-            Variable v = assignments.get(i);
-            v.setValue(value.get(0));
         }
         r.add(new ArrayValue(variable.getName(), l));
         return r;
