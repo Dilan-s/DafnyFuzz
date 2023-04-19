@@ -56,20 +56,6 @@ public class IntLiteral implements Expression {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof IntLiteral)) {
-            return false;
-        }
-        IntLiteral other = (IntLiteral) obj;
-        return value == other.value;
-    }
-
-    @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
         r.add(value);

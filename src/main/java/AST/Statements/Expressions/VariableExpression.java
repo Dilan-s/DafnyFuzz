@@ -43,20 +43,6 @@ public class VariableExpression implements Expression {
     }
 
     @Override
-    public int hashCode() {
-        return variable.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof VariableExpression)) {
-            return false;
-        }
-        VariableExpression other = (VariableExpression) obj;
-        return other.variable.equals(variable);
-    }
-
-    @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         if (paramsMap.containsKey(variable)) {
             return paramsMap.get(variable).getValue(paramsMap);

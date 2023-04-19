@@ -3,7 +3,7 @@ package AST.SymbolTable.Types.DCollectionTypes;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Statements.Expressions.ArrayLiteral;
+import AST.Statements.Expressions.Array.ArrayLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -14,12 +14,6 @@ public class DArray implements DCollection {
 
     public static final int MAX_SIZE_OF_ARRAY = 10;
     private Type type;
-
-    public int getLength() {
-        return length;
-    }
-
-    private int length;
 
     public DArray(Type type) {
         this.type = type;
@@ -72,7 +66,7 @@ public class DArray implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
+        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
 
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
@@ -83,12 +77,6 @@ public class DArray implements DCollection {
         }
         ArrayLiteral expression = new ArrayLiteral(symbolTable, this, values);
         return expression;
-    }
-
-    @Override
-    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
-        Type t = this.concrete(symbolTable);
-        return new ArrayLiteral(symbolTable, t, (List<Expression>) value, false);
     }
 
     @Override

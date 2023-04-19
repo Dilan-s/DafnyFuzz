@@ -49,12 +49,6 @@ public class Int implements BaseType {
     }
 
     @Override
-    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
-        Type t = this.concrete(symbolTable);
-        return new IntLiteral(t, symbolTable, (Integer) value);
-    }
-
-    @Override
     public boolean operatorExists() {
         return true;
     }

@@ -1,8 +1,11 @@
-package AST.Statements.Expressions;
+package AST.Statements.Expressions.DSeq;
 
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class SubsequenceExpression implements Expression {
+public class SeqSubsequenceExpression implements Expression {
 
     private final Expression seq;
 
@@ -29,7 +32,7 @@ public class SubsequenceExpression implements Expression {
     private Variable hiVar;
     private CallExpression callExp;
 
-    public SubsequenceExpression(SymbolTable symbolTable, Expression seq, Expression i, Expression j) {
+    public SeqSubsequenceExpression(SymbolTable symbolTable, Expression seq, Expression i, Expression j) {
         this.symbolTable = symbolTable;
         this.seq = seq;
         addIndexes(seq, i, j);
@@ -79,20 +82,6 @@ public class SubsequenceExpression implements Expression {
     @Override
     public String toString() {
         return String.format("%s[%s..%s]", seqVar.getName(), loVar.getName(), hiVar.getName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(seqVar, loVar, hiVar);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof SubsequenceExpression)) {
-            return false;
-        }
-        SubsequenceExpression other = (SubsequenceExpression) obj;
-        return other.seqVar.equals(seqVar) && other.loVar.equals(loVar) && other.hiVar.equals(hiVar);
     }
 
     @Override

@@ -49,6 +49,20 @@ public class DafnyProgram {
         Statement statement = randomStatementGenerator.generateBody(main, main.getSymbolTable());
         main.setBody(statement);
 
+        StringBuilder s = new StringBuilder();
+        main.executeWithOutput(s);
+        try {
+            Path path = Paths.get("./outputs");
+            if (!Files.exists(path)) {
+                Files.createDirectory(path);
+            }
+            FileWriter p = new FileWriter(String.format("%s/expected.txt", path.toAbsolutePath()));
+            p.write(s.toString());
+            p.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         List<String> programOptions = main.toOutput();
 
         try {
@@ -65,19 +79,6 @@ public class DafnyProgram {
             e.printStackTrace();
         }
 
-        StringBuilder s = new StringBuilder();
-        main.executeWithOutput(s);
-        try {
-            Path path = Paths.get("./outputs");
-            if (!Files.exists(path)) {
-                Files.createDirectory(path);
-            }
-            FileWriter p = new FileWriter(String.format("%s/expected.txt", path.toAbsolutePath()));
-            p.write(s.toString());
-            p.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 }

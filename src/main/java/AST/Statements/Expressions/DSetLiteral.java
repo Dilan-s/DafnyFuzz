@@ -77,6 +77,8 @@ public class DSetLiteral implements Expression {
                 temp.addAll(res);
             }
             first = false;
+            Collections.shuffle(temp, GeneratorConfig.getRandom());
+            temp = temp.subList(0, Math.min(5, temp.size()));
             res = new HashSet(temp);
         }
 
@@ -89,29 +91,6 @@ public class DSetLiteral implements Expression {
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());
         return r.subList(0, Math.min(5, res.size()));
-    }
-
-    @Override
-    public int hashCode() {
-        return values.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof DSetLiteral)) {
-            return false;
-        }
-        DSetLiteral other = (DSetLiteral) obj;
-        if (values.size() != other.values.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < values.size(); i++) {
-            if (!values.get(i).equals(other.values.get(i))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

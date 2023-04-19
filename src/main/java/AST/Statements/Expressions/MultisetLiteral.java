@@ -93,6 +93,8 @@ public class MultisetLiteral implements Expression {
                     temp.addAll(res);
                 }
                 first = false;
+                Collections.shuffle(temp, GeneratorConfig.getRandom());
+                temp = temp.subList(0, Math.min(5, temp.size()));
                 res = new HashSet(temp);
             }
 
@@ -121,40 +123,6 @@ public class MultisetLiteral implements Expression {
             }
         }
         return list;
-    }
-
-    @Override
-    public int hashCode() {
-        if (collection.isPresent()) {
-            return collection.hashCode();
-        } else {
-            return Objects.hash(values);
-        }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof MultisetLiteral)) {
-            return false;
-        }
-        MultisetLiteral other = (MultisetLiteral) obj;
-
-        if (collection.isPresent() && other.collection.isPresent()) {
-            return collection.get().equals(other.collection.get());
-        } else if (collection.isEmpty() && other.collection.isEmpty()) {
-            if (values.size() != other.values.size()) {
-                return false;
-            }
-
-            for (int i = 0; i < values.size(); i++) {
-                if (!values.get(i).equals(other.values.get(i))) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override

@@ -9,7 +9,7 @@ import AST.Statements.Expressions.IfElseExpression;
 import AST.Statements.Expressions.IntLiteral;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.UnaryOperator;
-import AST.Statements.Expressions.OperatorExpression;
+import AST.Statements.Expressions.Operator.OperatorExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.IfElseStatement;
 import AST.Statements.ReturnStatement;

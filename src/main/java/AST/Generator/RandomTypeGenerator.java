@@ -2,6 +2,7 @@ package AST.Generator;
 
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.DCollectionTypes.DArray;
+import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
@@ -17,7 +18,7 @@ import java.util.List;
 public class RandomTypeGenerator {
 
     public static final int MAX_TYPE_DEPTH = 2;
-    public static final ArrayList<Type> PRIMITIVE_TYPES = new ArrayList<>(List.of(new Int(), new Bool(), new Char(), new Real()));
+    public static final List<Type> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Char(), new Real());
     public static final List<DCollection> COLLECTION_TYPES = List.of(new DSet(), new Seq(), new Multiset(), new DArray());
     private static int typeDepth = 0;
 
@@ -36,6 +37,7 @@ public class RandomTypeGenerator {
         option.addAll(PRIMITIVE_TYPES);
         if (typeDepth < MAX_TYPE_DEPTH) {
             option.addAll(COLLECTION_TYPES);
+            option.add(new DMap());
         }
 
         for (int i = 0; i < noOfTypes; i++) {
