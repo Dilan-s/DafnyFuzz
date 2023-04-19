@@ -23,15 +23,6 @@ public interface Type extends Identifier {
 
     boolean isCollection();
 
-    Expression generateLiteral(SymbolTable symbolTable, Object value);
-
-    default Expression generateLiteral(SymbolTable symbolTable, Expression exp, Object value) {
-        if (value == null) {
-            return exp;
-        }
-        return generateLiteral(symbolTable, value);
-    }
-
     Boolean lessThan(Object lhsV, Object rhsV);
 
     Boolean equal(Object lhsV, Object rhsV);

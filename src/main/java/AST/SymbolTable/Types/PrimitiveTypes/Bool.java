@@ -9,12 +9,6 @@ import java.util.Objects;
 
 public class Bool implements BaseType {
 
-    private Boolean value;
-
-    public Bool() {
-        this.value = null;
-    }
-
     @Override
     public String getName() {
         return "bool";
@@ -36,14 +30,7 @@ public class Bool implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        value = GeneratorConfig.getRandom().nextBoolean();
-        return new BoolLiteral(this, symbolTable, value);
-    }
-
-    @Override
-    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
-        Type t = this.concrete(symbolTable);
-        return new BoolLiteral(t, symbolTable, (Boolean) value);
+        return new BoolLiteral(this, symbolTable, GeneratorConfig.getRandom().nextBoolean());
     }
 
     @Override

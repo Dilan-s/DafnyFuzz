@@ -10,11 +10,6 @@ import java.util.Objects;
 public class Char implements BaseType {
 
     private static final double PROB_UPPERCASE = 0.5;
-    private Character value;
-
-    public Char() {
-        this.value = null;
-    }
 
     @Override
     public String getName() {
@@ -37,17 +32,11 @@ public class Char implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        value = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
+        Character value = (char) ('a' + GeneratorConfig.getRandom().nextInt(26));
         if (GeneratorConfig.getRandom().nextDouble() < PROB_UPPERCASE) {
             value = Character.toUpperCase(value);
         }
         return new CharLiteral(this, symbolTable, value);
-    }
-
-    @Override
-    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
-        Type t = this.concrete(symbolTable);
-        return new CharLiteral(t, symbolTable, (Character) value);
     }
 
     @Override

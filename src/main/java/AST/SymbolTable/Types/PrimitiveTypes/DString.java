@@ -39,12 +39,6 @@ public class DString implements BaseType {
     }
 
     @Override
-    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
-        Type t = this.concrete(symbolTable);
-        return new StringLiteral(t, symbolTable, (String) value);
-    }
-
-    @Override
     public boolean operatorExists() {
         return false;
     }

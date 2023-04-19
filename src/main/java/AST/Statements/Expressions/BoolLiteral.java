@@ -38,20 +38,6 @@ public class BoolLiteral implements Expression {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof BoolLiteral)) {
-            return false;
-        }
-        BoolLiteral other = (BoolLiteral) obj;
-        return value == other.value;
-    }
-
-    @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
         r.add(value);

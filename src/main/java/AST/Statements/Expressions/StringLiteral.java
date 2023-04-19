@@ -38,20 +38,6 @@ public class StringLiteral implements Expression {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof StringLiteral)) {
-            return false;
-        }
-        StringLiteral other = (StringLiteral) obj;
-        return value.equals(other.value);
-    }
-
-    @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
         r.add(value);

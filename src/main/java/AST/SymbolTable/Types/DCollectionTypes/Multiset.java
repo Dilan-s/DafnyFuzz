@@ -103,19 +103,6 @@ public class Multiset implements DCollection {
     }
 
     @Override
-    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
-        Map<Expression, Integer> v = (Map<Expression, Integer>) value;
-        List<Expression> res = new ArrayList<>();
-        for (Entry<Expression, Integer> e : v.entrySet()) {
-            for (int i = 0; i < e.getValue(); i++) {
-                res.add(e.getKey());
-            }
-        }
-        Type t = this.concrete(symbolTable);
-        return new MultisetLiteral(symbolTable, t, res);
-    }
-
-    @Override
     public String getVariableType() {
         if (type == null) {
             return "multiset";
@@ -127,7 +114,6 @@ public class Multiset implements DCollection {
     public Type concrete(SymbolTable symbolTable) {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-//            Type t = typeGenerator.generateBaseTypes(1, symbolTable).get(0);
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             return new Multiset(t);
         }

@@ -1,5 +1,7 @@
 package AST.Statements.Expressions.Operator;
 
+import AST.SymbolTable.Types.DCollectionTypes.DArray;
+import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
@@ -23,4 +25,8 @@ public class Args {
     public static final List<Type> DSET = List.of(new DSet());
     public static final List<Type> MULTISET = List.of(new Multiset());
     public static final List<Type> BOOL = List.of(new Bool());
+    public static final List<Type> DMAP = List.of(new DMap());
+    public static final List<Type> DARRAY = List.of(new DArray());
+    public static final List<Type> DMAP_DMAP = List.of(new DMap(), new DMap());
+    public static final List<Type> DMAP_DSET = List.of(new DMap(), new DSet());
 }

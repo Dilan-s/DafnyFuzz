@@ -81,12 +81,6 @@ public class DSet implements DCollection {
     }
 
     @Override
-    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
-        Type t = this.concrete(symbolTable);
-        return new DSetLiteral(symbolTable, t, new ArrayList<>((Set<Expression>) value));
-    }
-
-    @Override
     public String getVariableType() {
         if (type == null) {
             return "set";

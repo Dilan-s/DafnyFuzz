@@ -6,6 +6,7 @@ import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
+import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
@@ -14,6 +15,7 @@ import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
+import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -513,6 +515,58 @@ public enum BinaryOperator implements Operator {
             return ret;
         }
     },
+    MapAdd("+", List.of(Args.DMAP_DMAP), new DMap()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DMap type = (DMap) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+
+            if (lhsV != null && rhsV != null) {
+                return type.add(lhsV, rhsV);
+            }
+            return null;
+        }
+
+        @Override
+        public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
+            Type expected) {
+            List<Type> ret = new ArrayList<>();
+            for (Type ignored : types) {
+                ret.add(expected.concrete(symbolTable));
+            }
+            return ret;
+        }
+    },
+    MapDifference("-", List.of(Args.DMAP_DSET), new DMap()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DMap type = (DMap) lhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                return type.remove(lhsV, rhsV);
+            }
+            return null;
+        }
+
+        @Override
+        public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
+            List<Type> ret = new ArrayList<>();
+            DMap map = (DMap) expected.concrete(symbolTable);
+            ret.add(map);
+            ret.add(new DSet(map.getKeyType()));
+            return ret;
+        }
+    },
     Difference("-", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
@@ -565,6 +619,60 @@ public enum BinaryOperator implements Operator {
                 ret.add(expected.concrete(symbolTable));
             }
             return ret;
+        }
+    },
+    MembershipMap("in", List.of(Args.DMAP), new Bool()) {
+        @Override
+        public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
+            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            List<Type> ret = new ArrayList<>();
+            ret.add(t);
+            DMap map = (DMap) types.get(0);
+            ret.add(map.setKeyType(t).concrete(symbolTable));
+            return ret;
+        }
+
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DMap map = (DMap) rhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                return map.contains(lhsV, rhsV);
+            }
+            return null;
+        }
+    },
+    NotMembershipMap("!in", List.of(Args.DMAP), new Bool()) {
+        @Override
+        public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
+            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            List<Type> ret = new ArrayList<>();
+            ret.add(t);
+            DMap map = (DMap) types.get(0);
+            ret.add(map.setKeyType(t).concrete(symbolTable));
+            return ret;
+        }
+
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
+            DMap map = (DMap) rhsE.getTypes().get(0);
+
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            if (lhsV != null && rhsV != null) {
+                return !map.contains(lhsV, rhsV);
+            }
+            return null;
         }
     },
     Membership("in", List.of(Args.SEQ, Args.DSET, Args.MULTISET), new Bool()) {

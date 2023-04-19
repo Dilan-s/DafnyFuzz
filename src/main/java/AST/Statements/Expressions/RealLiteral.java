@@ -38,20 +38,6 @@ public class RealLiteral implements Expression {
     }
 
     @Override
-    public int hashCode() {
-        return String.format("%.2f", value).hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof RealLiteral)) {
-            return false;
-        }
-        RealLiteral other = (RealLiteral) obj;
-        return String.format("%.2f", value).equals(String.format("%.2f", other.value));
-    }
-
-    @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
         List<Object> r = new ArrayList<>();
         r.add(String.format("%.2f", value));

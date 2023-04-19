@@ -1,19 +1,24 @@
 package AST.Statements.Expressions;
 
 import AST.Errors.SemanticException;
+import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DMap.DMapEntry;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CallExpression implements Expression {
@@ -103,9 +108,7 @@ public class CallExpression implements Expression {
         List<Statement> list = new ArrayList<>();
         for (Statement assignment : assignments) {
             List<Statement> expand = assignment.expand();
-            for (Statement statement : expand) {
-                list.add(statement);
-            }
+            list.addAll(expand);
         }
         r.addAll(list);
         r.add(assignStat);
@@ -122,43 +125,6 @@ public class CallExpression implements Expression {
         return assignedVariables.stream()
             .map(Variable::getName)
             .collect(Collectors.joining(", "));
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(method, variables, assignedVariables);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CallExpression)) {
-            return false;
-        }
-        CallExpression other = (CallExpression) obj;
-        if (!other.method.equals(method)) {
-            return false;
-        }
-
-        if (other.variables.size() != variables.size()) {
-            return false;
-        }
-
-        if (other.assignedVariables.size() != assignedVariables.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < variables.size(); i++) {
-            if (!other.variables.get(i).equals(variables.get(i))) {
-                return false;
-            }
-        }
-
-        for (int i = 0; i < assignedVariables.size(); i++) {
-            if (!other.assignedVariables.get(i).equals(assignedVariables.get(i))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

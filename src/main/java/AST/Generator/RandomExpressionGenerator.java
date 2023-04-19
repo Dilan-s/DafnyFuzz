@@ -1,18 +1,21 @@
 package AST.Generator;
 
 import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.DMap.DMapSelection;
+import AST.Statements.Expressions.DMap.DMapUpdateExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
 import AST.Statements.Expressions.IntLiteral;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
 import AST.Statements.Expressions.Operator.UnaryOperator;
-import AST.Statements.Expressions.OperatorExpression;
-import AST.Statements.Expressions.ReassignSeqExpression;
-import AST.Statements.Expressions.IndexExpression;
-import AST.Statements.Expressions.SubsequenceExpression;
+import AST.Statements.Expressions.Operator.OperatorExpression;
+import AST.Statements.Expressions.DSeq.SeqUpdateExpression;
+import AST.Statements.Expressions.DSeq.SeqIndexExpression;
+import AST.Statements.Expressions.DSeq.SeqSubsequenceExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.SymbolTable.Method;
+import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
@@ -30,8 +33,10 @@ public class RandomExpressionGenerator {
     public static double PROB_OPERATOR_EXPRESSION = 40.0;
     public static double PROB_VARIABLE_EXPRESSION = 60.0;
     public static double PROB_SEQ_INDEX_EXPRESSION = 20.0;
-    public static double PROB_SUBSEQUENCE_EXPRESSION = 20.0;
-    public static double PROB_REASSIGN_SEQ_EXPRESSION = 20.0;
+    public static double PROB_DMAP_SELECTION_EXPRESSION = 20.0;
+    public static double PROB_SEQ_SUBSEQUENCE_EXPRESSION = 20.0;
+    public static double PROB_SEQ_UPDATE_EXPRESSION = 20.0;
+    public static double PROB_DMAP_UPDATE_EXPRESSION = 20.0;
     public static double PROB_IF_ELSE_EXPRESSION = 30.0;
     public static double PROB_CALL_EXPRESSION = 30.0;
 
@@ -47,8 +52,9 @@ public class RandomExpressionGenerator {
         expressionDepth++;
         while (ret == null) {
             double ratioSum = PROB_LITERAL_EXPRESSION + PROB_OPERATOR_EXPRESSION +
-                PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_SUBSEQUENCE_EXPRESSION +
-                PROB_REASSIGN_SEQ_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_EXPRESSION;
+                PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_DMAP_SELECTION_EXPRESSION
+                + PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION +
+                PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_EXPRESSION;
             double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * ratioSum;
             if (expressionDepth > MAX_EXPRESSION_DEPTH || (probTypeOfExpression -= PROB_LITERAL_EXPRESSION) < 0) {
                 //literal
@@ -69,20 +75,26 @@ public class RandomExpressionGenerator {
                     PROB_OPERATOR_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     ret = expression;
                 }
-            }else if ((probTypeOfExpression -= PROB_SEQ_INDEX_EXPRESSION) < 0) {
-                if (!type.isCollection()) {
-                    PROB_SEQ_INDEX_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                    ret = generateSeqIndexExpression(type, symbolTable);
-                }
-            } else if ((probTypeOfExpression -= PROB_SUBSEQUENCE_EXPRESSION) < 0) {
+            } else if ((probTypeOfExpression -= PROB_SEQ_INDEX_EXPRESSION) < 0) {
+                PROB_SEQ_INDEX_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateSeqIndexExpression(type, symbolTable);
+            } else if ((probTypeOfExpression -= PROB_DMAP_SELECTION_EXPRESSION) < 0) {
+                PROB_DMAP_SELECTION_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateDMapSelectionExpression(type, symbolTable);
+            } else if ((probTypeOfExpression -= PROB_SEQ_SUBSEQUENCE_EXPRESSION) < 0) {
                 if (type.equals(new Seq())) {
-                    PROB_SUBSEQUENCE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                    ret = generateSubsequenceExpression(type, symbolTable);
+                    PROB_SEQ_SUBSEQUENCE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateSeqSubsequenceExpression(type, symbolTable);
                 }
-            } else if ((probTypeOfExpression -= PROB_REASSIGN_SEQ_EXPRESSION) < 0) {
+            } else if ((probTypeOfExpression -= PROB_SEQ_UPDATE_EXPRESSION) < 0) {
                 if (type.equals(new Seq())) {
-                    PROB_REASSIGN_SEQ_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                    ret = generateReassignSeqExpression(type, symbolTable);
+                    PROB_SEQ_UPDATE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateSeqUpdateExpression(type, symbolTable);
+                }
+            } else if ((probTypeOfExpression -= PROB_DMAP_UPDATE_EXPRESSION) < 0) {
+                if (type.equals(new DMap())) {
+                    PROB_DMAP_UPDATE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateDMapUpdateExpression(type, symbolTable);
                 }
             } else if ((probTypeOfExpression -= PROB_IF_ELSE_EXPRESSION) < 0) {
                 //ifElse
@@ -99,17 +111,29 @@ public class RandomExpressionGenerator {
         return ret;
     }
 
-    private Expression generateReassignSeqExpression(Type type, SymbolTable symbolTable) {
+    private Expression generateDMapUpdateExpression(Type type, SymbolTable symbolTable) {
+        DMap mapT = (DMap) type.concrete(symbolTable);
+
+        Expression map = generateExpression(type, symbolTable);
+        Expression key = generateExpression(mapT.getKeyType(), symbolTable);
+        Expression value = generateExpression(mapT.getValueType(), symbolTable);
+
+        DMapUpdateExpression mapUpdateExpression = new DMapUpdateExpression(symbolTable, type, map,
+            key, value);
+        return mapUpdateExpression;
+    }
+
+    private Expression generateSeqUpdateExpression(Type type, SymbolTable symbolTable) {
         Seq seqT = (Seq) type.concrete(symbolTable);
         Expression seq = generateExpression(seqT, symbolTable);
 
         Int indT = new Int();
-        Expression ind = generateLiteral(indT, symbolTable);
+        Expression ind = generateExpression(indT, symbolTable);
 
         Type expT = seqT.getInnerType().concrete(symbolTable);
         Expression exp = generateExpression(expT, symbolTable);
 
-        ReassignSeqExpression expression = new ReassignSeqExpression(symbolTable, seq, ind, exp);
+        SeqUpdateExpression expression = new SeqUpdateExpression(symbolTable, seq, ind, exp);
         VariableExpression seqVar = expression.getSequenceVariableExpression();
 
         OperatorExpression size = new OperatorExpression(symbolTable, new Int(), UnaryOperator.Cardinality, List.of(seqVar));
@@ -122,7 +146,7 @@ public class RandomExpressionGenerator {
         return ifElseExpression;
     }
 
-    private Expression generateSubsequenceExpression(Type type, SymbolTable symbolTable) {
+    private Expression generateSeqSubsequenceExpression(Type type, SymbolTable symbolTable) {
         Seq seqT = (Seq) type.concrete(symbolTable);
         Expression seq = generateExpression(seqT, symbolTable);
 
@@ -136,7 +160,7 @@ public class RandomExpressionGenerator {
         } else {
             indJ = new IntLiteral(indJT, symbolTable, 0);
         }
-        SubsequenceExpression expression = new SubsequenceExpression(symbolTable, seq, indI, indJ);
+        SeqSubsequenceExpression expression = new SeqSubsequenceExpression(symbolTable, seq, indI, indJ);
         VariableExpression seqVar = expression.getSequenceVariableExpression();
 
         OperatorExpression size = new OperatorExpression(symbolTable, new Int(), UnaryOperator.Cardinality, List.of(seqVar));
@@ -149,15 +173,28 @@ public class RandomExpressionGenerator {
         return ifElseExpression;
     }
 
+    private Expression generateDMapSelectionExpression(Type type, SymbolTable symbolTable) {
+        DMap mapT = (DMap) new DMap().setValueType(type).concrete(symbolTable);
+        Expression map = generateExpression(mapT, symbolTable);
+
+        Type keyT = mapT.getKeyType();
+        Expression ind = generateExpression(keyT, symbolTable);
+
+        Expression def = generateExpression(type, symbolTable);
+
+        DMapSelection dMapSelection = new DMapSelection(symbolTable, type, map, ind, def);
+        return dMapSelection;
+    }
+
 
     private Expression generateSeqIndexExpression(Type type, SymbolTable symbolTable) {
         Seq seqT = new Seq(type.concrete(symbolTable));
-        Expression seq = seqT.generateLiteral(symbolTable);
+        Expression seq = generateExpression(seqT, symbolTable);
 
         Int indT = new Int();
         Expression ind = generateExpression(indT, symbolTable);
 
-        IndexExpression expression = new IndexExpression(symbolTable, type, seq, ind);
+        SeqIndexExpression expression = new SeqIndexExpression(symbolTable, type, seq, ind);
 
         VariableExpression seqVar = expression.getSequenceVariableExpression();
 

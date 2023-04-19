@@ -1,26 +1,27 @@
-package AST.Statements.Expressions;
+package AST.Statements.Expressions.DSeq;
 
 import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class ReassignSeqExpression implements Expression {
+public class SeqUpdateExpression implements Expression {
 
     private final Expression seq;
     private SymbolTable symbolTable;
@@ -34,7 +35,7 @@ public class ReassignSeqExpression implements Expression {
     private CallExpression callExp;
 
 
-    public ReassignSeqExpression(SymbolTable symbolTable, Expression seq, Expression ind, Expression exp) {
+    public SeqUpdateExpression(SymbolTable symbolTable, Expression seq, Expression ind, Expression exp) {
         this.symbolTable = symbolTable;
         this.seq = seq;
         this.exp = exp;
@@ -112,20 +113,6 @@ public class ReassignSeqExpression implements Expression {
 
     public VariableExpression getSequenceVariableExpression() {
         return new VariableExpression(symbolTable, seqVar, seqVar.getType());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(seqVar, indVar, exp);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ReassignSeqExpression)) {
-            return false;
-        }
-        ReassignSeqExpression other = (ReassignSeqExpression) obj;
-        return other.seqVar.equals(seqVar) && other.indVar.equals(indVar) && other.exp.equals(exp);
     }
 
     @Override

@@ -4,7 +4,7 @@ import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.SeqLiteral;
+import AST.Statements.Expressions.DSeq.SeqLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.Type;
@@ -78,12 +78,6 @@ public class Seq implements DCollection {
         }
         SeqLiteral expression = new SeqLiteral(symbolTable,this, values);
         return expression;
-    }
-
-    @Override
-    public Expression generateLiteral(SymbolTable symbolTable, Object value) {
-        Type t = this.concrete(symbolTable);
-        return new SeqLiteral(symbolTable, t, (List<Expression>) value);
     }
 
     @Override

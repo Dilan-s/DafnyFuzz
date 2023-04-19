@@ -1,8 +1,11 @@
-package AST.Statements.Expressions;
+package AST.Statements.Expressions.DSeq;
 
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class IndexExpression implements Expression {
+public class SeqIndexExpression implements Expression {
 
     private final Expression seq;
     private AssignmentStatement asStatSeq;
@@ -27,7 +30,7 @@ public class IndexExpression implements Expression {
     private Variable indVar;
     private CallExpression callExp;
 
-    public IndexExpression(SymbolTable symbolTable, Type type, Expression seq, Expression index) {
+    public SeqIndexExpression(SymbolTable symbolTable, Type type, Expression seq, Expression index) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.seq = seq;
@@ -75,20 +78,6 @@ public class IndexExpression implements Expression {
     @Override
     public String toString() {
         return String.format("%s[%s]", seqVar.getName(), indVar.getName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(seqVar, indVar);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof IndexExpression)) {
-            return false;
-        }
-        IndexExpression other = (IndexExpression) obj;
-        return other.seqVar.equals(seqVar) && other.indVar.equals(indVar);
     }
 
     @Override

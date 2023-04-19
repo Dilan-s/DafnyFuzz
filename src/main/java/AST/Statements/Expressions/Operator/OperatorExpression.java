@@ -1,23 +1,20 @@
-package AST.Statements.Expressions;
+package AST.Statements.Expressions.Operator;
 
 import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
-import AST.Statements.Expressions.Operator.BinaryOperator;
-import AST.Statements.Expressions.Operator.Operator;
+import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Variable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class OperatorExpression implements Expression {
 
@@ -97,40 +94,6 @@ public class OperatorExpression implements Expression {
         } else if (convertToCall && operator.equals(BinaryOperator.Modulus)) {
             CallExpression safe_modulus = new CallExpression(symbolTable, symbolTable.getMethod("safe_modulus"), args);
             replacementExpression = Optional.of(safe_modulus);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        if (replacementExpression.isPresent()) {
-            return replacementExpression.hashCode();
-        } else {
-            return Objects.hash(operator, args);
-        }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof OperatorExpression)) {
-            return false;
-        }
-        OperatorExpression other = (OperatorExpression) obj;
-
-        if (replacementExpression.isPresent() && other.replacementExpression.isPresent()) {
-            return replacementExpression.get().equals(other.replacementExpression.get());
-        } else if (replacementExpression.isEmpty() && other.replacementExpression.isEmpty()) {
-            if (!operator.equals(other.operator) || args.size() != other.args.size()) {
-                return false;
-            }
-
-            for (int i = 0; i < args.size(); i++) {
-                if (!args.get(i).equals(other.args.get(i))) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
         }
     }
 
