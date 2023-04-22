@@ -14,7 +14,7 @@ import java.util.List;
 public class DArray implements DCollection {
 
     public static final int MAX_SIZE_OF_ARRAY = 10;
-    public static final double PROB_EXPAND = 0.8;
+    public static final double PROB_EXPAND = 0.9;
     private Type type;
 
     public DArray(Type type) {
@@ -110,7 +110,7 @@ public class DArray implements DCollection {
     public Type concrete(SymbolTable symbolTable) {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            Type t = typeGenerator.generateTypes(1, symbolTable).get(0).concrete(symbolTable);
             return new DArray(t);
         }
         return new DArray(type.concrete(symbolTable));

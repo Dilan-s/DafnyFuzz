@@ -1,15 +1,17 @@
-package AST.Statements.Expressions.Array;
+package AST.Statements.Expressions.Tuple;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
-import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import AST.SymbolTable.Types.Variables.Variable;
 import AST.SymbolTable.Types.Variables.VariableArrayIndex;
+import AST.SymbolTable.Types.Variables.VariableDatatypeIndex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,40 +21,62 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DArrayLiteralInline implements Expression {
+public class TupleLiteral implements Expression {
 
+    private final SymbolTable symbolTable;
     private final Type type;
-    private SymbolTable symbolTable;
+    private final List<Expression> values;
+    private final Variable variable;
+    private final Statement statement;
 
-    private Variable variable;
-    private List<Expression> values;
-    private Statement statement;
-
-    public DArrayLiteralInline(SymbolTable symbolTable, Type type, List<Expression> values) {
+    public TupleLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
 
         this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-        this.statement = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues(values));
-
+        this.statement = new AssignmentStatement(symbolTable, List.of(variable), new TupleInitValues(values));
         generateAssignments();
     }
 
     private void generateAssignments() {
-        DCollection t = (DCollection) this.type;
-        Type valType = t.getInnerType();
+        Tuple t = (Tuple) this.type;
 
         for (int i = 0; i < values.size(); i++) {
-            VariableArrayIndex v = new VariableArrayIndex(this.variable.getName(), valType, i);
+            Type valType = t.getType(i);
+            VariableDatatypeIndex v = new VariableDatatypeIndex(this.variable.getName(), valType, i);
             v.setDeclared();
             new AssignmentStatement(symbolTable, List.of(v), values.get(i));
         }
     }
 
     @Override
+    public String toString() {
+        return variable.getName();
+    }
+
+    @Override
     public List<Type> getTypes() {
         return List.of(type);
+    }
+
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+        List<Object> r = new ArrayList<>();
+
+        List<Object> l = new ArrayList<>();
+        for (Expression exp : values) {
+            List<Object> value = exp.getValue(paramsMap, s);
+            for (Object v : value) {
+                if (v == null) {
+                    r.add(null);
+                    return r;
+                }
+                l.add(v);
+            }
+        }
+        r.add(l);
+        return r;
     }
 
     @Override
@@ -66,37 +90,11 @@ public class DArrayLiteralInline implements Expression {
         return r;
     }
 
-    @Override
-    public String toString() {
-        return variable.getName();
-    }
-
-    @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
-        List<Object> r = new ArrayList<>();
-
-
-        List<Object> l = new ArrayList<>();
-        for (int i = 0; i < values.size(); i++) {
-            Expression exp = values.get(i);
-            List<Object> value = exp.getValue(paramsMap, s);
-            for (Object v : value) {
-                if (v == null) {
-                    r.add(null);
-                    return r;
-                }
-                l.add(v);
-            }
-        }
-        r.add(new ArrayValue(variable.getName(), l));
-        return r;
-    }
-
-    private class ArrayInitValues implements Expression {
+    private class TupleInitValues implements Expression {
 
         private final List<Expression> values;
 
-        public ArrayInitValues(List<Expression> values) {
+        public TupleInitValues(List<Expression> values) {
             this.values = values;
         }
 
@@ -119,7 +117,7 @@ public class DArrayLiteralInline implements Expression {
                     l.add(v);
                 }
             }
-            r.add(new ArrayValue(variable.getName(), l));
+            r.add(l);
             return r;
         }
 
@@ -128,8 +126,7 @@ public class DArrayLiteralInline implements Expression {
             String value = values.stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", "));
-            DCollection t = (DCollection) type;
-            return String.format("new %s[%d] [%s]", t.getInnerType().getVariableType(), values.size(), value);
+            return String.format("(%s)", value);
         }
 
         @Override
@@ -137,8 +134,7 @@ public class DArrayLiteralInline implements Expression {
             Set<String> res = new HashSet<>();
             List<String> temp = new ArrayList<>();
 
-            DCollection t = (DCollection) type;
-            res.add(String.format("new %s[%d] [", t.getInnerType().getVariableType(), values.size()));
+            res.add("(");
 
             boolean first = true;
             for (Expression exp : values) {
@@ -164,7 +160,7 @@ public class DArrayLiteralInline implements Expression {
 
             temp = new ArrayList<>();
             for (String f : res) {
-                temp.add(f + "]");
+                temp.add(f + ")");
             }
             res = new HashSet(temp);
 

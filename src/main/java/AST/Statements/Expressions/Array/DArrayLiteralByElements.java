@@ -5,11 +5,10 @@ import AST.Statements.AssignmentStatement;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
-import AST.SymbolTable.Types.Variables.VariableIndex;
+import AST.SymbolTable.Types.Variables.VariableArrayIndex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +39,7 @@ public class DArrayLiteralByElements implements Expression {
         DCollection collection = (DCollection) this.type;
 
         for (int i = 0; i < values.size(); i++) {
-            VariableIndex v = new VariableIndex(variable.getName(), collection.getInnerType(), i);
+            VariableArrayIndex v = new VariableArrayIndex(variable.getName(), collection.getInnerType(), i);
             v.setDeclared();
             AssignmentStatement stat = new AssignmentStatement(symbolTable, List.of(v), values.get(i));
 
@@ -122,7 +121,7 @@ public class DArrayLiteralByElements implements Expression {
         @Override
         public String toString() {
             DCollection t = (DCollection) type;
-            return String.format("new %s[%d]", t.getInnerType().getName(), values.size());
+            return String.format("new %s[%d]", t.getInnerType().getVariableType(), values.size());
         }
 
         @Override
