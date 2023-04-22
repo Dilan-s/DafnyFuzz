@@ -2,7 +2,7 @@ package AST.SymbolTable.Types.UserDefinedTypes;
 
 import AST.SymbolTable.Types.Type;
 
-public interface UserDefined extends Type {
+public interface UserDefinedType extends Type {
 
     @Override
     default boolean operatorExists() {
