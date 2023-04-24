@@ -115,6 +115,43 @@ public enum UnaryOperator implements Operator {
             return null;
         }
     },
+    RealFloor("Floor", List.of(Args.REAL), new Int()) {
+        @Override
+        public String formExpression(List<Expression> args) {
+            String res = args.get(0).toString();
+            return String.format("(%s).Floor", res);
+        }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+            for (String arg : args.get(0).toOutput()) {
+                res.add(String.format("(%s).Floor", arg));
+            }
+
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
+        }
+
+        @Override
+        public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
+            return types.stream()
+                .map(x -> x.concrete(symbolTable))
+                .collect(Collectors.toList());
+        }
+
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression exp = args.get(0);
+            Object val = exp.getValue(paramsMap).get(0);
+            if (val != null) {
+                String d = (String) val;
+                return (int) Math.floor(Double.parseDouble(d));
+            }
+            return null;
+        }
+    },
     Negate("!", List.of(Args.BOOL), new Bool()) {
         @Override
         public String formExpression(List<Expression> args) {

@@ -29,4 +29,5 @@ public class Args {
     public static final List<Type> DARRAY = List.of(new DArray());
     public static final List<Type> DMAP_DMAP = List.of(new DMap(), new DMap());
     public static final List<Type> DMAP_DSET = List.of(new DMap(), new DSet());
+    public static final List<Type> REAL = List.of(new Real());
 }
