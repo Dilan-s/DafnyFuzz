@@ -57,7 +57,7 @@ public class Real implements BaseType {
 
     @Override
     public String formatPrint(Object object) {
-        return String.format("%.2f", object);
+        return object.toString();
     }
 
     @Override
@@ -73,5 +73,15 @@ public class Real implements BaseType {
     @Override
     public Type concrete(SymbolTable symbolTable) {
         return new Real();
+    }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (object == null) {
+            return null;
+        }
+        double v = Double.parseDouble(object.toString());
+
+        return String.format("(%.2f < %s < %.2f)", v - 0.1, variableName, v + 0.1);
     }
 }

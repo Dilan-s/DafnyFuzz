@@ -40,4 +40,10 @@ public interface Type extends Identifier {
     }
 
     String formatPrint(Object object);
+
+    String formatEnsures(String variableName, Object object);
+
+    default boolean validMethodType() {
+        return true;
+    }
 }

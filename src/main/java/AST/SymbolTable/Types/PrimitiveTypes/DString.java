@@ -62,4 +62,14 @@ public class DString implements BaseType {
     public String formatPrint(Object object) {
         return object.toString();
     }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (object == null) {
+            return null;
+        }
+        String v = object.toString();
+
+        return String.format("(%s == \"%s\")", variableName, v);
+    }
 }

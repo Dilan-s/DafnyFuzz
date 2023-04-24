@@ -39,7 +39,7 @@ public class DArrayLiteralByElements implements Expression {
         DCollection collection = (DCollection) this.type;
 
         for (int i = 0; i < values.size(); i++) {
-            VariableArrayIndex v = new VariableArrayIndex(variable.getName(), collection.getInnerType(), i);
+            VariableArrayIndex v = new VariableArrayIndex(variable, collection.getInnerType(), i);
             v.setDeclared();
             AssignmentStatement stat = new AssignmentStatement(symbolTable, List.of(v), values.get(i));
 

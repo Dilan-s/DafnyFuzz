@@ -1,15 +1,10 @@
 package AST.Statements;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
-import AST.Statements.util.ReturnStatus;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +19,8 @@ public class AssignmentStatement implements Statement {
     private final List<Expression> values;
     private boolean declared;
 
-    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables, List<Expression> values) {
+    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables,
+        List<Expression> values) {
         this.symbolTable = symbolTable;
         this.variables = variables;
         this.values = values;
@@ -32,7 +28,8 @@ public class AssignmentStatement implements Statement {
         declareVariables();
     }
 
-    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables, Expression value) {
+    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables,
+        Expression value) {
         this(symbolTable, variables, List.of(value));
     }
 
@@ -43,6 +40,7 @@ public class AssignmentStatement implements Statement {
             symbolTable.addVariable(v);
         }
 
+        /*
         List<Object> expValues = new ArrayList<>();
         for (Expression value : values) {
             List<Object> expressionValue = value.getValue();
@@ -56,6 +54,7 @@ public class AssignmentStatement implements Statement {
             Variable v = variables.get(i);
             v.setValue(expV);
         }
+        */
     }
 
     @Override
@@ -73,7 +72,6 @@ public class AssignmentStatement implements Statement {
             String lhs = variables.stream()
                 .map(Variable::toString)
                 .collect(Collectors.joining(", "));
-
 
             return String.format("var %s := %s;", lhs, rhs);
         }
@@ -94,7 +92,6 @@ public class AssignmentStatement implements Statement {
             String lhs = variables.stream()
                 .map(Variable::toString)
                 .collect(Collectors.joining(", "));
-
 
             res.add(String.format("var %s := ", lhs));
         }
@@ -129,11 +126,6 @@ public class AssignmentStatement implements Statement {
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());
         return r.subList(0, Math.min(5, res.size()));
-    }
-
-    @Override
-    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
-        return currStatus;
     }
 
     @Override

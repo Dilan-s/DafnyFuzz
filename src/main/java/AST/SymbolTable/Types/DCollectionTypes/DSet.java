@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DSet implements DCollection {
 
-    public static final int MAX_SIZE_OF_SET = 10;
+    public static final int MAX_SIZE_OF_SET = 5;
     private Type type;
 
     public DSet(Type type) {
@@ -23,6 +24,11 @@ public class DSet implements DCollection {
 
     public DSet() {
         this(null);
+    }
+
+    @Override
+    public boolean validMethodType() {
+        return false;
     }
 
     @Override
@@ -68,7 +74,7 @@ public class DSet implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < noOfElems; i++) {
             Type t = type.concrete(symbolTable);
@@ -174,4 +180,17 @@ public class DSet implements DCollection {
 
         return rhsVS.containsAll(lhsVS) && lhsVS.containsAll(rhsVS);
     }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (type == null) {
+            return null;
+        }
+
+        String res;
+        Set<Object> value = (Set<Object>) object;
+        res = "{" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", ")) + "}";
+        return variableName + " == " + res;
+    }
+
 }

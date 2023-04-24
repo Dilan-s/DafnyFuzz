@@ -13,11 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 import javax.management.ObjectName;
 
 public class DMap implements Type {
 
-    private static final int MAX_NUMBER_OF_ELEMS = 10;
+    private static final int MAX_NUMBER_OF_ELEMS = 5;
     private Type keyType;
     private Type valueType;
 
@@ -30,6 +32,27 @@ public class DMap implements Type {
         this(null, null);
     }
 
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (keyType == null || valueType == null) {
+            return null;
+        }
+        Map<Object, Object> m = (Map<Object, Object>) object;
+
+        List<String> res = new ArrayList<>();
+        List<String> mapContents = new ArrayList<>();
+
+        int i = 0;
+        for (Entry<Object, Object> x : m.entrySet()) {
+            String s = String.format("%s := %s", keyType.formatPrint(x.getKey()), valueType.formatPrint(x.getValue()));
+            mapContents.add(s);
+        }
+        res.add(String.format("(%s == map[%s])", variableName,
+            String.join(", ", mapContents)));
+        return String.join(" && ", res);
+
+    }
+
     public Type setKeyAndValueType(Type keyType, Type valueType) {
         return new DMap(keyType, valueType);
     }
@@ -40,6 +63,11 @@ public class DMap implements Type {
 
     public Type setValueType(Type valueType) {
         return new DMap(null, valueType);
+    }
+
+    @Override
+    public boolean validMethodType() {
+        return keyType.validMethodType() && keyType.isPrintable() && valueType.validMethodType() && valueType.isPrintable();
     }
 
     @Override

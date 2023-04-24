@@ -1,17 +1,12 @@
 package AST.Statements;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.PrintAll;
-import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -38,11 +33,6 @@ public class ReturnStatement implements Statement {
 
     @Override
     public boolean isReturn() {
-        return true;
-    }
-
-    @Override
-    public boolean couldReturn() {
         return true;
     }
 
@@ -98,13 +88,6 @@ public class ReturnStatement implements Statement {
 
     public List<Expression> getReturnValues() {
         return values;
-    }
-
-    @Override
-    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus,
-        List<Expression> dependencies) {
-        method.setReturnValues(values, dependencies);
-        return ReturnStatus.ASSIGNED;
     }
 
     @Override

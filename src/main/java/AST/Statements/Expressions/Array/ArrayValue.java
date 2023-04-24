@@ -35,4 +35,8 @@ public class ArrayValue {
     public String toString() {
         return contents.toString();
     }
+
+    public Object get(int index) {
+        return contents.get(index);
+    }
 }

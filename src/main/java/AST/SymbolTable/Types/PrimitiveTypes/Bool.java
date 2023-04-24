@@ -59,4 +59,14 @@ public class Bool implements BaseType {
     public String formatPrint(Object object) {
         return object.toString();
     }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (object == null) {
+            return null;
+        }
+        Boolean v = Boolean.valueOf(object.toString());
+
+        return String.format("(%s == %b)", variableName, v);
+    }
 }

@@ -1,11 +1,8 @@
 package AST.Statements;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
-import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -34,7 +31,8 @@ public class PrintStatement implements Statement {
 
     @Override
     public String toString() {
-        List<String> code = new ArrayList<>();;
+        List<String> code = new ArrayList<>();
+        ;
 
         String printValues = values.stream()
             .filter(x -> x.getTypes().stream().allMatch(Type::isPrintable))
@@ -87,11 +85,6 @@ public class PrintStatement implements Statement {
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());
         return r.subList(0, Math.min(5, res.size()));
-    }
-
-    @Override
-    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
-        return currStatus;
     }
 
     @Override

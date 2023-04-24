@@ -1,17 +1,9 @@
 package AST.Statements;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.Operator.UnaryOperator;
-import AST.Statements.Expressions.Operator.OperatorExpression;
-import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
-import AST.SymbolTable.Identifier;
-import AST.SymbolTable.Method;
-import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class IfElseStatement implements Statement {
 
@@ -49,11 +40,6 @@ public class IfElseStatement implements Statement {
     @Override
     public boolean isReturn() {
         return ifStat.isReturn() && elseStat.isPresent() && elseStat.get().isReturn();
-    }
-
-    @Override
-    public boolean couldReturn() {
-        return ifStat.couldReturn() || (elseStat.isPresent() && elseStat.get().couldReturn());
     }
 
     @Override
@@ -144,47 +130,6 @@ public class IfElseStatement implements Statement {
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());
         return r.subList(0, Math.min(5, res.size()));
-    }
-
-
-    @Override
-    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
-
-        Object testV = test.getValue().get(0);
-
-
-        if (testV != null) {
-            Boolean testVB = (Boolean) testV;
-            if (testVB && ifStat.couldReturn()) {
-                return ifStat.assignReturnIfPossible(method, currStatus, dependencies);
-            } else if (!testVB && elseStat.isPresent() && elseStat.get().couldReturn()) {
-                return elseStat.get().assignReturnIfPossible(method, currStatus, dependencies);
-            }
-        } else {
-            ReturnStatus rIf = currStatus;
-            ReturnStatus rElse = currStatus;
-            if (ifStat.couldReturn()) {
-
-                List<Expression> trueDep = new ArrayList<>(dependencies);
-                trueDep.add(test);
-                rIf = ifStat.assignReturnIfPossible(method, currStatus, trueDep);
-            }
-            if (elseStat.isPresent() && elseStat.get().couldReturn()) {
-
-                List<Expression> falseDep = new ArrayList<>(dependencies);
-
-                Bool bool = new Bool();
-                OperatorExpression op = new OperatorExpression(symbolTable, bool,
-                    UnaryOperator.Negate, List.of(test));
-                falseDep.add(op);
-                rElse = elseStat.get()
-                    .assignReturnIfPossible(method, currStatus, falseDep);
-            }
-            if (rIf == ReturnStatus.ASSIGNED && rElse == ReturnStatus.ASSIGNED) {
-                return ReturnStatus.ASSIGNED;
-            }
-        }
-        return currStatus;
     }
 
     @Override

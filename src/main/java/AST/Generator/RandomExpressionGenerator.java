@@ -286,6 +286,10 @@ public class RandomExpressionGenerator {
     }
 
     public CallExpression generateCallExpression(SymbolTable symbolTable, List<Type> returnTypes) {
+        if (!returnTypes.stream().allMatch(Type::validMethodType)) {
+            return null;
+        }
+
         RandomMethodGenerator methodGenerator = new RandomMethodGenerator();
         Method m = methodGenerator.generateMethod(returnTypes, symbolTable);
 

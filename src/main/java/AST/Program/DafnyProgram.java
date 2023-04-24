@@ -51,13 +51,20 @@ public class DafnyProgram {
 
         StringBuilder s = new StringBuilder();
 
+        main.executeWithOutput(s);
+        try {
+            Path path = Paths.get("./outputs");
+            FileWriter p = new FileWriter(String.format("%s/expected.txt", path.toAbsolutePath()));
+            p.write(s.toString());
+            p.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         List<String> programOptions = main.toOutput();
 
         try {
             Path path = Paths.get("./tests");
-            if (!Files.exists(path)) {
-                Files.createDirectory(path);
-            }
             for (int i = 0; i < programOptions.size(); i++) {
                 FileWriter p = new FileWriter(String.format("%s/test%d.dfy", path.toAbsolutePath(), i));
                 p.write(programOptions.get(i));
@@ -68,18 +75,6 @@ public class DafnyProgram {
         }
 
 
-        main.executeWithOutput(s);
-        try {
-            Path path = Paths.get("./outputs");
-            if (!Files.exists(path)) {
-                Files.createDirectory(path);
-            }
-            FileWriter p = new FileWriter(String.format("%s/expected.txt", path.toAbsolutePath()));
-            p.write(s.toString());
-            p.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 
