@@ -6,6 +6,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RandomMethodGenerator {
 
@@ -37,7 +38,7 @@ public class RandomMethodGenerator {
         Method m = new Method(returnTypes, methodName);
 
         int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS) + 1;
-        List<Type> args = typeGenerator.generateTypes(noOfArgs, symbolTable);
+        List<Type> args = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
         for (Type t : args) {
             Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
             m.addArgument(var);
@@ -46,8 +47,6 @@ public class RandomMethodGenerator {
         Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
         methodDepth--;
         m.setBody(statement);
-
-        m.assignReturn();
 
         Method msimple = m.getSimpleMethod();
         symbolTable.addMethod(msimple);

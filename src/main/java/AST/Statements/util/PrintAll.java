@@ -33,11 +33,6 @@ public class PrintAll implements Statement {
     }
 
     @Override
-    public ReturnStatus assignReturnIfPossible(Method method, ReturnStatus currStatus, List<Expression> dependencies) {
-        return currStatus;
-    }
-
-    @Override
     public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
         return null;
     }

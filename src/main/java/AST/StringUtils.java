@@ -1,6 +1,7 @@
 package AST;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StringUtils {
@@ -13,6 +14,10 @@ public class StringUtils {
     }
 
     public static String intersperse(String s, List<String> code) {
+        return code.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining(s));
+    }
+
+    public static String intersperse(String s, Set<String> code) {
         return code.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining(s));
     }
 }

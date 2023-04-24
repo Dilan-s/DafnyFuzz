@@ -10,7 +10,6 @@ import java.util.Objects;
 public class Int implements BaseType {
 
     private static final int MAX_INT = 30;
-    private static final double PROB_HEX = 0.2;
     public static final double PROB_NEGATION = 0.1;
     private int max;
 
@@ -75,5 +74,15 @@ public class Int implements BaseType {
     @Override
     public String formatPrint(Object object) {
         return String.valueOf(object);
+    }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (object == null) {
+            return null;
+        }
+        Integer v = Integer.parseInt(object.toString());
+
+        return String.format("(%s == %d)", variableName, v);
     }
 }

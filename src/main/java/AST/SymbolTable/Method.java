@@ -3,8 +3,8 @@ package AST.SymbolTable;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
-import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -24,20 +24,29 @@ public class Method implements Identifier {
     private final String name;
     private final List<Type> returnTypes;
     private final List<Variable> args;
+    private final List<Variable> retArgs;
     private final SymbolTable symbolTable;
     private Statement body;
-    private List<PotentialValue> returnValues;
 
-    public Method(List<Type> returnTypes, String name, SymbolTable symbolTable, List<Variable> args, List<PotentialValue> returnValues) {
+    Set<String> requires;
+    Set<String> ensures;
+
+    public Method(List<Type> returnTypes, String name, SymbolTable symbolTable, List<Variable> args) {
         this.returnTypes = returnTypes;
         this.name = name;
         this.symbolTable = symbolTable;
         this.args = args;
-        this.returnValues = returnValues;
+        this.requires = new HashSet<>();
+        this.ensures = new HashSet<>();
+
+        this.retArgs = returnTypes.stream()
+            .filter(x -> !x.equals(new Void()))
+            .map(t -> new Variable(VariableNameGenerator.generateReturnVariableName(getName()), t))
+            .collect(Collectors.toList());
     }
 
     public Method(List<Type> returnTypes, String name, SymbolTable symbolTable) {
-        this(returnTypes, name, symbolTable, new ArrayList<>(), new ArrayList<>());
+        this(returnTypes, name, symbolTable, new ArrayList<>());
     }
 
     public Method(Type returnTypes, String name, SymbolTable symbolTable) {
@@ -172,12 +181,22 @@ public class Method implements Identifier {
         String arguments = getArgs().stream()
             .map(Variable::toString)
             .collect(Collectors.joining(", "));
-        String types = getReturnTypes().stream()
-            .filter(x -> !x.equals(new Void()))
-            .map(Type::getVariableType)
-            .map(x -> String.format("%s: %s", VariableNameGenerator.generateReturnVariableName(getName()), x))
+
+        String types = retArgs.stream()
+            .map(v -> String.format("%s: %s", v.getName(), v.getType().getVariableType()))
             .collect(Collectors.joining(", "));
-        return String.format("method %s(%s) returns (%s) { ", getName(), arguments, types);
+
+        String res = String.format("method %s(%s) returns (%s)\n", getName(), arguments, types);
+
+        if (!requires.isEmpty()) {
+            res = res + StringUtils.indent("requires " + StringUtils.intersperse(" || ", requires)) + ";\n";
+        }
+        if (!ensures.isEmpty()) {
+            res = res + StringUtils.indent("ensures " + StringUtils.intersperse(" && ", ensures)) + ";\n";
+        }
+
+        res = res + "{";
+        return res;
     }
 
     public void addMethod(Method method) {
@@ -188,41 +207,109 @@ public class Method implements Identifier {
         return this;
     }
 
-    public void assignReturn() {
-        if (hasReturn()) {
-            body.assignReturnIfPossible(this, ReturnStatus.UNASSIGNED, new ArrayList<>());
-        }
-    }
-
-    public void setReturnValues(List<Expression> expression, List<Expression> dependencies) {
-        this.returnValues.add(new PotentialValue(expression, dependencies));
-    }
     public List<Object> execute(List<Variable> params) {
         return execute(params, new StringBuilder());
     }
 
     public List<Object> execute(List<Variable> params, StringBuilder s) {
+        Map<Variable, Variable> requiresEnsures = new HashMap<>();
         Map<Variable, Variable> paramMap = new HashMap<>();
         for (int i = 0, argsSize = args.size(); i < argsSize; i++) {
             Variable arg = args.get(i);
             Variable param = params.get(i);
             paramMap.put(arg, param);
+            requiresEnsures.put(arg, param);
         }
-        return body.execute(paramMap, s);
+
+        List<Object> execute = body.execute(paramMap, s);
+
+        if (!getName().startsWith("safe") && !getName().equals("Main")) {
+            addRequires(requiresEnsures);
+            addEnsures(requiresEnsures, execute);
+        }
+        return execute;
+    }
+
+    private void addEnsures(Map<Variable, Variable> requiresEnsures, List<Object> execute) {
+        List<String> clausesRequires = getRequiresClauses(requiresEnsures);
+        if (clausesRequires == null) {
+            return;
+        }
+
+        List<String> clausesEnsures = getEnsuresClauses(execute);
+
+        String res = "";
+
+        if (!clausesEnsures.isEmpty()) {
+
+            if (!clausesRequires.isEmpty()) {
+                res = res + "(" + String.join(" && ", clausesRequires) + ") ==> ";
+            }
+
+            res = res + "(" + String.join(" && ", clausesEnsures) + ")";
+        }
+
+        if (!res.isEmpty()) {
+            ensures.add("(" + res + ")");
+        }
+
+
+    }
+
+    private void addRequires(Map<Variable, Variable> requiresEnsures) {
+        List<String> clausesRequires = getRequiresClauses(requiresEnsures);
+        if (clausesRequires == null) {
+            return;
+        }
+
+        if (!clausesRequires.isEmpty()) {
+            String res = "(" + String.join(" && ", clausesRequires) + ")";
+            requires.add(res);
+        }
+    }
+
+    private List<String> getEnsuresClauses(List<Object> execute) {
+        List<String> ensures = new ArrayList<>();
+
+        for (int i = 0, executeSize = execute.size(); i < executeSize; i++) {
+            Variable retV = retArgs.get(i);
+            Object o = execute.get(i);
+
+            String variable = retV.getName();
+            String v = retV.getType().formatEnsures(variable, o);
+
+            ensures.add(v);
+        }
+
+        return ensures;
+    }
+
+    private List<String> getRequiresClauses(Map<Variable, Variable> requiresEnsures) {
+        List<String> clauses = new ArrayList<>();
+
+        for (Map.Entry<Variable, Variable> entry : requiresEnsures.entrySet()) {
+            Variable key = entry.getKey();
+            Variable value = entry.getValue();
+
+            String variable = key.getName();
+            String v = value.getType().formatEnsures(variable, value.getValue(requiresEnsures).get(0));
+
+            if (v == null) {
+                return null;
+            }
+
+            clauses.add(v);
+        }
+        return clauses;
     }
 
     public void executeWithOutput(StringBuilder s) {
         execute(new ArrayList<>(), s);
     }
 
-
-    private static class PotentialValue {
-        List<Expression> expression;
-        List<Expression> dependencies;
-
-        public PotentialValue(List<Expression> expression, List<Expression> dependencies) {
-            this.expression = expression;
-            this.dependencies = dependencies;
-        }
+    public void addEnsures(String s) {
+        ensures.add(s);
     }
+
+
 }

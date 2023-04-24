@@ -6,6 +6,7 @@ import AST.Generator.RandomTypeGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.Tuple.TupleLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class Tuple implements UserDefinedType {
 
-    public static final int MAX_SIZE_OF_TUPLE = 5;
+    public static final int MAX_SIZE_OF_TUPLE = 2;
     public static final int MIN_SIZE_OF_TUPLE = 2;
     List<Type> typeList;
 
@@ -23,6 +24,11 @@ public class Tuple implements UserDefinedType {
 
     public Tuple(List<Type> typeList) {
         this.typeList = typeList;
+    }
+
+    @Override
+    public boolean validMethodType() {
+        return typeList.stream().allMatch(Type::validMethodType);
     }
 
     @Override
@@ -87,13 +93,38 @@ public class Tuple implements UserDefinedType {
                 res = res + ", ";
             }
             first = false;
-
+            Seq.printDepth++;
             res = res + type.formatPrint(val);
+            Seq.printDepth--;
         }
 
         res = res + ")";
 
         return res;
+    }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (typeList == null) {
+            return null;
+        }
+
+        List<String> res = new ArrayList<>();
+        List<Object> value = (List<Object>) object;
+
+        for (int i = 0; i < typeList.size(); i++) {
+            Type t = typeList.get(i);
+            Object v = value.get(i);
+
+            String element = t.formatEnsures(String.format("%s.%d", variableName, i), v);
+
+            if (element == null) {
+                return null;
+            }
+            res.add(element);
+
+        }
+        return String.join(" && ", res);
     }
 
     @Override

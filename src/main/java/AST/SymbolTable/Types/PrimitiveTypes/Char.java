@@ -68,6 +68,16 @@ public class Char implements BaseType {
         return "'" + object + "'";
     }
 
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (object == null) {
+            return null;
+        }
+        String v = object.toString();
+
+        return String.format("(%s == '%s')", variableName, v);
+    }
+
     public String formatPrintWithNoQuotes(Object v) {
         return String.valueOf(v);
     }

@@ -54,4 +54,9 @@ public class Void implements BaseType {
     public Type concrete(SymbolTable symbolTable) {
         return new Void();
     }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        return null;
+    }
 }

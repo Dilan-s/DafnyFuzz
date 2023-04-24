@@ -14,10 +14,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Multiset implements DCollection {
 
-    public static final int MAX_SIZE_OF_MULTISET = 10;
+    public static final int MAX_SIZE_OF_MULTISET = 5;
     public static final double PROB_USE_DSET = 0.3;
     public static final double PROB_USE_SEQ = PROB_USE_DSET + 0.3;
     private Type type;
@@ -28,6 +29,11 @@ public class Multiset implements DCollection {
 
     public Multiset() {
         this(null);
+    }
+
+    @Override
+    public boolean validMethodType() {
+        return false;
     }
 
     @Override
@@ -90,7 +96,7 @@ public class Multiset implements DCollection {
             return expression;
         }
 
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET) + 1;
+        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < noOfElems; i++) {
             Type t = type.concrete(symbolTable);
@@ -245,5 +251,31 @@ public class Multiset implements DCollection {
             }
         }
         return lhsVM.keySet().containsAll(rhsVM.keySet());
+    }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (type == null) {
+            return null;
+        }
+
+        String res;
+        Map<Object, Integer> value = (Map<Object, Integer>) object;
+        res = "multiset([";
+
+        boolean first = true;
+        for (Map.Entry<Object, Integer> entry : value.entrySet()) {
+
+            for (int i = 0; i < entry.getValue(); i++) {
+                if (!first) {
+                    res = res + ", ";
+                }
+                first = false;
+                res = res + type.formatPrint(entry.getKey());
+            }
+        }
+
+        res = res + "])";
+        return variableName + " == " + res;
     }
 }

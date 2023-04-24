@@ -22,37 +22,71 @@ public class RandomTypeGenerator {
 
     public static final int MAX_TYPE_DEPTH = 2;
     public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Char(), new Real());
+    public static double PROB_PRIMITIVE = 40.0;
     public static final List<UserDefinedType> USER_DEFINED_TYPES = List.of(new Tuple());
+    public static double PROB_USER_DEFINED = 5.0;
     public static final List<DCollection> COLLECTION_TYPES = List.of(new DSet(), new Seq(), new Multiset(), new DArray());
+    public static double PROB_COLLECTION = 20.0;
+    public static final List<DMap> DMAPS = List.of(new DMap());
+    public static double PROB_DMAP = 7.0;
     private static int typeDepth = 0;
 
-
-
-    public List<Type> generateBaseTypes(int noOfTypes, SymbolTable symbolTable) {
-        typeDepth += MAX_TYPE_DEPTH;
-        List<Type> types = generateTypes(noOfTypes, symbolTable);
-        typeDepth -= MAX_TYPE_DEPTH;
-        return types;
-    }
     public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
         typeDepth++;
         List<Type> types = new ArrayList<>();
-        List<Type> option = new ArrayList<>();
-        option.addAll(PRIMITIVE_TYPES);
-        if (typeDepth < MAX_TYPE_DEPTH) {
-            option.addAll(COLLECTION_TYPES);
-            option.addAll(USER_DEFINED_TYPES);
-            option.add(new DMap());
-        }
-
         for (int i = 0; i < noOfTypes; i++) {
-            int randType = GeneratorConfig.getRandom().nextInt(option.size());
-            Type t = option.get(randType);
+            Type t = generateType();
             Type concrete = t.concrete(symbolTable);
             types.add(concrete);
         }
-
         typeDepth--;
+        return types;
+    }
+
+    private Type generateType() {
+        Type t = null;
+        while (t == null) {
+            double ratioSum = PROB_COLLECTION + PROB_DMAP + PROB_PRIMITIVE + PROB_USER_DEFINED;
+            double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
+
+            if (typeDepth > MAX_TYPE_DEPTH || (probType -= PROB_PRIMITIVE) < 0) {
+                int index = GeneratorConfig.getRandom().nextInt(PRIMITIVE_TYPES.size());
+                t = PRIMITIVE_TYPES.get(index);
+
+            } else if ((probType -= PROB_DMAP) < 0) {
+                PROB_DMAP *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                int index = GeneratorConfig.getRandom().nextInt(DMAPS.size());
+                t = DMAPS.get(index);
+
+            } else if ((probType -= PROB_COLLECTION) < 0) {
+                PROB_COLLECTION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                int index = GeneratorConfig.getRandom().nextInt(COLLECTION_TYPES.size());
+                t = COLLECTION_TYPES.get(index);
+
+            } else if ((probType -= PROB_USER_DEFINED) < 0) {
+                PROB_USER_DEFINED *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                int index = GeneratorConfig.getRandom().nextInt(USER_DEFINED_TYPES.size());
+                t = USER_DEFINED_TYPES.get(index);
+            }
+        }
+        return t;
+    }
+
+    public List<Type> generateMethodTypes(int noOfArgs, SymbolTable symbolTable) {
+        typeDepth += MAX_TYPE_DEPTH;
+        List<Type> types = new ArrayList<>();
+
+        int i = 0;
+        while (i < noOfArgs) {
+            Type t = generateTypes(1, symbolTable).get(0);
+
+            if (t.validMethodType()) {
+                types.add(t.concrete(symbolTable));
+                i++;
+            }
+        }
+
+        typeDepth -= MAX_TYPE_DEPTH;
         return types;
     }
 }

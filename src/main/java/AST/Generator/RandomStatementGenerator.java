@@ -1,11 +1,11 @@
 package AST.Generator;
 
+import AST.Statements.AssertStatement;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.BlockStatement;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.IfElseStatement;
-import AST.Statements.PrintStatement;
 import AST.Statements.ReturnStatement;
 import AST.Statements.Statement;
 import AST.Statements.util.PrintAll;
@@ -16,16 +16,17 @@ import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RandomStatementGenerator {
 
-    public static final int MAX_PRINT_SIZE = 10;
-    public static double PROB_RETURN_STAT = 15.0;
+    private static final int MAX_ASSERT_VALUES = 5;
+    public static double PROB_RETURN_STAT = 30.0;
     public static double PROB_ASSIGN_STAT = 40.0;
-    public static double PROB_PRINT_STAT = 10.0;
-    public static double PROB_IF_ELSE_STAT = 30.0;
+    public static double PROB_IF_ELSE_STAT = 20.0;
+    public static double PROB_ASSERT = 30.0;
 
     public static final double PROB_METHOD_ASSIGN = 0.05;
     public static final double PROB_ELSE_STAT = 0.5;
@@ -40,8 +41,7 @@ public class RandomStatementGenerator {
     public Statement generateBody(Method method, SymbolTable symbolTable) {
         BlockStatement body = new BlockStatement(symbolTable);
 
-        int size = 0;
-        double probContinue = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.CONTINUE_DECAY_FACTOR, size);
+        double probContinue = GeneratorConfig.getRandom().nextDouble();
         boolean hasReturn = method.hasReturn();
         Statement statement = null;
         while (probContinue < PROB_NEXT_STAT || hasReturn) {
@@ -51,14 +51,7 @@ public class RandomStatementGenerator {
             if (statement.isReturn()) {
                 break;
             }
-//            double probForceReturn = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.CONTINUE_DECAY_FACTOR, size);
-//            if (probForceReturn < PROB_FORCE_RETURN) {
-//                statement = generateReturnStatement(method, symbolTable);
-//                body.addStatement(statement.expand());
-//                break;
-//            }
             probContinue = GeneratorConfig.getRandom().nextDouble();
-            size += stats.size();
         }
 
         if (statement != null && !statement.isReturn()) {
@@ -73,18 +66,15 @@ public class RandomStatementGenerator {
         statementDepth++;
         Statement ret = null;
         while (ret == null) {
-            double ratioSum = PROB_RETURN_STAT + PROB_ASSIGN_STAT + PROB_PRINT_STAT +
-                PROB_IF_ELSE_STAT;
+            double ratioSum = PROB_RETURN_STAT + PROB_ASSIGN_STAT +
+                PROB_IF_ELSE_STAT + PROB_ASSERT;
             double probTypeOfStatement = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
-            if ((statementDepth > MAX_STATEMENT_DEPTH || (probTypeOfStatement -= PROB_RETURN_STAT) < 0)) {
+            if ((statementDepth > MAX_STATEMENT_DEPTH
+                || (probTypeOfStatement -= PROB_RETURN_STAT) < 0)) {
                 //return
                 ret = generateReturnStatement(method, symbolTable);
 
-            } else if (statementDepth > MAX_STATEMENT_DEPTH || (probTypeOfStatement -= PROB_PRINT_STAT) < 0) {
-                //Print
-                PROB_PRINT_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                ret = generatePrintStatement(symbolTable);
             } else if ((probTypeOfStatement -= PROB_ASSIGN_STAT) < 0) {
                 //Assign
                 PROB_ASSIGN_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
@@ -95,10 +85,34 @@ public class RandomStatementGenerator {
                 PROB_IF_ELSE_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateIfElseStatement(method, symbolTable);
 
+            } else if ((probTypeOfStatement -= PROB_ASSERT) < 0) {
+                //IfElse
+                PROB_ASSERT *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateAssertStatement(method, symbolTable);
+
             }
         }
         statementDepth--;
         return ret;
+    }
+
+    private Statement generateAssertStatement(Method method, SymbolTable symbolTable) {
+        int noOfValues = GeneratorConfig.getRandom().nextInt(MAX_ASSERT_VALUES) + 1;
+
+        List<Variable> variablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope()
+            .stream()
+            .filter(x -> x.getType().validMethodType())
+            .collect(Collectors.toList());
+        if (variablesInCurrentScope.isEmpty()) {
+            return null;
+        }
+
+        Collections.shuffle(variablesInCurrentScope, GeneratorConfig.getRandom());
+
+        List<Variable> vs = variablesInCurrentScope.subList(0, Math.min(noOfValues, variablesInCurrentScope.size()));
+
+        AssertStatement statement = new AssertStatement(symbolTable, vs);
+        return statement;
     }
 
     private ReturnStatement generateReturnStatement(Method method, SymbolTable symbolTable) {
@@ -115,23 +129,6 @@ public class RandomStatementGenerator {
         }
 
         ReturnStatement statement = new ReturnStatement(symbolTable, values);
-        return statement;
-    }
-
-    private PrintStatement generatePrintStatement(SymbolTable symbolTable) {
-        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
-        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-
-        PrintStatement statement = new PrintStatement(symbolTable);
-
-        int noOfValues = GeneratorConfig.getRandom().nextInt(MAX_PRINT_SIZE) + 1;
-        List<Type> types = typeGenerator.generateTypes(noOfValues, symbolTable);
-
-        for (Type type : types) {
-            Expression expression = expressionGenerator.generateExpression(type, symbolTable);
-            statement.addValue(expression);
-        }
-
         return statement;
     }
 

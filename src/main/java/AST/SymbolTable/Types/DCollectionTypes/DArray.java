@@ -3,6 +3,7 @@ package AST.SymbolTable.Types.DCollectionTypes;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
+import AST.Statements.Expressions.Array.ArrayValue;
 import AST.Statements.Expressions.Array.DArrayLiteralByElements;
 import AST.Statements.Expressions.Array.DArrayLiteralInline;
 import AST.Statements.Expressions.Expression;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class DArray implements DCollection {
 
-    public static final int MAX_SIZE_OF_ARRAY = 10;
+    public static final int MAX_SIZE_OF_ARRAY = 5;
     public static final double PROB_EXPAND = 0.9;
     private Type type;
 
@@ -23,6 +24,11 @@ public class DArray implements DCollection {
 
     public DArray() {
         this(null);
+    }
+
+    @Override
+    public boolean validMethodType() {
+        return type.validMethodType();
     }
 
     @Override
@@ -68,7 +74,7 @@ public class DArray implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
+        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY);
 
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
@@ -154,5 +160,25 @@ public class DArray implements DCollection {
     @Override
     public String formatPrint(Object object) {
         return "";
+    }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (type == null) {
+            return null;
+        }
+        ArrayValue value = (ArrayValue) object;
+        List<String> res = new ArrayList<>();
+
+        res.add(String.format("%s.Length == %d", variableName, value.size()));
+
+        for (int i = 0; i < value.size(); i++) {
+            String e = type.formatEnsures(String.format("%s[%d]", variableName, i), value.get(i));
+            if (e == null) {
+                return null;
+            }
+            res.add(e);
+        }
+        return String.join(" && ", res);
     }
 }

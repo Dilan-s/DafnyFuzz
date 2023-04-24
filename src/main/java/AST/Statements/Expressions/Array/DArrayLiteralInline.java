@@ -44,7 +44,7 @@ public class DArrayLiteralInline implements Expression {
         Type valType = t.getInnerType();
 
         for (int i = 0; i < values.size(); i++) {
-            VariableArrayIndex v = new VariableArrayIndex(this.variable.getName(), valType, i);
+            VariableArrayIndex v = new VariableArrayIndex(variable, valType, i);
             v.setDeclared();
             new AssignmentStatement(symbolTable, List.of(v), values.get(i));
         }

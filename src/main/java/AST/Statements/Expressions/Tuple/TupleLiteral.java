@@ -44,7 +44,7 @@ public class TupleLiteral implements Expression {
 
         for (int i = 0; i < values.size(); i++) {
             Type valType = t.getType(i);
-            VariableDatatypeIndex v = new VariableDatatypeIndex(this.variable.getName(), valType, i);
+            VariableDatatypeIndex v = new VariableDatatypeIndex(variable, valType, i);
             v.setDeclared();
             new AssignmentStatement(symbolTable, List.of(v), values.get(i));
         }

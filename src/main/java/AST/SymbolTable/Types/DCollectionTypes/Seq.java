@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 public class Seq implements DCollection {
 
-    public static final int MAX_SIZE_OF_SET = 10;
+    public static final int MAX_SIZE_OF_SET = 5;
     private Type type;
-    private static int printDepth = 0;
+    public static int printDepth = 0;
 
     public Seq(Type type) {
         this.type = type;
@@ -25,6 +25,11 @@ public class Seq implements DCollection {
 
     public Seq() {
         this(null);
+    }
+
+    @Override
+    public boolean validMethodType() {
+        return type.validMethodType();
     }
 
     @Override
@@ -70,7 +75,7 @@ public class Seq implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             Type concrete = type.concrete(symbolTable);
@@ -154,6 +159,26 @@ public class Seq implements DCollection {
             }
         }
         return true;
+    }
+
+    @Override
+    public String formatEnsures(String variableName, Object object) {
+        if (type == null) {
+            return null;
+        }
+        List<Object> value = (List<Object>) object;
+        List<String> res = new ArrayList<>();
+
+        res.add(String.format("|%s| == %d", variableName, value.size()));
+
+        for (int i = 0; i < value.size(); i++) {
+            String e = type.formatEnsures(String.format("%s[%d]", variableName, i), value.get(i));
+            if (e == null) {
+                return null;
+            }
+            res.add(e);
+        }
+        return String.join(" && ", res);
     }
 
     @Override

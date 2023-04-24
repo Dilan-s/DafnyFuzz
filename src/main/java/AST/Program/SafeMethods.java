@@ -25,6 +25,7 @@ public class SafeMethods {
 
     public static Method safe_subsequence() {
         Method safe_subsequence = new Method(List.of(new Int(), new Int()), "safe_subsequence");
+        safe_subsequence.addEnsures("((|p_safe_subsequence_1| > 0) ==> ((0 <= ret_1 < |p_safe_subsequence_1|) && (0 <= ret_2 < |p_safe_subsequence_1|) && ret_1 <= ret_2))");
         SymbolTable symbolTable = safe_subsequence.getSymbolTable();
 
         String p1 = VariableNameGenerator.generateArgumentName(safe_subsequence);
@@ -84,12 +85,12 @@ public class SafeMethods {
         ifElseStatement.setElseStat(elseRet);
 
         statement.addStatement(ifElseStatement.expand());
-        safe_subsequence.assignReturn();
         return safe_subsequence.getSimpleMethod();
     }
 
     public static Method safe_index_seq() {
         Method safe_index_seq = new Method(new Int(), "safe_index_seq");
+        safe_index_seq.addEnsures("((0 <= p_safe_index_seq_2 < |p_safe_index_seq_1|) ==> (ret_1 == p_safe_index_seq_2)) && ((0 > p_safe_index_seq_2 || p_safe_index_seq_2 >= |p_safe_index_seq_1|) ==> (ret_1 == 0))");
         SymbolTable symbolTable = safe_index_seq.getSymbolTable();
         BlockStatement statement = new BlockStatement(symbolTable);
         safe_index_seq.setBody(statement);
@@ -124,12 +125,12 @@ public class SafeMethods {
 
         statement.addStatement(returnStatement.expand());
 
-        safe_index_seq.assignReturn();
         return safe_index_seq.getSimpleMethod();
     }
 
     static Method safe_division() {
         Method safe_div = new Method(new Int(), "safe_division");
+        safe_div.addEnsures("(p_safe_division_2 == 0 ==> ret_1 == p_safe_division_1) && (p_safe_division_2 != 0 ==> ret_1 == p_safe_division_1 / p_safe_division_2)");
         SymbolTable symbolTable = safe_div.getSymbolTable();
         BlockStatement statement = new BlockStatement(symbolTable);
         safe_div.setBody(statement);
@@ -163,12 +164,12 @@ public class SafeMethods {
 
         statement.addStatement(returnStatement.expand());
 
-        safe_div.assignReturn();
         return safe_div.getSimpleMethod();
     }
 
     static Method safe_modulus() {
         Method safe_mod = new Method(new Int(), "safe_modulus");
+        safe_mod.addEnsures("(p_safe_modulus_2 == 0 ==> ret_1 == p_safe_modulus_1) && (p_safe_modulus_2 != 0 ==> ret_1 == p_safe_modulus_1 % p_safe_modulus_2)");
         SymbolTable symbolTable = safe_mod.getSymbolTable();
         BlockStatement statement = new BlockStatement(symbolTable);
         safe_mod.setBody(statement);
@@ -202,7 +203,6 @@ public class SafeMethods {
 
         statement.addStatement(returnStatement.expand());
 
-        safe_mod.assignReturn();
         return safe_mod.getSimpleMethod();
     }
 }
