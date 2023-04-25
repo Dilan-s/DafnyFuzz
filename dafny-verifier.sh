@@ -14,6 +14,13 @@ rm -rf errors || true
 mkdir tests || true
 mkdir outputs || true
 mkdir errors || true
+mkdir errors/verificationErrors
+mkdir errors/compErrors
+touch errors/compErrors/go.txt
+touch errors/compErrors/java.txt
+touch errors/compErrors/js.txt
+touch errors/compErrors/py.txt
+
 
 
 directory=$(pwd)
@@ -23,7 +30,10 @@ x=0
 while [ true ]; do
   cd "$directory"
 
-  echo "Test number $x"
+  echo "Test number $x" >> errors/compErrors/go.txt
+  echo "Test number $x" >> errors/compErrors/js.txt
+  echo "Test number $x" >> errors/compErrors/java.txt
+  echo "Test number $x" >> errors/compErrors/py.txt
 
   cd "$directory"
   timeout $t java -cp out/ Main.GenerateProgram $x
@@ -43,13 +53,25 @@ while [ true ]; do
   do
     cp "$file" test.dfy
 
+    cd "$directory"
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify test.dfy > tmp.txt 2>&1
+    if [ $? -eq 4 ]
+    then
+      echo "Verification error found in test $x file $y"
+      mkdir "errors/verificationErrors/$x" || true
+      cp test.dfy "errors/verificationErrors/$x/test$y.dfy"
+      cat tmp.txt > "errors/verificationErrors/$x/test$y-verificationOutput.dfy"
+    fi
+
+
+
     # GO
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/go.txt
     if [ $? -eq 0 ]
     then
       echo "Created GO files"
-      ./test > "outputs/output-go-$y.txt"
+      ./test > "outputs/output-go-$y.txt" 2>>errors/compErrors/go.txt
       rm -rf test || true
       rm -rf test-go || true
     else
@@ -58,11 +80,11 @@ while [ true ]; do
 
     # js
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/js.txt
     if [ $? -eq 0 ]
     then
       echo "Created JS files"
-      node test.js > "outputs/output-js-$y.txt"
+      node test.js > "outputs/output-js-$y.txt" 2>>errors/compErrors/js.txt
       rm -rf test.js || true
     else
       echo "Failed to convert to JS in $t seconds"
@@ -70,11 +92,11 @@ while [ true ]; do
 
     # java
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy  > tmp.txt 2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy  > tmp.txt 2>>errors/compErrors/java.txt
     if [ $? -eq 0 ]
     then
       echo "Created Java files"
-      java -jar test.jar > "outputs/output-java-$y.txt"
+      java -jar test.jar > "outputs/output-java-$y.txt" 2>>errors/compErrors/java.txt
       rm -rf test.jar || true
       rm -rf test-java || true
     else
@@ -83,11 +105,11 @@ while [ true ]; do
 
     # py
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>&1
+    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>>errors/compErrors/py.txt
     if [ $? -eq 0 ]
     then
       echo "Created Python files"
-      python3 test-py/test.py > "outputs/output-py-$y.txt"
+      python3 test-py/test.py > "outputs/output-py-$y.txt" 2>>errors/compErrors/py.txt
       rm -rf test-py || true
     else
       echo "Failed to convert to Python in $t seconds"
