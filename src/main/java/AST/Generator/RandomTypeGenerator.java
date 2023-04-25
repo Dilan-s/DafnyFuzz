@@ -21,7 +21,7 @@ import java.util.List;
 public class RandomTypeGenerator {
 
     public static final int MAX_TYPE_DEPTH = 2;
-    public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Char(), new Real());
+    public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Real()); //, new Char()
     public static double PROB_PRIMITIVE = 40.0;
     public static final List<UserDefinedType> USER_DEFINED_TYPES = List.of(new Tuple());
     public static double PROB_USER_DEFINED = 5.0;
