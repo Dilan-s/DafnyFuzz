@@ -25,7 +25,7 @@ public class SafeMethods {
 
     public static Method safe_subsequence() {
         Method safe_subsequence = new Method(List.of(new Int(), new Int()), "safe_subsequence");
-        safe_subsequence.addEnsures("((|p_safe_subsequence_1| > 0) ==> ((0 <= ret_1 < |p_safe_subsequence_1|) && (0 <= ret_2 < |p_safe_subsequence_1|) && ret_1 <= ret_2))");
+        safe_subsequence.addEnsures("((|p_safe_subsequence_1| > 0) ==> ((0 <= ret_1 < |p_safe_subsequence_1|) && (0 <= ret_2 < |p_safe_subsequence_1|) && ret_1 <= ret_2)) && ((((0 <= p_safe_subsequence_2 < |p_safe_subsequence_1|) ==> (ret_1 == p_safe_subsequence_2)) && ((0 > p_safe_subsequence_2 || p_safe_subsequence_2 >= |p_safe_subsequence_1|) ==> (ret_1 == 0)) && ((0 <= p_safe_subsequence_3 < |p_safe_subsequence_1|) ==> (ret_2 == p_safe_subsequence_3)) && ((0 > p_safe_subsequence_3 || p_safe_subsequence_3 >= |p_safe_subsequence_1|) ==> (ret_2 == 0))) || ((((0 <= p_safe_subsequence_2 < |p_safe_subsequence_1|) ==> (ret_2 == p_safe_subsequence_2)) && ((0 > p_safe_subsequence_2 || p_safe_subsequence_2 >= |p_safe_subsequence_1|) ==> (ret_2 == 0)) && ((0 <= p_safe_subsequence_3 < |p_safe_subsequence_1|) ==> (ret_1 == p_safe_subsequence_3)) && ((0 > p_safe_subsequence_3 || p_safe_subsequence_3 >= |p_safe_subsequence_1|) ==> (ret_1 == 0)))))");
         SymbolTable symbolTable = safe_subsequence.getSymbolTable();
 
         String p1 = VariableNameGenerator.generateArgumentName(safe_subsequence);
@@ -71,7 +71,7 @@ public class SafeMethods {
         statement.addStatement(asJ.expand());
 
 
-        OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Less_Than, List.of(iVarExp, jVarExp));
+        OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Less_Than_Or_Equal, List.of(iVarExp, jVarExp));
 
         ReturnStatement ifRet = new ReturnStatement(symbolTable, List.of(iVarExp, jVarExp));
         ifRet.setPrintAll(false);
