@@ -406,6 +406,12 @@ public enum BinaryOperator implements Operator {
     },
     Divide("/", List.of(Args.INT_INT), new Int()) {
         @Override
+        public boolean requiresSafe(List<Object> vals) {
+            Integer denominator = (Integer) vals.get(1);
+            return denominator == 0;
+        }
+
+        @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
@@ -431,6 +437,12 @@ public enum BinaryOperator implements Operator {
         }
     },
     Modulus("%", List.of(Args.INT_INT), new Int()) {
+        @Override
+        public boolean requiresSafe(List<Object> vals) {
+            Integer denominator = (Integer) vals.get(1);
+            return denominator == 0;
+        }
+
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);

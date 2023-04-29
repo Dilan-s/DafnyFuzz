@@ -58,7 +58,7 @@ public class SafeMethods {
         CallExpression iSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p2VarExp));
 
         AssignmentStatement asI = new AssignmentStatement(symbolTable, List.of(iVar), iSafeIndex);
-        statement.addStatement(asI.expand());
+        statement.addStatement(asI);
 
         Int jT = new Int();
         String j = VariableNameGenerator.generateVariableValueName(jT, symbolTable);
@@ -68,7 +68,7 @@ public class SafeMethods {
         CallExpression jSafeIndex = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p3VarExp));
 
         AssignmentStatement asJ = new AssignmentStatement(symbolTable, List.of(jVar), jSafeIndex);
-        statement.addStatement(asJ.expand());
+        statement.addStatement(asJ);
 
 
         OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Less_Than_Or_Equal, List.of(iVarExp, jVarExp));
@@ -84,7 +84,7 @@ public class SafeMethods {
         ifElseStatement.setIfStat(ifRet);
         ifElseStatement.setElseStat(elseRet);
 
-        statement.addStatement(ifElseStatement.expand());
+        statement.addStatement(ifElseStatement);
         return safe_subsequence.getSimpleMethod();
     }
 
@@ -123,7 +123,7 @@ public class SafeMethods {
         ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(ifElseExpression));
         returnStatement.setPrintAll(false);
 
-        statement.addStatement(returnStatement.expand());
+        statement.addStatement(returnStatement);
 
         return safe_index_seq.getSimpleMethod();
     }
@@ -162,7 +162,7 @@ public class SafeMethods {
         ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(expression));
         returnStatement.setPrintAll(false);
 
-        statement.addStatement(returnStatement.expand());
+        statement.addStatement(returnStatement);
 
         return safe_div.getSimpleMethod();
     }
@@ -201,7 +201,7 @@ public class SafeMethods {
         returnStatement.setPrintAll(false);
 
 
-        statement.addStatement(returnStatement.expand());
+        statement.addStatement(returnStatement);
 
         return safe_mod.getSimpleMethod();
     }

@@ -14,16 +14,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ReturnStatement implements Statement {
+public class ReturnStatement extends BaseStatement {
 
     private final SymbolTable symbolTable;
     private final List<Expression> values;
     private boolean printAll;
+    private PrintAll printScope;
 
     public ReturnStatement(SymbolTable symbolTable, List<Expression> values) {
+        super();
         this.symbolTable = symbolTable;
         this.values = values;
         this.printAll = true;
+        this.printScope = new PrintAll(symbolTable);
 
     }
 
@@ -46,6 +49,11 @@ public class ReturnStatement implements Statement {
 
         code.add(String.format("return %s;", returnValues));
         return StringUtils.intersperse("\n", code);
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        return toString();
     }
 
     @Override
@@ -92,6 +100,7 @@ public class ReturnStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        super.incrementUse();
         List<Object> list = new ArrayList<>();
         for (Expression x : values) {
             List<Object> value = x.getValue(paramMap, s);
@@ -114,7 +123,7 @@ public class ReturnStatement implements Statement {
         }
         r.addAll(list);
         if (printAll) {
-            r.addAll(new PrintAll(symbolTable).expand());
+            r.addAll(printScope.expand());
         }
         r.add(this);
         return r;

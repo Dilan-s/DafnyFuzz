@@ -15,12 +15,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PrintStatement implements Statement {
+public class PrintStatement extends BaseStatement {
 
     private final SymbolTable symbolTable;
     private final List<Expression> values;
 
     public PrintStatement(SymbolTable symbolTable) {
+        super();
         this.symbolTable = symbolTable;
         this.values = new ArrayList<>();
     }
@@ -32,7 +33,6 @@ public class PrintStatement implements Statement {
     @Override
     public String toString() {
         List<String> code = new ArrayList<>();
-        ;
 
         String printValues = values.stream()
             .filter(x -> x.getTypes().stream().allMatch(Type::isPrintable))
@@ -42,6 +42,11 @@ public class PrintStatement implements Statement {
             code.add(String.format("print %s, \"\\n\";", printValues));
         }
         return StringUtils.intersperse("\n", code);
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        return toString();
     }
 
     @Override
@@ -89,6 +94,7 @@ public class PrintStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        super.incrementUse();
         List<String> joiner = new ArrayList<>();
 
         for (Expression exp : values) {

@@ -25,6 +25,8 @@ public class OperatorExpression implements Expression {
     private boolean convertToCall;
     private SymbolTable symbolTable;
 
+    private boolean safeReplacement;
+
     public OperatorExpression(SymbolTable symbolTable, Type type, Operator operator, List<Expression> args, boolean convertToCall) {
         this.symbolTable = symbolTable;
         this.replacementExpression = Optional.empty();
@@ -32,7 +34,7 @@ public class OperatorExpression implements Expression {
         this.convertToCall = convertToCall;
         this.type = type;
         this.args = args;
-        generateMethodCallReplacement();
+        this.safeReplacement = false;
     }
 
     public OperatorExpression(SymbolTable symbolTable, Type type, Operator operator, List<Expression> args) {
@@ -81,12 +83,19 @@ public class OperatorExpression implements Expression {
         return list;
     }
 
-    private void generateMethodCallReplacement() {
+    private void generateMethodCallReplacement(Map<Variable, Variable> paramsMap, StringBuilder s) {
+        safeReplacement = true;
         if (convertToCall && operator.equals(BinaryOperator.Divide)) {
             CallExpression safe_division = new CallExpression(symbolTable, symbolTable.getMethod("safe_division"), args);
+            for (Statement stat : safe_division.expand()) {
+                stat.execute(paramsMap, s);
+            }
             replacementExpression = Optional.of(safe_division);
         } else if (convertToCall && operator.equals(BinaryOperator.Modulus)) {
             CallExpression safe_modulus = new CallExpression(symbolTable, symbolTable.getMethod("safe_modulus"), args);
+            for (Statement stat : safe_modulus.expand()) {
+                stat.execute(paramsMap, s);
+            }
             replacementExpression = Optional.of(safe_modulus);
         }
     }
@@ -99,6 +108,7 @@ public class OperatorExpression implements Expression {
             return replacementExpression.get().getValue(paramsMap, s);
         }
 
+        List<Object> vals = new ArrayList<>();
         for (Expression e : args) {
             List<Object> value = e.getValue(paramsMap, s);
             for (Object v : value) {
@@ -107,6 +117,15 @@ public class OperatorExpression implements Expression {
                     return r;
                 }
             }
+            vals.addAll(value);
+        }
+
+        if (operator.requiresSafe(vals) && !safeReplacement) {
+            generateMethodCallReplacement(paramsMap, s);
+            if (replacementExpression.isPresent()) {
+                return replacementExpression.get().getValue(paramsMap, s);
+            }
+
         }
 
         r.add(operator.apply(args, paramsMap));

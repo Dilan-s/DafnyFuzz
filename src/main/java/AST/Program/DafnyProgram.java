@@ -74,6 +74,15 @@ public class DafnyProgram {
             e.printStackTrace();
         }
 
+        String minimizedTestCase = main.minimizedTestCase();
+        try {
+            Path path = Paths.get("./tests");
+            FileWriter p = new FileWriter(String.format("%s/test-minimized.dfy", path.toAbsolutePath()));
+            p.write(minimizedTestCase);
+            p.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
     }
