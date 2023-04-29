@@ -28,8 +28,10 @@ public class Method implements Identifier {
     private final SymbolTable symbolTable;
     private Statement body;
 
-    Set<String> requires;
-    Set<String> ensures;
+    private final Set<String> requires;
+    private final Set<String> ensures;
+
+    private int noOfUses;
 
     public Method(List<Type> returnTypes, String name, SymbolTable symbolTable, List<Variable> args) {
         this.returnTypes = returnTypes;
@@ -43,6 +45,7 @@ public class Method implements Identifier {
             .filter(x -> !x.equals(new Void()))
             .map(t -> new Variable(VariableNameGenerator.generateReturnVariableName(getName()), t))
             .collect(Collectors.toList());
+        this.noOfUses = 0;
     }
 
     public Method(List<Type> returnTypes, String name, SymbolTable symbolTable) {
@@ -59,6 +62,14 @@ public class Method implements Identifier {
 
     public Method(List<Type> returnTypes, String name) {
         this(returnTypes, name, new SymbolTable());
+    }
+
+    public void incrementUse() {
+        this.noOfUses++;
+    }
+
+    public int getNoOfUses() {
+        return noOfUses;
     }
 
     public void addArgument(String name, Type type) {
@@ -212,6 +223,7 @@ public class Method implements Identifier {
     }
 
     public List<Object> execute(List<Variable> params, StringBuilder s) {
+        incrementUse();
         Map<Variable, Variable> requiresEnsures = new HashMap<>();
         Map<Variable, Variable> paramMap = new HashMap<>();
         for (int i = 0, argsSize = args.size(); i < argsSize; i++) {
@@ -312,4 +324,28 @@ public class Method implements Identifier {
     }
 
 
+    public String minimizedTestCase() {
+        return minimizedTestCase(true);
+    }
+    public String minimizedTestCase(boolean printMethods) {
+        List<String> code = new ArrayList<>();
+
+        if (printMethods) {
+            List<Method> allMethods = symbolTable.getAllMethods();
+            for (Method m : allMethods) {
+                if (m.getNoOfUses() > 0) {
+                    if (m.getName().startsWith("safe")) {
+                        code.add(m.toCode(false));
+                    } else {
+                        code.add(m.minimizedTestCase(false));
+                    }
+                }
+            }
+        }
+
+        code.add(declarationLine());
+        code.add(StringUtils.indent(body.minimizedTestCase()));
+        code.add("}\n");
+        return String.join("\n", code);
+    }
 }

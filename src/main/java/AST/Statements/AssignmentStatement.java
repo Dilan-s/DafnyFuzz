@@ -12,15 +12,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AssignmentStatement implements Statement {
+public class AssignmentStatement extends BaseStatement {
 
     private final SymbolTable symbolTable;
     private final List<Variable> variables;
     private final List<Expression> values;
     private boolean declared;
 
-    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables,
-        List<Expression> values) {
+    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables, List<Expression> values) {
+        super();
         this.symbolTable = symbolTable;
         this.variables = variables;
         this.values = values;
@@ -28,8 +28,7 @@ public class AssignmentStatement implements Statement {
         declareVariables();
     }
 
-    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables,
-        Expression value) {
+    public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables, Expression value) {
         this(symbolTable, variables, List.of(value));
     }
 
@@ -75,6 +74,11 @@ public class AssignmentStatement implements Statement {
 
             return String.format("var %s := %s;", lhs, rhs);
         }
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        return toString();
     }
 
     @Override
@@ -130,6 +134,7 @@ public class AssignmentStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        super.incrementUse();
         List<Object> expValues = new ArrayList<>();
         for (Expression value : values) {
             List<Object> expressionValue = value.getValue(paramMap, s);

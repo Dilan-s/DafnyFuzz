@@ -9,6 +9,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -98,7 +99,10 @@ public class CallExpression implements Expression {
 
     @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
-        return callExpr.getValue(paramsMap, new StringBuilder());
+        return assignedVariables.stream()
+            .map(v -> v.getValue(paramsMap))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
     }
 
     private class CallMethodExpression implements Expression {

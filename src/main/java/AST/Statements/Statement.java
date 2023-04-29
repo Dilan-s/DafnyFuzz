@@ -15,4 +15,14 @@ public interface Statement {
     List<Statement> expand();
 
     List<String> toOutput();
+
+    void incrementUse();
+
+    int getNoOfUses();
+
+    String minimizedTestCase();
+
+    default boolean minimizedReturn() {
+        return isReturn();
+    }
 }

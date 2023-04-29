@@ -46,8 +46,7 @@ public class RandomStatementGenerator {
         Statement statement = null;
         while (probContinue < PROB_NEXT_STAT || hasReturn) {
             statement = generateStatement(method, symbolTable);
-            List<Statement> stats = statement.expand();
-            body.addStatement(stats);
+            body.addStatement(statement);
             if (statement.isReturn()) {
                 break;
             }

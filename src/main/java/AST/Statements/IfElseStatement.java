@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class IfElseStatement implements Statement {
+public class IfElseStatement extends BaseStatement {
 
     private final SymbolTable symbolTable;
     private Expression test;
@@ -21,6 +21,7 @@ public class IfElseStatement implements Statement {
     private Optional<Statement> elseStat;
 
     public IfElseStatement(SymbolTable symbolTable) {
+        super();
         this.symbolTable = symbolTable;
         this.elseStat = Optional.empty();
     }
@@ -43,6 +44,24 @@ public class IfElseStatement implements Statement {
     }
 
     @Override
+    public boolean minimizedReturn() {
+        if (elseStat.isEmpty()) {
+            if (ifStat.getNoOfUses() > 0) {
+                return ifStat.minimizedReturn();
+            }
+            return false;
+        }
+
+        if (ifStat.getNoOfUses() > 0 && elseStat.get().getNoOfUses() == 0) {
+            return ifStat.minimizedReturn() ;
+        } else if (ifStat.getNoOfUses() == 0 && elseStat.get().getNoOfUses() > 0) {
+            return elseStat.get().minimizedReturn();
+        } else {
+            return ifStat.minimizedReturn() && elseStat.get().minimizedReturn();
+        }
+    }
+
+    @Override
     public String toString() {
         List<String> code = new ArrayList<>();
 
@@ -56,6 +75,36 @@ public class IfElseStatement implements Statement {
 
         code.add("}");
         return StringUtils.intersperse("\n", code);
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        if (elseStat.isEmpty()) {
+            if (ifStat.getNoOfUses() > 0) {
+                return ifStat.minimizedTestCase();
+            }
+            return "";
+        }
+
+        if (ifStat.getNoOfUses() > 0 && elseStat.get().getNoOfUses() == 0) {
+            return ifStat.minimizedTestCase();
+        } else if (ifStat.getNoOfUses() == 0 && elseStat.get().getNoOfUses() > 0) {
+            return elseStat.get().minimizedTestCase();
+        } else {
+
+            List<String> code = new ArrayList<>();
+
+            code.add(String.format("if %s {", test));
+            code.add(StringUtils.indent(ifStat.minimizedTestCase()));
+
+            if (elseStat.isPresent()) {
+                code.add("} else {");
+                code.add(StringUtils.indent(elseStat.get().minimizedTestCase()));
+            }
+
+            code.add("}");
+            return StringUtils.intersperse("\n", code);
+        }
     }
 
     @Override
@@ -134,6 +183,7 @@ public class IfElseStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        super.incrementUse();
         Object testValue = test.getValue(paramMap, s).get(0);
         Boolean testB = (Boolean) testValue;
         if (testB) {

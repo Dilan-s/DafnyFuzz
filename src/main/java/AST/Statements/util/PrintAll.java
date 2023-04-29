@@ -13,13 +13,18 @@ import AST.SymbolTable.Types.Variables.Variable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PrintAll implements Statement {
 
+    private final List<Variable> variables;
     private SymbolTable symbolTable;
 
     public PrintAll(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
+        this.variables = symbolTable.getAllVariablesInCurrentScope().stream()
+            .filter(v -> v.getType().isPrintable())
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -40,17 +45,28 @@ public class PrintAll implements Statement {
     @Override
     public List<Statement> expand() {
 
-        List<Variable> allVariablesInCurrentScope = symbolTable.getAllVariablesInCurrentScope();
         PrintStatement statement = new PrintStatement(symbolTable);
 
-        for (Variable v : allVariablesInCurrentScope) {
-            if (v.getType().isPrintable()) {
-                StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
-                VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
-                statement.addValue(stringLiteral);
-                statement.addValue(expression);
-            }
+        for (Variable v : variables) {
+            StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
+            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
+            statement.addValue(stringLiteral);
+            statement.addValue(expression);
         }
         return statement.expand();
+    }
+
+    @Override
+    public void incrementUse() {
+    }
+
+    @Override
+    public int getNoOfUses() {
+        return 0;
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        return null;
     }
 }

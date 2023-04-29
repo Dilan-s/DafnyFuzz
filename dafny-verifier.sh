@@ -30,6 +30,7 @@ x=0
 while [ true ]; do
   cd "$directory"
 
+  echo "Test number $x"
   echo "Test number $x" >> errors/compErrors/go.txt
   echo "Test number $x" >> errors/compErrors/js.txt
   echo "Test number $x" >> errors/compErrors/java.txt
@@ -51,6 +52,7 @@ while [ true ]; do
   y=0
   for file in tests/*.dfy
   do
+    echo "$file"
     cp "$file" test.dfy
 
     cd "$directory"

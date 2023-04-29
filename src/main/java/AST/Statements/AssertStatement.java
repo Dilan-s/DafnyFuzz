@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AssertStatement implements Statement {
+public class AssertStatement extends BaseStatement {
 
     private final SymbolTable symbolTable;
     private final List<Variable> variables;
     private final Set<String> disjuncts;
 
     public AssertStatement(SymbolTable symbolTable, List<Variable> variables) {
+        super();
         this.symbolTable = symbolTable;
         this.variables = variables;
 
@@ -23,6 +24,7 @@ public class AssertStatement implements Statement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        super.incrementUse();
         List<String> conjuncts = new ArrayList<>();
         for (Variable v : variables) {
             Object val = v.getValue(paramMap).get(0);
@@ -53,5 +55,13 @@ public class AssertStatement implements Statement {
             return "assert true;";
         }
         return String.format("assert %s;", String.join(" || ", disjuncts));
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        if (disjuncts.size() > 0) {
+            return toString();
+        }
+        return "";
     }
 }
