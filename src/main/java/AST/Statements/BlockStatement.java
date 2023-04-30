@@ -1,6 +1,7 @@
 package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
+import AST.Statements.Expressions.Expression;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -18,10 +19,13 @@ public class BlockStatement extends BaseStatement {
     private final SymbolTable symbolTable;
     private final List<Statement> body;
 
+    private List<List<Statement>> expanded;
+
     public BlockStatement(SymbolTable symbolTable) {
         super();
         this.symbolTable = new SymbolTable(symbolTable);
         this.body = new ArrayList<>();
+        this.expanded = new ArrayList<>();
     }
 
     public SymbolTable getSymbolTable() {
@@ -30,10 +34,13 @@ public class BlockStatement extends BaseStatement {
 
     public void addStatement(Statement statement) {
         body.add(statement);
+        expanded.add(statement.expand());
     }
 
     public void addStatement(List<Statement> statement) {
-        body.addAll(statement);
+        for (Statement s : statement) {
+            addStatement(s);
+        }
     }
 
     @Override
@@ -63,11 +70,19 @@ public class BlockStatement extends BaseStatement {
     }
 
     @Override
+    public boolean requireUpdate() {
+        return body.stream().anyMatch(Statement::requireUpdate);
+    }
+
+    @Override
     public List<Statement> expand() {
-        return body.stream()
-            .map(Statement::expand)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+        for (int i = 0, bodySize = body.size(); i < bodySize; i++) {
+            Statement statement = body.get(i);
+            if (statement.requireUpdate()) {
+                expanded.set(i, statement.expand());
+            }
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     @Override

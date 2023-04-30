@@ -7,6 +7,7 @@ import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -20,18 +21,26 @@ public class ReturnStatement extends BaseStatement {
     private final List<Expression> values;
     private boolean printAll;
     private PrintAll printScope;
+    private List<List<Statement>> expanded;
 
-    public ReturnStatement(SymbolTable symbolTable, List<Expression> values) {
+    public ReturnStatement(SymbolTable symbolTable, List<Expression> values, boolean printAll) {
         super();
         this.symbolTable = symbolTable;
         this.values = values;
-        this.printAll = true;
+        this.printAll = printAll;
         this.printScope = new PrintAll(symbolTable);
 
+        expanded = values.stream()
+            .map(Expression::expand)
+            .collect(Collectors.toList());
+        if (printAll) {
+            expanded.add(printScope.expand());
+        }
+        expanded.add(List.of(this));
     }
 
-    public void setPrintAll(boolean printAll) {
-        this.printAll = printAll;
+    public ReturnStatement(SymbolTable symbolTable, List<Expression> values) {
+        this(symbolTable, values, true);
     }
 
     @Override
@@ -112,20 +121,22 @@ public class ReturnStatement extends BaseStatement {
     }
 
     @Override
+    public boolean requireUpdate() {
+        return values.stream().anyMatch(Expression::requireUpdate);
+    }
+
+    @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-        List<Statement> list = new ArrayList<>();
-        for (Expression value : values) {
-            List<Statement> expand = value.expand();
-            for (Statement statement : expand) {
-                list.add(statement);
+        int i;
+        for (i = 0; i < values.size(); i++) {
+            Expression exp = values.get(i);
+            if (exp.requireUpdate()) {
+                expanded.set(i, exp.expand());
             }
         }
-        r.addAll(list);
-        if (printAll) {
-            r.addAll(printScope.expand());
+        if (printAll && printScope.requireUpdate()) {
+            expanded.set(i, printScope.expand());
         }
-        r.add(this);
-        return r;
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 }

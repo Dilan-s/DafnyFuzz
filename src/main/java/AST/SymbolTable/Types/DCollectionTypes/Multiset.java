@@ -85,14 +85,14 @@ public class Multiset implements DCollection {
             DSet t = new DSet(this.type.concrete(symbolTable));
             Expression exp = expressionGenerator.generateExpression(t, symbolTable);
 
-            MultisetLiteral expression = new MultisetLiteral(symbolTable, this, Optional.of(exp));
+            MultisetLiteral expression = new MultisetLiteral(symbolTable, this, exp);
             return expression;
         }
         if (probType < PROB_USE_SEQ) {
             Seq t = new Seq(this.type.concrete(symbolTable));
             Expression exp = expressionGenerator.generateExpression(t, symbolTable);
 
-            MultisetLiteral expression = new MultisetLiteral(symbolTable, this, Optional.of(exp));
+            MultisetLiteral expression = new MultisetLiteral(symbolTable, this, exp);
             return expression;
         }
 

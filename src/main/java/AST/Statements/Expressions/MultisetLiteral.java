@@ -10,6 +10,7 @@ import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,18 +27,28 @@ public class MultisetLiteral implements Expression {
     private List<Expression> values;
     private Optional<Expression> collection;
 
+    private List<List<Statement>> expanded;
+
     public MultisetLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
-        this.symbolTable = symbolTable;
-        this.type = type;
+        this(symbolTable, type);
         this.values = values;
         this.collection = Optional.empty();
+
+        values.forEach(v -> expanded.add(v.expand()));
     }
 
-    public MultisetLiteral(SymbolTable symbolTable, Type type, Optional<Expression> collection) {
+    public MultisetLiteral(SymbolTable symbolTable, Type type, Expression collection) {
+        this(symbolTable, type);
+        this.values = new ArrayList<>();
+        this.collection = Optional.of(collection);
+
+        expanded.add(collection.expand());
+    }
+
+    private MultisetLiteral(SymbolTable symbolTable, Type type) {
         this.symbolTable = symbolTable;
         this.type = type;
-        this.values = new ArrayList<>();
-        this.collection = collection;
+        this.expanded = new ArrayList<>();
     }
 
     @Override
@@ -107,16 +118,23 @@ public class MultisetLiteral implements Expression {
     @Override
     public List<Statement> expand() {
         if (collection.isPresent()) {
-            return collection.get().expand();
-        }
-        List<Statement> list = new ArrayList<>();
-        for (Expression value : values) {
-            List<Statement> expand = value.expand();
-            for (Statement statement : expand) {
-                list.add(statement);
+            if (collection.get().requireUpdate()) {
+                expanded.set(0, collection.get().expand());
+            }
+        } else {
+            for (int i = 0, valuesSize = values.size(); i < valuesSize; i++) {
+                Expression value = values.get(i);
+                if (value.requireUpdate()) {
+                    expanded.set(i, value.expand());
+                }
             }
         }
-        return list;
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return (collection.isPresent() && collection.get().requireUpdate()) || values.stream().anyMatch(Expression::requireUpdate);
     }
 
     @Override

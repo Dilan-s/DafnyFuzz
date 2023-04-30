@@ -24,6 +24,8 @@ public class CallExpression implements Expression {
     private CallMethodExpression callExpr;
     private AssignmentStatement assignStat;
 
+    private List<List<Statement>> expanded;
+
     public CallExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
         this.symbolTable = symbolTable;
         this.method = method;
@@ -32,6 +34,10 @@ public class CallExpression implements Expression {
         this.assignedVariables = new ArrayList<>();
         addArg(args);
         generateReturnAssignment();
+
+        this.expanded = new ArrayList<>();
+        assignments.forEach(s -> expanded.add(s.expand()));
+        expanded.add(List.of(assignStat));
     }
 
     private void addArg(List<Expression> expressions) {
@@ -73,16 +79,22 @@ public class CallExpression implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-
-        List<Statement> list = new ArrayList<>();
-        for (Statement assignment : assignments) {
-            List<Statement> expand = assignment.expand();
-            list.addAll(expand);
+        int i;
+        for (i = 0; i < assignments.size(); i++) {
+            Statement assignment = assignments.get(i);
+            if (assignment.requireUpdate()) {
+                expanded.set(i, assignment.expand());
+            }
         }
-        r.addAll(list);
-        r.add(assignStat);
-        return r;
+        if (assignStat.requireUpdate()) {
+            expanded.set(i, assignStat.expand());
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return assignments.stream().anyMatch(Statement::requireUpdate) || assignStat.requireUpdate();
     }
 
     @Override
@@ -129,18 +141,12 @@ public class CallExpression implements Expression {
 
         @Override
         public List<Statement> expand() {
-            List<Statement> r = new ArrayList<>();
+            return new ArrayList<>();
+        }
 
-            List<Statement> list = new ArrayList<>();
-            for (Statement assignment : assignments) {
-                List<Statement> expand = assignment.expand();
-                for (Statement statement : expand) {
-                    list.add(statement);
-                }
-            }
-            r.addAll(list);
-            r.add(assignStat);
-            return r;
+        @Override
+        public boolean requireUpdate() {
+            return true;
         }
 
         @Override

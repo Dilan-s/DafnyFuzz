@@ -25,4 +25,8 @@ public interface Statement {
     default boolean minimizedReturn() {
         return isReturn();
     }
+
+    default boolean requireUpdate() {
+        return false;
+    }
 }

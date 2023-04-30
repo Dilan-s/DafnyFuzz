@@ -6,12 +6,14 @@ import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class IfElseStatement extends BaseStatement {
 
@@ -20,22 +22,26 @@ public class IfElseStatement extends BaseStatement {
     private Statement ifStat;
     private Optional<Statement> elseStat;
 
-    public IfElseStatement(SymbolTable symbolTable) {
+    private List<List<Statement>> expanded;
+
+    public IfElseStatement(SymbolTable symbolTable, Expression test, Statement ifStat) {
+        this(symbolTable, test, ifStat, Optional.empty());
+    }
+
+    public IfElseStatement(SymbolTable symbolTable, Expression test, Statement ifStat, Statement elseStat) {
+        this(symbolTable, test, ifStat, Optional.of(elseStat));
+    }
+
+    private IfElseStatement(SymbolTable symbolTable, Expression test, Statement ifStat, Optional<Statement> elseStat) {
         super();
         this.symbolTable = symbolTable;
-        this.elseStat = Optional.empty();
-    }
-
-    public void setTest(Expression test) {
         this.test = test;
-    }
-
-    public void setIfStat(Statement ifStat) {
         this.ifStat = ifStat;
-    }
+        this.elseStat = elseStat;
 
-    public void setElseStat(Statement elseStat) {
-        this.elseStat = Optional.of(elseStat);
+        this.expanded = new ArrayList<>();
+        this.expanded.add(test.expand());
+        this.expanded.add(List.of(this));
     }
 
     @Override
@@ -195,10 +201,15 @@ public class IfElseStatement extends BaseStatement {
     }
 
     @Override
+    public boolean requireUpdate() {
+        return test.requireUpdate();
+    }
+
+    @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-        r.addAll(test.expand());
-        r.add(this);
-        return r;
+        if (test.requireUpdate()) {
+            expanded.set(0, test.expand());
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 }

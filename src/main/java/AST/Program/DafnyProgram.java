@@ -52,6 +52,7 @@ public class DafnyProgram {
         StringBuilder s = new StringBuilder();
 
         main.executeWithOutput(s);
+//        System.out.println(s);
         try {
             Path path = Paths.get("./outputs");
             FileWriter p = new FileWriter(String.format("%s/expected.txt", path.toAbsolutePath()));
@@ -62,6 +63,7 @@ public class DafnyProgram {
         }
 
         List<String> programOptions = main.toOutput();
+//        System.out.println(programOptions.get(0));
 
         try {
             Path path = Paths.get("./tests");
@@ -83,8 +85,5 @@ public class DafnyProgram {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
-
 }

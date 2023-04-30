@@ -27,7 +27,9 @@ public class TupleLiteral implements Expression {
     private final Type type;
     private final List<Expression> values;
     private final Variable variable;
-    private final Statement statement;
+    private final AssignmentStatement statement;
+
+    private List<List<Statement>> expanded;
 
     public TupleLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
@@ -37,6 +39,10 @@ public class TupleLiteral implements Expression {
         this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
         this.statement = new AssignmentStatement(symbolTable, List.of(variable), new TupleInitValues(values));
         generateAssignments();
+
+        this.expanded = new ArrayList<>();
+        values.forEach(v -> expanded.add(v.expand()));
+        expanded.add(statement.expand());
     }
 
     private void generateAssignments() {
@@ -81,13 +87,22 @@ public class TupleLiteral implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-        r.addAll(values.stream()
-            .map(Expression::expand)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList()));
-        r.add(statement);
-        return r;
+        int i;
+        for (i = 0; i < values.size(); i++) {
+            Expression expression = values.get(i);
+            if (expression.requireUpdate()) {
+                expanded.set(i, expression.expand());
+            }
+        }
+        if (statement.requireUpdate()) {
+            expanded.set(i, statement.expand());
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return values.stream().anyMatch(Expression::requireUpdate) || statement.requireUpdate();
     }
 
     private class TupleInitValues implements Expression {

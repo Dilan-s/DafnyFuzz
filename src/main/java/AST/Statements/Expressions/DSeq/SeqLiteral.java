@@ -23,10 +23,15 @@ public class SeqLiteral implements Expression {
     private final List<Expression> values;
     private SymbolTable symbolTable;
 
+    private List<List<Statement>> expanded;
+
     public SeqLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
+
+        this.expanded = new ArrayList<>();
+        values.forEach(v -> expanded.add(v.expand()));
     }
 
     @Override
@@ -103,9 +108,17 @@ public class SeqLiteral implements Expression {
 
     @Override
     public List<Statement> expand() {
-        return values.stream()
-            .map(Expression::expand)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+        for (int i = 0, valuesSize = values.size(); i < valuesSize; i++) {
+            Expression value = values.get(i);
+            if (value.requireUpdate()) {
+                expanded.set(i, value.expand());
+            }
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return values.stream().anyMatch(Expression::requireUpdate);
     }
 }

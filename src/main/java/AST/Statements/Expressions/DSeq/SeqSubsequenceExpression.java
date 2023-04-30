@@ -12,9 +12,11 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class SeqSubsequenceExpression implements Expression {
 
@@ -34,7 +36,9 @@ public class SeqSubsequenceExpression implements Expression {
     private Optional<Variable> hiVar;
     private Optional<CallExpression> callExp;
 
-    private boolean setIndIandJ;
+    private boolean update;
+
+    private List<List<Statement>> expanded;
 
     public SeqSubsequenceExpression(SymbolTable symbolTable, Expression seq, Expression i, Expression j) {
         this.symbolTable = symbolTable;
@@ -42,12 +46,17 @@ public class SeqSubsequenceExpression implements Expression {
         this.j = j;
         this.min = null;
         this.max = null;
-        this.setIndIandJ = false;
+        this.update = false;
         setSeqAssign(seq);
         this.statLoHi = Optional.empty();
         this.loVar = Optional.empty();
         this.hiVar = Optional.empty();
         this.callExp = Optional.empty();
+
+        expanded = new ArrayList<>();
+        expanded.add(statSeq.expand());
+        expanded.add(i.expand());
+        expanded.add(j.expand());
     }
 
     private void setSeqAssign(Expression seq) {
@@ -61,9 +70,7 @@ public class SeqSubsequenceExpression implements Expression {
         return new VariableExpression(symbolTable, seqVar, seqVar.getType());
     }
 
-    private void setIndIandJ(
-        Map<Variable, Variable> paramsMap, StringBuilder s) {
-        setIndIandJ = true;
+    private void setIndIandJ(Map<Variable, Variable> paramsMap, StringBuilder s) {
         VariableExpression seqVarExp = getSequenceVariableExpression();
 
         Int loT = new Int();
@@ -80,6 +87,11 @@ public class SeqSubsequenceExpression implements Expression {
         for (Statement stat : statLoHi.get().expand()) {
             stat.execute(paramsMap, s);
         }
+
+        expanded = new ArrayList<>();
+        expanded.add(statSeq.expand());
+        expanded.add(statLoHi.get().expand());
+        update = true;
     }
 
     @Override
@@ -89,18 +101,32 @@ public class SeqSubsequenceExpression implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
 
-        r.addAll(statSeq.expand());
-
-        if (loVar.isPresent() && hiVar.isPresent() && callExp.isPresent() && statLoHi.isPresent()) {
-            r.addAll(statLoHi.get().expand());
-        } else {
-            r.addAll(i.expand());
-            r.addAll(j.expand());
+        if (statSeq.requireUpdate()) {
+            expanded.set(0, statSeq.expand());
         }
 
-        return r;
+        if (statLoHi.isPresent()) {
+            if (statLoHi.get().requireUpdate()) {
+                expanded.set(1, statLoHi.get().expand());
+            }
+        } else {
+            if (i.requireUpdate()) {
+                expanded.set(1, i.expand());
+            }
+            if (j.requireUpdate()) {
+                expanded.set(2, j.expand());
+            }
+        }
+
+        update = false;
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return this.update || statSeq.requireUpdate() || (statLoHi.isPresent() && statLoHi.get().requireUpdate())
+            || (statLoHi.isEmpty() && (i.requireUpdate() || j.requireUpdate()));
     }
 
     @Override
@@ -118,48 +144,58 @@ public class SeqSubsequenceExpression implements Expression {
         List<Object> r = new ArrayList<>();
 
         Object seqVarValue = seqVar.getValue(paramsMap).get(0);
-        if (min != null && max != null) {
-            setIndIandJ(paramsMap, s);
+
+        if (seqVarValue != null) {
+            List<Object> seqVarL = (List<Object>) seqVarValue;
+
             if (loVar.isPresent() && hiVar.isPresent()) {
                 Object loVarValue = loVar.get().getValue(paramsMap).get(0);
                 Object hiVarValue = hiVar.get().getValue(paramsMap).get(0);
 
-                if (seqVarValue != null && loVarValue != null && hiVarValue != null) {
-                    List<Object> seqVarL = (List<Object>) seqVarValue;
+                if (loVarValue != null && hiVarValue != null) {
                     Integer loVarI = (Integer) loVarValue;
                     Integer hiVarI = (Integer) hiVarValue;
 
                     r.add(seqVarL.subList(loVarI, hiVarI));
                     return r;
-
                 }
             }
-            r.add(null);
-            return r;
-        }
 
-        Object iValue = i.getValue(paramsMap).get(0);
-        Object jValue = j.getValue(paramsMap).get(0);
+            if (min != null && max != null) {
+                Object minValue = min.getValue(paramsMap).get(0);
+                Object maxValue = max.getValue(paramsMap).get(0);
 
-        if (seqVarValue != null && iValue != null && jValue != null) {
-            List<Object> seqVarL = (List<Object>) seqVarValue;
-            Integer iI = (Integer) iValue;
-            Integer jI = (Integer) jValue;
+                if (seqVarValue != null && minValue != null && maxValue != null) {
+                    Integer loVarI = (Integer) minValue;
+                    Integer hiVarI = (Integer) maxValue;
 
-            if (0 <= iI && iI < seqVarL.size() && 0 <= jI && jI < seqVarL.size()) {
-                this.min = iI < jI ? i : j;
-                this.max = iI < jI ? j : i;
+                    r.add(seqVarL.subList(loVarI, hiVarI));
+                    return r;
 
-                Integer minI = iI < jI ? iI : jI;
-                Integer maxI = iI < jI ? jI : iI;
-
-                r.add(seqVarL.subList(minI, maxI));
+                }
+                r.add(null);
                 return r;
             }
-            if (!setIndIandJ) {
+
+            Object iValue = i.getValue(paramsMap).get(0);
+            Object jValue = j.getValue(paramsMap).get(0);
+
+            if (iValue != null && jValue != null) {
+                Integer iI = (Integer) iValue;
+                Integer jI = (Integer) jValue;
+
+                if (0 <= iI && iI < seqVarL.size() && 0 <= jI && jI < seqVarL.size()) {
+                    this.min = iI < jI ? i : j;
+                    this.max = iI < jI ? j : i;
+
+                    Integer minI = iI < jI ? iI : jI;
+                    Integer maxI = iI < jI ? jI : iI;
+
+                    r.add(seqVarL.subList(minI, maxI));
+                    return r;
+                }
                 setIndIandJ(paramsMap, s);
-            }
-            if (loVar.isPresent() && hiVar.isPresent()) {
+
                 Object loVarValue = loVar.get().getValue(paramsMap).get(0);
                 Object hiVarValue = hiVar.get().getValue(paramsMap).get(0);
 

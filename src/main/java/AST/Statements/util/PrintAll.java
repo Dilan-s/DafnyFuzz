@@ -1,6 +1,7 @@
 package AST.Statements.util;
 
 import AST.Errors.SemanticException;
+import AST.Statements.BaseStatement;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.StringLiteral;
 import AST.Statements.Expressions.VariableExpression;
@@ -13,11 +14,13 @@ import AST.SymbolTable.Types.Variables.Variable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
-public class PrintAll implements Statement {
+public class PrintAll extends BaseStatement {
 
     private final List<Variable> variables;
+    private final PrintStatement printStat;
     private SymbolTable symbolTable;
 
     public PrintAll(SymbolTable symbolTable) {
@@ -25,6 +28,15 @@ public class PrintAll implements Statement {
         this.variables = symbolTable.getAllVariablesInCurrentScope().stream()
             .filter(v -> v.getType().isPrintable())
             .collect(Collectors.toList());
+
+        this.printStat = new PrintStatement(symbolTable);
+
+        variables.forEach(v -> {
+            StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
+            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
+            printStat.addValue(stringLiteral);
+            printStat.addValue(expression);
+        });
     }
 
     @Override
@@ -43,26 +55,13 @@ public class PrintAll implements Statement {
     }
 
     @Override
+    public boolean requireUpdate() {
+        return printStat.requireUpdate();
+    }
+
+    @Override
     public List<Statement> expand() {
-
-        PrintStatement statement = new PrintStatement(symbolTable);
-
-        for (Variable v : variables) {
-            StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
-            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
-            statement.addValue(stringLiteral);
-            statement.addValue(expression);
-        }
-        return statement.expand();
-    }
-
-    @Override
-    public void incrementUse() {
-    }
-
-    @Override
-    public int getNoOfUses() {
-        return 0;
+        return printStat.expand();
     }
 
     @Override

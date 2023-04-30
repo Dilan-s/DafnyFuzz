@@ -5,6 +5,7 @@ import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -19,13 +20,19 @@ public class AssignmentStatement extends BaseStatement {
     private final List<Expression> values;
     private boolean declared;
 
+    private List<List<Statement>> expanded;
+
     public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables, List<Expression> values) {
         super();
         this.symbolTable = symbolTable;
         this.variables = variables;
         this.values = values;
-        declared = variables.stream().allMatch(Variable::isDeclared);
+        this.declared = variables.stream().allMatch(Variable::isDeclared);
         declareVariables();
+
+        this.expanded = new ArrayList<>();
+        values.forEach(e -> expanded.add(e.expand()));
+        expanded.add(List.of(this));
     }
 
     public AssignmentStatement(SymbolTable symbolTable, List<Variable> variables, Expression value) {
@@ -152,17 +159,18 @@ public class AssignmentStatement extends BaseStatement {
     }
 
     @Override
+    public boolean requireUpdate() {
+        return values.stream().anyMatch(Expression::requireUpdate);
+    }
+
+    @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-        List<Statement> list = new ArrayList<>();
-        for (Expression value : values) {
-            List<Statement> expand = value.expand();
-            for (Statement statement : expand) {
-                list.add(statement);
+        for (int i = 0, valuesSize = values.size(); i < valuesSize; i++) {
+            Expression value = values.get(i);
+            if (value.requireUpdate()) {
+                expanded.set(i, value.expand());
             }
         }
-        r.addAll(list);
-        r.add(this);
-        return r;
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 }

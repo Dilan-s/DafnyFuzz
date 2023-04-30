@@ -19,15 +19,19 @@ public class PrintStatement extends BaseStatement {
 
     private final SymbolTable symbolTable;
     private final List<Expression> values;
+    private List<List<Statement>> expanded;
 
     public PrintStatement(SymbolTable symbolTable) {
         super();
         this.symbolTable = symbolTable;
         this.values = new ArrayList<>();
+        this.expanded = new ArrayList<>();
+        expanded.add(List.of(this));
     }
 
     public void addValue(Expression expression) {
         values.add(expression);
+        expanded.add(expanded.size() - 1, expression.expand());
     }
 
     @Override
@@ -119,13 +123,18 @@ public class PrintStatement extends BaseStatement {
     }
 
     @Override
+    public boolean requireUpdate() {
+        return values.stream().anyMatch(Expression::requireUpdate);
+    }
+
+    @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-        r.addAll(values.stream()
-            .map(Expression::expand)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList()));
-        r.add(this);
-        return r;
+        for (int i = 0; i < values.size(); i++) {
+            Expression exp = values.get(i);
+            if (exp.requireUpdate()) {
+                expanded.set(i, exp.expand());
+            }
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 }

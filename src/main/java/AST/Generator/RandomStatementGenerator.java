@@ -134,20 +134,19 @@ public class RandomStatementGenerator {
     private IfElseStatement generateIfElseStatement(Method method, SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        IfElseStatement statement = new IfElseStatement(symbolTable);
 
         Expression test = expressionGenerator.generateExpression(new Bool(), symbolTable);
-        statement.setTest(test);
 
         Statement ifStat = generateBody(method, new SymbolTable(symbolTable));
-        statement.setIfStat(ifStat);
 
         if (GeneratorConfig.getRandom().nextDouble() < PROB_ELSE_STAT) {
             Statement elseStat = generateBody(method, new SymbolTable(symbolTable));
-            statement.setElseStat(elseStat);
+            IfElseStatement statement = new IfElseStatement(symbolTable, test, ifStat, elseStat);
+            return statement;
+        } else {
+            IfElseStatement statement = new IfElseStatement(symbolTable, test, ifStat);
+            return statement;
         }
-
-        return statement;
     }
 
     private AssignmentStatement generateAssignmentStatement(SymbolTable symbolTable) {

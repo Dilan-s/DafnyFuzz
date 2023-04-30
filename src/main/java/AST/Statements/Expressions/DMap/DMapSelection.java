@@ -15,8 +15,10 @@ import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DMapSelection implements Expression {
 
@@ -27,10 +29,17 @@ public class DMapSelection implements Expression {
     private IfElseExpression ifElseExp;
     private AssignmentStatement indexAssign;
 
+    private List<List<Statement>> expanded;
+
     public DMapSelection(SymbolTable symbolTable, Type type, Expression map, Expression index, Expression def) {
         this.symbolTable = symbolTable;
         this.type = type;
         generateVariableCalls(map, index, def);
+
+        this.expanded = new ArrayList<>();
+        expanded.add(mapAssign.expand());
+        expanded.add(indexAssign.expand());
+        expanded.add(ifElseExp.expand());
     }
 
     private void generateVariableCalls(Expression map, Expression index, Expression def) {
@@ -68,13 +77,24 @@ public class DMapSelection implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> s = new ArrayList<>();
+        if (mapAssign.requireUpdate()) {
+            expanded.set(0, mapAssign.expand());
+        }
 
-        s.addAll(mapAssign.expand());
-        s.addAll(indexAssign.expand());
-        s.addAll(ifElseExp.expand());
+        if (indexAssign.requireUpdate()) {
+            expanded.set(1, indexAssign.expand());
+        }
 
-        return s;
+        if (ifElseExp.requireUpdate()) {
+            expanded.set(2, ifElseExp.expand());
+        }
+
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return mapAssign.requireUpdate() || indexAssign.requireUpdate() || ifElseExp.requireUpdate();
     }
 
     @Override

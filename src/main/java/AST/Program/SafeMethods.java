@@ -73,16 +73,11 @@ public class SafeMethods {
 
         OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Less_Than_Or_Equal, List.of(iVarExp, jVarExp));
 
-        ReturnStatement ifRet = new ReturnStatement(symbolTable, List.of(iVarExp, jVarExp));
-        ifRet.setPrintAll(false);
+        ReturnStatement ifRet = new ReturnStatement(symbolTable, List.of(iVarExp, jVarExp), false);
 
-        ReturnStatement elseRet = new ReturnStatement(symbolTable, List.of(jVarExp, iVarExp));
-        elseRet.setPrintAll(false);
+        ReturnStatement elseRet = new ReturnStatement(symbolTable, List.of(jVarExp, iVarExp), false);
 
-        IfElseStatement ifElseStatement = new IfElseStatement(symbolTable);
-        ifElseStatement.setTest(test);
-        ifElseStatement.setIfStat(ifRet);
-        ifElseStatement.setElseStat(elseRet);
+        IfElseStatement ifElseStatement = new IfElseStatement(symbolTable, test, ifRet, elseRet);
 
         statement.addStatement(ifElseStatement);
         return safe_subsequence.getSimpleMethod();
@@ -120,8 +115,7 @@ public class SafeMethods {
 
         IfElseExpression ifElseExpression = new IfElseExpression(symbolTable, new Int(), test, p2VarExp, new IntLiteral(new Int(), symbolTable, 0));
 
-        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(ifElseExpression));
-        returnStatement.setPrintAll(false);
+        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(ifElseExpression), false);
 
         statement.addStatement(returnStatement);
 
@@ -159,8 +153,7 @@ public class SafeMethods {
 
         IfElseExpression expression = new IfElseExpression(symbolTable, new Int(), test, ifDiv, elseDiv);
 
-        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(expression));
-        returnStatement.setPrintAll(false);
+        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(expression), false);
 
         statement.addStatement(returnStatement);
 
@@ -197,9 +190,7 @@ public class SafeMethods {
 
         IfElseExpression expression = new IfElseExpression(symbolTable, new Int(), test, ifDiv, elseDiv);
 
-        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(expression));
-        returnStatement.setPrintAll(false);
-
+        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(expression), false);
 
         statement.addStatement(returnStatement);
 

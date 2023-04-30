@@ -9,11 +9,13 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DMapIndex implements Expression {
 
@@ -22,11 +24,17 @@ public class DMapIndex implements Expression {
     private final Expression map;
     private final Expression index;
 
+    private List<List<Statement>> expanded;
+
     public DMapIndex(SymbolTable symbolTable, Type type, Expression map, Expression index) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.map = map;
         this.index = index;
+
+        this.expanded = new ArrayList<>();
+        expanded.add(map.expand());
+        expanded.add(index.expand());
     }
 
     @Override
@@ -56,11 +64,22 @@ public class DMapIndex implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> s = new ArrayList<>();
-        s.addAll(map.expand());
-        s.addAll(index.expand());
-        return s;
+        if (map.requireUpdate()) {
+            expanded.set(0, map.expand());
+        }
+
+        if (index.requireUpdate()) {
+            expanded.set(1, index.expand());
+        }
+
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
+
+    @Override
+    public boolean requireUpdate() {
+        return map.requireUpdate() || index.requireUpdate();
+    }
+
 
     @Override
     public List<String> toOutput() {

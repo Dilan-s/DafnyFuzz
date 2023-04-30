@@ -31,4 +31,8 @@ public interface Expression {
     default List<String> toOutput() {
         return List.of(toString());
     }
+
+    default boolean requireUpdate() {
+        return false;
+    }
 }

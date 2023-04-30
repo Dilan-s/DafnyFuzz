@@ -10,6 +10,7 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -25,12 +26,20 @@ public class IfElseExpression implements Expression {
     private final Expression elseExp;
     private SymbolTable symbolTable;
 
+    private List<List<Statement>> expanded;
+
     public IfElseExpression(SymbolTable symbolTable, Type type, Expression test, Expression ifExp, Expression elseExp) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.test = test;
         this.ifExp = ifExp;
         this.elseExp = elseExp;
+
+        this.expanded = new ArrayList<>();
+        expanded.add(test.expand());
+        expanded.add(ifExp.expand());
+        expanded.add(elseExp.expand());
+
     }
 
     @Override
@@ -137,10 +146,23 @@ public class IfElseExpression implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-        r.addAll(test.expand());
-        r.addAll(ifExp.expand());
-        r.addAll(elseExp.expand());
-        return r;
+
+        if (test.requireUpdate()) {
+            expanded.set(0, test.expand());
+        }
+        if (ifExp.requireUpdate()) {
+            expanded.set(1, ifExp.expand());
+
+        }
+        if (elseExp.requireUpdate()) {
+            expanded.set(2, elseExp.expand());
+
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return test.requireUpdate() || ifExp.requireUpdate() || elseExp.requireUpdate();
     }
 }

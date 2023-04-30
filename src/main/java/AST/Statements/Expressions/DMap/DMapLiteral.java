@@ -10,6 +10,7 @@ import AST.SymbolTable.Types.DMap.DMapEntry;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,11 +26,19 @@ public class DMapLiteral implements Expression {
     private final List<DMapEntry> entries;
     private final List<DMapEntry> entriesInMap;
 
+    private List<List<Statement>> expanded;
+
     public DMapLiteral(SymbolTable symbolTable, Type type, List<DMapEntry> entries) {
         this.symbolTable = symbolTable;
         this.type = type;
         this.entries = entries;
         this.entriesInMap = new ArrayList<>(entries);
+
+        this.expanded = new ArrayList<>();
+        entries.forEach(e -> {
+            expanded.add(e.getKey().expand());
+            expanded.add(e.getValue().expand());
+        });
     }
 
     @Override
@@ -44,13 +53,14 @@ public class DMapLiteral implements Expression {
 
         List<DMapEntry> entries = new ArrayList<>(this.entriesInMap);
 
-        for (DMapEntry entry : entries) {
+        for (int i = 0; i < entries.size(); i++) {
+            DMapEntry entry = entries.get(i);
             List<Object> keyValues = entry.getKey().getValue(paramsMap, s);
             List<Object> valueValues = entry.getValue().getValue(paramsMap, s);
 
-            for (int i = 0; i < Math.min(keyValues.size(), valueValues.size()); i++) {
-                Object key = keyValues.get(i);
-                Object value = valueValues.get(i);
+            for (int j = 0; j < Math.min(keyValues.size(), valueValues.size()); j++) {
+                Object key = keyValues.get(j);
+                Object value = valueValues.get(j);
 
                 if (key == null || value == null) {
                     r.add(null);
@@ -70,14 +80,23 @@ public class DMapLiteral implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> list = new ArrayList<>();
+        for (int i = 0; i < entries.size(); i++) {
+            DMapEntry entry = entries.get(i);
 
-        for (DMapEntry entry : entries) {
-            list.addAll(entry.getKey().expand());
-            list.addAll(entry.getValue().expand());
+            if (entry.getKey().requireUpdate()) {
+                expanded.set(2 * i, entry.getKey().expand());
+            }
+
+            if (entry.getValue().requireUpdate()) {
+                expanded.set(2 * i + 1, entry.getValue().expand());
+            }
         }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
 
-        return list;
+    @Override
+    public boolean requireUpdate() {
+        return entries.stream().anyMatch(e -> e.getKey().requireUpdate() || e.getValue().requireUpdate());
     }
 
     @Override
