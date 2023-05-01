@@ -319,14 +319,18 @@ public class Method implements Identifier {
         execute(new ArrayList<>(), s);
     }
 
+    public void execute() {
+        execute(new ArrayList<>(), new StringBuilder());
+    }
+
     public void addEnsures(String s) {
         ensures.add(s);
     }
 
-
     public String minimizedTestCase() {
         return minimizedTestCase(true);
     }
+
     public String minimizedTestCase(boolean printMethods) {
         List<String> code = new ArrayList<>();
 

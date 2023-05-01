@@ -87,14 +87,13 @@ public class OperatorExpression implements Expression {
                 }
             }
         }
+        update = false;
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     @Override
     public boolean requireUpdate() {
-        boolean update = this.update;
-        this.update = false;
-        return update;
+        return this.update || args.stream().anyMatch(Expression::requireUpdate);
     }
 
     private void generateMethodCallReplacement(Map<Variable, Variable> paramsMap, StringBuilder s) {

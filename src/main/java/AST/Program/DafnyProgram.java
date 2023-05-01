@@ -51,6 +51,7 @@ public class DafnyProgram {
 
         StringBuilder s = new StringBuilder();
 
+        main.execute();
         main.executeWithOutput(s);
 //        System.out.println(s);
         try {
