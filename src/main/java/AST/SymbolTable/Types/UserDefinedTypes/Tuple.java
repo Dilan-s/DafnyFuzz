@@ -7,6 +7,7 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.Tuple.TupleLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
+import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,5 +135,29 @@ public class Tuple implements UserDefinedType {
 
     public Type getType(int i) {
         return typeList.get(i);
+    }
+
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Type)) {
+            return false;
+        }
+        Type other = (Type) obj;
+        if (!(other instanceof Tuple)) {
+            return false;
+        }
+
+        Tuple tupleOther = (Tuple) other;
+
+        if (typeList == null || tupleOther.typeList == null) {
+            return true;
+        }
+
+        return tupleOther.typeList.equals(typeList);
     }
 }

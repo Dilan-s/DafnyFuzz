@@ -111,12 +111,16 @@ public class RandomStatementGenerator {
 
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        Expression testExpression = expressionGenerator.generateExpression(type, symbolTable);
+        Expression testExpression = expressionGenerator.generateLiteral(type, symbolTable);
+//        Expression testExpression = expressionGenerator.generateExpression(type, symbolTable);
 
         List<MatchStatementCase> cases = new ArrayList<>();
         for (int i = 0; i < noOfCases; i++) {
             SymbolTable caseSymbolTable = new SymbolTable(symbolTable);
-            Expression exp = expressionGenerator.generateExpression(type, caseSymbolTable);
+
+            Expression exp = expressionGenerator.generateLiteral(type, caseSymbolTable);
+//            Expression exp = expressionGenerator.generateExpression(type, caseSymbolTable);
+
             Statement b = generateBody(method, caseSymbolTable);
 
             MatchStatementCase c = new MatchStatementCase(caseSymbolTable, exp, b);

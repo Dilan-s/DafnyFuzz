@@ -95,7 +95,7 @@ public class RandomTypeGenerator {
         while (t == null) {
             t = generateTypes(1, symbolTable).get(0);
 
-            if (t.isCollection()) {
+            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap())) {
                 t = null;
             }
         }

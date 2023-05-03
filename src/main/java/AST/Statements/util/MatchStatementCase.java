@@ -37,10 +37,11 @@ public class MatchStatementCase extends BaseStatement {
 
         this.expanded = new ArrayList<>();
         if (test != null) {
-            Type type = test.getTypes().get(0);
-            testVar = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-            testAssign = new AssignmentStatement(symbolTable, List.of(testVar), test);
-            expanded.add(testAssign.expand());
+//            Type type = test.getTypes().get(0);
+//            testVar = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
+//            testAssign = new AssignmentStatement(symbolTable, List.of(testVar), test);
+//            expanded.add(testAssign.expand());
+            expanded.add(test.expand());
         }
     }
 
@@ -65,8 +66,8 @@ public class MatchStatementCase extends BaseStatement {
 
     @Override
     public List<Statement> expand() {
-        if (test != null && testAssign.requireUpdate()) {
-            expanded.set(0, testAssign.expand());
+        if (test != null && test.requireUpdate()) {
+            expanded.set(0, test.expand());
         }
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
@@ -78,13 +79,13 @@ public class MatchStatementCase extends BaseStatement {
 
     @Override
     public boolean requireUpdate() {
-        return test != null && testAssign.requireUpdate();
+        return test != null && test.requireUpdate();
     }
 
     @Override
     public String toString() {
 
-        String res = String.format("case %s => {\n", test == null ? "_" : testVar.getName());
+        String res = String.format("case %s => {\n", test == null ? "_" : test.toString());
         res = res + StringUtils.indent(body.toString());
         res = res + "\n}\n";
 
@@ -94,7 +95,7 @@ public class MatchStatementCase extends BaseStatement {
     @Override
     public String minimizedTestCase() {
 
-        String res = String.format("case %s => {\n", test == null ? "_" : testVar.getName());
+        String res = String.format("case %s => {\n", test == null ? "_" : test.toString());
         res = res + StringUtils.indent(body.minimizedTestCase());
         res = res + "\n}\n";
 
@@ -108,7 +109,7 @@ public class MatchStatementCase extends BaseStatement {
 
         String testName;
         if (test != null) {
-            testName = testVar.getName();
+            testName = test.toString();
         } else {
             testName = "_";
         }

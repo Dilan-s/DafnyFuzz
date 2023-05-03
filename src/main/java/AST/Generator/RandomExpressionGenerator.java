@@ -265,7 +265,7 @@ public class RandomExpressionGenerator {
         return expression;
     }
 
-    private Expression generateLiteral(Type type, SymbolTable symbolTable) {
+    public Expression generateLiteral(Type type, SymbolTable symbolTable) {
         Expression expression = type.generateLiteral(symbolTable);
         return expression;
     }
