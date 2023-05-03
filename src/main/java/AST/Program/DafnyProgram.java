@@ -79,7 +79,7 @@ public class DafnyProgram {
 
         String minimizedTestCase = main.minimizedTestCase();
         try {
-            Path path = Paths.get("./tests");
+            Path path = Paths.get("./tests-minimized");
             FileWriter p = new FileWriter(String.format("%s/test-minimized.dfy", path.toAbsolutePath()));
             p.write(minimizedTestCase);
             p.close();

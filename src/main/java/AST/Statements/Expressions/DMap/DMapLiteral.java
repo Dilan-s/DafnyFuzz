@@ -23,7 +23,7 @@ public class DMapLiteral implements Expression {
 
     private final SymbolTable symbolTable;
     private final Type type;
-    private final List<DMapEntry> entries;
+    private List<DMapEntry> entries;
     private final List<DMapEntry> entriesInMap;
 
     private List<List<Statement>> expanded;

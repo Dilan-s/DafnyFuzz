@@ -74,7 +74,7 @@ public class DArray implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY);
+        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
 
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {

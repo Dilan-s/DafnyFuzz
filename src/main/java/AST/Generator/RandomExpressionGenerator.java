@@ -32,13 +32,13 @@ public class RandomExpressionGenerator {
     public static double PROB_LITERAL_EXPRESSION = 30.0;
     public static double PROB_OPERATOR_EXPRESSION = 40.0;
     public static double PROB_VARIABLE_EXPRESSION = 60.0;
-    public static double PROB_SEQ_INDEX_EXPRESSION = 20.0;
-    public static double PROB_DMAP_SELECTION_EXPRESSION = 20.0;
-    public static double PROB_SEQ_SUBSEQUENCE_EXPRESSION = 20.0;
-    public static double PROB_SEQ_UPDATE_EXPRESSION = 20.0;
-    public static double PROB_DMAP_UPDATE_EXPRESSION = 20.0;
-    public static double PROB_IF_ELSE_EXPRESSION = 30.0;
-    public static double PROB_CALL_EXPRESSION = 30.0;
+    public static double PROB_SEQ_INDEX_EXPRESSION = 15.0;
+    public static double PROB_DMAP_SELECTION_EXPRESSION = 15.0;
+    public static double PROB_SEQ_SUBSEQUENCE_EXPRESSION = 15.0;
+    public static double PROB_SEQ_UPDATE_EXPRESSION = 15.0;
+    public static double PROB_DMAP_UPDATE_EXPRESSION = 15.0;
+    public static double PROB_IF_ELSE_EXPRESSION = 15.0;
+    public static double PROB_CALL_EXPRESSION = 10.0;
 
     public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.7;
     public static final int MAX_EXPRESSION_DEPTH = 3;

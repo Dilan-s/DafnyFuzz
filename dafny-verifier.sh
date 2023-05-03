@@ -10,8 +10,10 @@ javac -cp src/main/java/ -d ./out/ src/main/java/Main/GenerateProgram.java src/m
 rm -rf outputs || true
 rm -rf tests || true
 rm -rf errors || true
+rm -rf tests-minimized || true
 
 mkdir tests || true
+mkdir tests-minimized || true
 mkdir outputs || true
 mkdir errors || true
 mkdir errors/verificationErrors
@@ -47,6 +49,15 @@ while [ true ]; do
 #  cp test.dfy tests/"test$x.dfy"
   # css
   #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
+  cd "$directory"
+  timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify tests-minimized/test-minimized.dfy > tmp.txt 2>&1
+  if [ $? -eq 4 ]
+  then
+    echo "Verification error found in test $x file $y"
+    mkdir "errors/verificationErrors/$x" || true
+    cp test.dfy "errors/verificationErrors/$x/test$y.dfy"
+    cat tmp.txt > "errors/verificationErrors/$x/test$y-verificationOutput.dfy"
+  fi
 
   cd "$directory"
   y=0
@@ -54,18 +65,6 @@ while [ true ]; do
   do
     echo "$file"
     cp "$file" test.dfy
-
-    cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify test.dfy > tmp.txt 2>&1
-    if [ $? -eq 4 ]
-    then
-      echo "Verification error found in test $x file $y"
-      mkdir "errors/verificationErrors/$x" || true
-      cp test.dfy "errors/verificationErrors/$x/test$y.dfy"
-      cat tmp.txt > "errors/verificationErrors/$x/test$y-verificationOutput.dfy"
-    fi
-
-
 
     # GO
     cd "$directory"
@@ -138,6 +137,7 @@ while [ true ]; do
 
   rm -rf tests/* || true
   rm -rf outputs/* || true
+  rm -rf tests-minimized/* || true
   x=$(( $x + 1 ))
 
 done

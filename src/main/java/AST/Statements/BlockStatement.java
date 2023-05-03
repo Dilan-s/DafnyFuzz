@@ -153,7 +153,7 @@ public class BlockStatement extends BaseStatement {
 
                 List<String> r = new ArrayList<>(res);
                 Collections.shuffle(r, GeneratorConfig.getRandom());
-                res = new HashSet<>(r.subList(0, Math.min(5, temp.size())));
+                res = new HashSet<>(r.subList(0, Math.min(5, r.size())));
             }
         }
 

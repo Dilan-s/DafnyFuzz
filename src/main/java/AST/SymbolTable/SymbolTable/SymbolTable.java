@@ -110,4 +110,8 @@ public class SymbolTable {
         }
         return true;
     }
+
+    public SymbolTable getEnclosingSymbolTable() {
+        return enclosingSymbolTable;
+    }
 }

@@ -75,7 +75,7 @@ public class Seq implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
+        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             Type concrete = type.concrete(symbolTable);

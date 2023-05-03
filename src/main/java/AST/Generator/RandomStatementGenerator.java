@@ -6,8 +6,10 @@ import AST.Statements.BlockStatement;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.IfElseStatement;
+import AST.Statements.MatchStatement;
 import AST.Statements.ReturnStatement;
 import AST.Statements.Statement;
+import AST.Statements.util.MatchStatementCase;
 import AST.Statements.util.PrintAll;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
@@ -23,10 +25,11 @@ import java.util.stream.Collectors;
 public class RandomStatementGenerator {
 
     private static final int MAX_ASSERT_VALUES = 5;
-    public static double PROB_RETURN_STAT = 30.0;
-    public static double PROB_ASSIGN_STAT = 40.0;
+    public static double PROB_RETURN_STAT = 35.0;
+    public static double PROB_ASSIGN_STAT = 30.0;
     public static double PROB_IF_ELSE_STAT = 20.0;
-    public static double PROB_ASSERT = 30.0;
+    public static double PROB_MATCH_STAT = 20.0;
+    public static double PROB_ASSERT = 25.0;
 
     public static final double PROB_METHOD_ASSIGN = 0.05;
     public static final double PROB_ELSE_STAT = 0.5;
@@ -66,7 +69,7 @@ public class RandomStatementGenerator {
         Statement ret = null;
         while (ret == null) {
             double ratioSum = PROB_RETURN_STAT + PROB_ASSIGN_STAT +
-                PROB_IF_ELSE_STAT + PROB_ASSERT;
+                PROB_IF_ELSE_STAT + PROB_ASSERT + PROB_MATCH_STAT;
             double probTypeOfStatement = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
             if ((statementDepth > MAX_STATEMENT_DEPTH
@@ -85,14 +88,46 @@ public class RandomStatementGenerator {
                 ret = generateIfElseStatement(method, symbolTable);
 
             } else if ((probTypeOfStatement -= PROB_ASSERT) < 0) {
-                //IfElse
+                //Assert
                 PROB_ASSERT *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateAssertStatement(method, symbolTable);
+
+            } else if ((probTypeOfStatement -= PROB_MATCH_STAT) < 0) {
+                //Match
+                PROB_MATCH_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateMatchStatement(method, symbolTable);
 
             }
         }
         statementDepth--;
         return ret;
+    }
+
+    private Statement generateMatchStatement(Method method, SymbolTable symbolTable) {
+        int noOfCases = GeneratorConfig.getRandom().nextInt(MAX_ASSERT_VALUES) + 1;
+
+        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+        Type type = typeGenerator.generateMatchType(symbolTable).concrete(symbolTable);
+
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+
+        Expression testExpression = expressionGenerator.generateExpression(type, symbolTable);
+
+        List<MatchStatementCase> cases = new ArrayList<>();
+        for (int i = 0; i < noOfCases; i++) {
+            SymbolTable caseSymbolTable = new SymbolTable(symbolTable);
+            Expression exp = expressionGenerator.generateExpression(type, caseSymbolTable);
+            Statement b = generateBody(method, caseSymbolTable);
+
+            MatchStatementCase c = new MatchStatementCase(caseSymbolTable, exp, b);
+            cases.add(c);
+        }
+
+        SymbolTable defCaseSymbolTable = new SymbolTable(symbolTable);
+        Statement defCaseBody = generateBody(method, defCaseSymbolTable);
+        MatchStatementCase defCase = new MatchStatementCase(defCaseSymbolTable, defCaseBody);
+        MatchStatement matchStatement = new MatchStatement(symbolTable, testExpression, cases, defCase);
+        return matchStatement;
     }
 
     private Statement generateAssertStatement(Method method, SymbolTable symbolTable) {

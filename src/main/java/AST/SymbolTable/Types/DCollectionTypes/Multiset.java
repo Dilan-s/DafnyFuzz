@@ -96,7 +96,7 @@ public class Multiset implements DCollection {
             return expression;
         }
 
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
+        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET) + 1;
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < noOfElems; i++) {
             Type t = type.concrete(symbolTable);

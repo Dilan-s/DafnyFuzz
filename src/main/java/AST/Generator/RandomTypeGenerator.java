@@ -89,4 +89,17 @@ public class RandomTypeGenerator {
         typeDepth -= MAX_TYPE_DEPTH;
         return types;
     }
+
+    public Type generateMatchType(SymbolTable symbolTable) {
+        Type t = null;
+        while (t == null) {
+            t = generateTypes(1, symbolTable).get(0);
+
+            if (t.isCollection()) {
+                t = null;
+            }
+        }
+
+        return t;
+    }
 }
