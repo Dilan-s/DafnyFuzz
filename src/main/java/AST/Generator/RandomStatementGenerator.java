@@ -5,6 +5,7 @@ import AST.Statements.AssignmentStatement;
 import AST.Statements.BlockStatement;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.IfElseStatement;
 import AST.Statements.MatchStatement;
 import AST.Statements.ReturnStatement;
@@ -27,8 +28,8 @@ public class RandomStatementGenerator {
     private static final int MAX_ASSERT_VALUES = 5;
     public static double PROB_RETURN_STAT = 35.0;
     public static double PROB_ASSIGN_STAT = 30.0;
-    public static double PROB_IF_ELSE_STAT = 20.0;
-    public static double PROB_MATCH_STAT = 20.0;
+    public static double PROB_IF_ELSE_STAT = 15.0;
+    public static double PROB_MATCH_STAT = 10.0;
     public static double PROB_ASSERT = 25.0;
 
     public static final double PROB_METHOD_ASSIGN = 0.05;
@@ -111,15 +112,14 @@ public class RandomStatementGenerator {
 
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        Expression testExpression = expressionGenerator.generateLiteral(type, symbolTable);
-//        Expression testExpression = expressionGenerator.generateExpression(type, symbolTable);
+//        Expression testExpression = expressionGenerator.generateLiteral(type, symbolTable);
+        Expression testExpression = expressionGenerator.generateExpression(type, symbolTable);
 
         List<MatchStatementCase> cases = new ArrayList<>();
         for (int i = 0; i < noOfCases; i++) {
             SymbolTable caseSymbolTable = new SymbolTable(symbolTable);
 
             Expression exp = expressionGenerator.generateLiteral(type, caseSymbolTable);
-//            Expression exp = expressionGenerator.generateExpression(type, caseSymbolTable);
 
             Statement b = generateBody(method, caseSymbolTable);
 

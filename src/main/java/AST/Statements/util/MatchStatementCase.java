@@ -37,10 +37,6 @@ public class MatchStatementCase extends BaseStatement {
 
         this.expanded = new ArrayList<>();
         if (test != null) {
-//            Type type = test.getTypes().get(0);
-//            testVar = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-//            testAssign = new AssignmentStatement(symbolTable, List.of(testVar), test);
-//            expanded.add(testAssign.expand());
             expanded.add(test.expand());
         }
     }
@@ -107,14 +103,15 @@ public class MatchStatementCase extends BaseStatement {
         Set<String> res = new HashSet<>();
         List<String> temp = new ArrayList<>();
 
-        String testName;
+        List<String> testName;
         if (test != null) {
-            testName = test.toString();
+            testName = test.toOutput();
         } else {
-            testName = "_";
+            testName = List.of("_");
         }
-        res.add(String.format("case %s => {\n", testName));
-
+        for (String s : testName) {
+            res.add(String.format("case %s => {\n", s));
+        }
         temp = new ArrayList<>();
         List<String> bodyOptions = body.toOutput();
         for (String f : res) {
