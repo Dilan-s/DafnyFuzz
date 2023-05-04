@@ -6,6 +6,8 @@ import AST.Statements.Expressions.DMap.DMapUpdateExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
 import AST.Statements.Expressions.IntLiteral;
+import AST.Statements.Expressions.Match.MatchExpression;
+import AST.Statements.Expressions.Match.MatchExpressionCase;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.Operator;
 import AST.Statements.Expressions.Operator.UnaryOperator;
@@ -14,6 +16,9 @@ import AST.Statements.Expressions.DSeq.SeqUpdateExpression;
 import AST.Statements.Expressions.DSeq.SeqIndexExpression;
 import AST.Statements.Expressions.DSeq.SeqSubsequenceExpression;
 import AST.Statements.Expressions.VariableExpression;
+import AST.Statements.MatchStatement;
+import AST.Statements.Statement;
+import AST.Statements.util.MatchStatementCase;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
@@ -39,7 +44,9 @@ public class RandomExpressionGenerator {
     public static double PROB_DMAP_UPDATE_EXPRESSION = 15.0;
     public static double PROB_IF_ELSE_EXPRESSION = 15.0;
     public static double PROB_CALL_EXPRESSION = 10.0;
+    public static double PROB_MATCH_EXPRESSION = 10.0;
 
+    private static final int MAX_MATCH_CASES_VALUES = 5;
     public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.7;
     public static final int MAX_EXPRESSION_DEPTH = 3;
 
@@ -52,9 +59,10 @@ public class RandomExpressionGenerator {
         expressionDepth++;
         while (ret == null) {
             double ratioSum = PROB_LITERAL_EXPRESSION + PROB_OPERATOR_EXPRESSION +
-                PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_DMAP_SELECTION_EXPRESSION
-                + PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION +
-                PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_EXPRESSION;
+                PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_DMAP_SELECTION_EXPRESSION +
+                PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION +
+                PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_EXPRESSION +
+                PROB_MATCH_EXPRESSION;
             double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * ratioSum;
             if (expressionDepth > MAX_EXPRESSION_DEPTH || (probTypeOfExpression -= PROB_LITERAL_EXPRESSION) < 0) {
                 //literal
@@ -105,10 +113,41 @@ public class RandomExpressionGenerator {
                 //call
                 PROB_CALL_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateCallExpression(symbolTable, List.of(type));
+            } else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
+                //call
+                PROB_CALL_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateMatchExpression(symbolTable, type);
             }
         }
         expressionDepth--;
         return ret;
+    }
+
+    private Expression generateMatchExpression(SymbolTable symbolTable, Type type) {
+        int noOfCases = GeneratorConfig.getRandom().nextInt(MAX_MATCH_CASES_VALUES) + 1;
+
+        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+        Type t = typeGenerator.generateMatchType(symbolTable).concrete(symbolTable);
+
+        Expression test = generateExpression(t, symbolTable);
+
+        List<MatchExpressionCase> cases = new ArrayList<>();
+        for (int i = 0; i < noOfCases; i++) {
+            SymbolTable caseSymbolTable = new SymbolTable(symbolTable);
+
+            Expression testCase = generateLiteral(t, caseSymbolTable);
+            Expression value = generateExpression(type, caseSymbolTable);
+
+            MatchExpressionCase c = new MatchExpressionCase(caseSymbolTable, type, testCase, value);
+            cases.add(c);
+        }
+
+        SymbolTable defCaseSymbolTable = new SymbolTable(symbolTable);
+        Expression defCaseValue = generateExpression(type, defCaseSymbolTable);
+
+        MatchExpressionCase defCase = new MatchExpressionCase(defCaseSymbolTable, type, defCaseValue);
+        MatchExpression matchExpression = new MatchExpression(symbolTable, type, test, cases, defCase);
+        return matchExpression;
     }
 
     private Expression generateDMapUpdateExpression(Type type, SymbolTable symbolTable) {

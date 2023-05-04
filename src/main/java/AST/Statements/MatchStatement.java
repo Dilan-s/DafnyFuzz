@@ -96,10 +96,11 @@ public class MatchStatement extends BaseStatement {
 
     @Override
     public List<Statement> expand() {
+        int j = 0;
         if (test.requireUpdate()) {
-            expanded.set(0, test.expand());
+            expanded.set(j, test.expand());
         }
-        int j = 1;
+        j++;
         int i;
         for (i = 0; i < cases.size(); i++) {
             MatchStatementCase c = cases.get(i);
@@ -155,7 +156,7 @@ public class MatchStatement extends BaseStatement {
         for (String f : res) {
             for (String defaultOption : defaultOptions) {
                 String curr = StringUtils.indent(defaultOption);
-                curr = f + curr;
+                curr = f + curr + "\n";
                 temp.add(curr);
             }
         }

@@ -10,7 +10,8 @@ rm -rf test.a || true
 rm -rf tmp.txt || true
 #rm -rf errors || true
 rm -rf out || true
-rm -rf outputs || true
-rm -rf tests || true
+rm -rf outputs/* || true
+rm -rf tests/* || true
+rm -rf tests-minimized/* || true
 rm -rf test.dfy || true
 rm -rf go.mod || true
