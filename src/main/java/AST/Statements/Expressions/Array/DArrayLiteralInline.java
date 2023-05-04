@@ -28,6 +28,8 @@ public class DArrayLiteralInline implements Expression {
     private List<Expression> values;
     private Statement statement;
 
+    private List<List<Statement>> expanded;
+
     public DArrayLiteralInline(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
@@ -35,6 +37,10 @@ public class DArrayLiteralInline implements Expression {
 
         this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
         this.statement = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues(values));
+
+        this.expanded = new ArrayList<>();
+        values.forEach(v -> expanded.add(v.expand()));
+        expanded.add(statement.expand());
 
         generateAssignments();
     }
@@ -57,13 +63,22 @@ public class DArrayLiteralInline implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-        r.addAll(values.stream()
-            .map(Expression::expand)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList()));
-        r.add(statement);
-        return r;
+        int i;
+        for (i = 0; i < values.size(); i++) {
+            Expression value = values.get(i);
+            if (value.requireUpdate()) {
+                expanded.set(i, value.expand());
+            }
+        }
+        if (statement.requireUpdate()) {
+            expanded.set(i, statement.expand());
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return values.stream().anyMatch(Expression::requireUpdate) || statement.requireUpdate();
     }
 
     @Override
@@ -178,5 +193,9 @@ public class DArrayLiteralInline implements Expression {
             return new ArrayList<>();
         }
 
+        @Override
+        public boolean requireUpdate() {
+            return false;
+        }
     }
 }

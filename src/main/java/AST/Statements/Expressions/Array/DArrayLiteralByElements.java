@@ -24,6 +24,8 @@ public class DArrayLiteralByElements implements Expression {
     private final Statement statement;
     private final List<Statement> assignments;
 
+    private List<List<Statement>> expanded;
+
     public DArrayLiteralByElements(SymbolTable symbolTable, Type type, List<Expression> values) {
         this.symbolTable = symbolTable;
         this.type = type;
@@ -33,6 +35,10 @@ public class DArrayLiteralByElements implements Expression {
         this.statement = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues(values));
         this.assignments = new ArrayList<>();
         generateAssignments();
+
+        this.expanded = new ArrayList<>();
+        expanded.add(statement.expand());
+        assignments.forEach(v -> expanded.add(v.expand()));
     }
 
     private void generateAssignments() {
@@ -78,13 +84,23 @@ public class DArrayLiteralByElements implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
-        r.add(statement);
-        r.addAll(assignments.stream()
-            .map(Statement::expand)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList()));
-        return r;
+        int i = 0;
+        if (statement.requireUpdate()) {
+            expanded.set(i, statement.expand());
+        }
+        i++;
+        for (int j = 0; j < assignments.size(); j++) {
+            Statement value = assignments.get(j);
+            if (value.requireUpdate()) {
+                expanded.set(i + j, value.expand());
+            }
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return assignments.stream().anyMatch(Statement::requireUpdate) || statement.requireUpdate();
     }
 
     private class ArrayInitValues implements Expression {
@@ -127,6 +143,11 @@ public class DArrayLiteralByElements implements Expression {
         @Override
         public List<Statement> expand() {
             return new ArrayList<>();
+        }
+
+        @Override
+        public boolean requireUpdate() {
+            return false;
         }
     }
 }

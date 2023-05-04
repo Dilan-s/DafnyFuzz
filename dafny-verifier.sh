@@ -55,7 +55,7 @@ while [ true ]; do
   then
     echo "Verification error found in test $x file $y"
     mkdir "errors/verificationErrors/$x" || true
-    cp test.dfy "errors/verificationErrors/$x/test$y.dfy"
+    cp tests-minimized/test-minimized.dfy "errors/verificationErrors/$x/test$y.dfy"
     cat tmp.txt > "errors/verificationErrors/$x/test$y-verificationOutput.dfy"
   fi
 
@@ -76,6 +76,8 @@ while [ true ]; do
       rm -rf test || true
       rm -rf test-go || true
     else
+      rm -rf test || true
+      rm -rf test-go || true
       echo "Failed to convert to GO in $t seconds"
     fi
 
@@ -88,6 +90,7 @@ while [ true ]; do
       node test.js > "outputs/output-js-$y.txt" 2>>errors/compErrors/js.txt
       rm -rf test.js || true
     else
+      rm -rf test.js || true
       echo "Failed to convert to JS in $t seconds"
     fi
 
@@ -101,6 +104,8 @@ while [ true ]; do
       rm -rf test.jar || true
       rm -rf test-java || true
     else
+      rm -rf test.jar || true
+      rm -rf test-java || true
       echo "Failed to convert to Java in $t seconds"
     fi
 
@@ -113,6 +118,7 @@ while [ true ]; do
       python3 test-py/test.py > "outputs/output-py-$y.txt" 2>>errors/compErrors/py.txt
       rm -rf test-py || true
     else
+      rm -rf test-py || true
       echo "Failed to convert to Python in $t seconds"
     fi
 

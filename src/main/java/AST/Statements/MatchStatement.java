@@ -66,7 +66,7 @@ public class MatchStatement extends BaseStatement {
             }
 
             if (testValues.contains(castTestValue)) {
-                distinctCases.remove(matchStatementCase);
+//                distinctCases.remove(matchStatementCase);
                 continue;
             }
             testValues.add(castTestValue);
@@ -82,7 +82,7 @@ public class MatchStatement extends BaseStatement {
                     }
 
                     if (testValues.contains(castTestValue)) {
-                        distinctCases.remove(matchStatementCase);
+//                        distinctCases.remove(matchStatementCase);
                     } else {
                         testValues.add(castTestValue);
                     }

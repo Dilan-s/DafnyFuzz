@@ -71,6 +71,11 @@ public class SeqUpdateExpression implements Expression {
     }
 
     @Override
+    public boolean requireUpdate() {
+        return seqAssign.requireUpdate() || indAssign.requireUpdate() || exp.requireUpdate();
+    }
+
+    @Override
     public String toString() {
         return String.format("%s[%s := %s]", seqVar.getName(), indVar.getName(), exp);
     }

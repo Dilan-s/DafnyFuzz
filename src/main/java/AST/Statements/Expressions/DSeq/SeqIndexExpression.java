@@ -67,6 +67,7 @@ public class SeqIndexExpression implements Expression {
     }
 
     public void setInd(Map<Variable, Variable> paramsMap, StringBuilder s) {
+        update = true;
         DCollection seqT = (DCollection) seqVar.getType();
         VariableExpression seqVarExp = getSequenceVariableExpression();
         VariableExpression indVarExp = getIndexVariableExpression();
@@ -79,7 +80,6 @@ public class SeqIndexExpression implements Expression {
             stat.execute(paramsMap, s);
         }
         expanded.add(asStatInd.get().expand());
-        update = true;
     }
 
     @Override
@@ -89,7 +89,6 @@ public class SeqIndexExpression implements Expression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
         if (asStatSeq.requireUpdate()) {
             expanded.set(0, asStatSeq.expand());
         }
@@ -109,8 +108,21 @@ public class SeqIndexExpression implements Expression {
 
     @Override
     public boolean requireUpdate() {
-        return this.update || asStatSeq.requireUpdate() || asStatIndPre.requireUpdate()
-            || (asStatInd.isPresent() && asStatInd.get().requireUpdate());
+        if (this.update) {
+            return true;
+        }
+        if (asStatSeq.requireUpdate()) {
+            return true;
+        }
+        if (asStatIndPre.requireUpdate()) {
+            return true;
+        }
+        if (asStatInd.isPresent()) {
+            if (asStatInd.get().requireUpdate()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
