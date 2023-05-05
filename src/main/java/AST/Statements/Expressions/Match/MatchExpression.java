@@ -128,6 +128,7 @@ public class MatchExpression implements Expression {
             res = new HashSet<>(temp.subList(0, Math.min(5, temp.size())));
         }
 
+        temp = new ArrayList<>();
         List<String> caseOptions = defaultCase.toOutput();
         for (String f : res) {
             for (String caseOption : caseOptions) {
