@@ -117,7 +117,7 @@ public class Tuple implements UserDefinedType {
             Type t = typeList.get(i);
             Object v = value.get(i);
 
-            String element = t.formatEnsures(String.format("%s.%d", variableName, i), v);
+            String element = t.formatEnsures(String.format("(%s).%d", variableName, i), v);
 
             if (element == null) {
                 return null;

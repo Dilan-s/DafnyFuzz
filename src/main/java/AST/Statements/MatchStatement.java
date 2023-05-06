@@ -22,6 +22,7 @@ public class MatchStatement extends BaseStatement {
     private List<MatchStatementCase> cases;
     private List<MatchStatementCase> distinctCases;
     private MatchStatementCase defaultCase;
+    private boolean requireDefault;
 
     private List<List<Statement>> expanded;
 
@@ -66,7 +67,7 @@ public class MatchStatement extends BaseStatement {
             }
 
             if (testValues.contains(castTestValue)) {
-//                distinctCases.remove(matchStatementCase);
+                distinctCases.remove(matchStatementCase);
                 continue;
             }
             testValues.add(castTestValue);
@@ -82,7 +83,7 @@ public class MatchStatement extends BaseStatement {
                     }
 
                     if (testValues.contains(castTestValue)) {
-//                        distinctCases.remove(matchStatementCase);
+                        distinctCases.remove(matchStatementCase);
                     } else {
                         testValues.add(castTestValue);
                     }
@@ -90,7 +91,6 @@ public class MatchStatement extends BaseStatement {
                 return execute;
             }
         }
-
         return defaultCase.execute(paramMap, s);
     }
 
@@ -130,25 +130,27 @@ public class MatchStatement extends BaseStatement {
             res.add(String.format("match %s {\n", testOutput));
         }
 
-        for (MatchStatementCase matchStatementCase : distinctCases) {
-            List<String> caseOptions = matchStatementCase.toOutput();
-            temp = new ArrayList<>();
-            for (String f : res) {
-                for (String caseOption : caseOptions) {
-                    String curr = StringUtils.indent(caseOption);
-                    curr = f + curr + "\n";
-                    temp.add(curr);
+        if (getNoOfUses() > 0) {
+            for (MatchStatementCase matchStatementCase : distinctCases) {
+                List<String> caseOptions = matchStatementCase.toOutput();
+                temp = new ArrayList<>();
+                for (String f : res) {
+                    for (String caseOption : caseOptions) {
+                        String curr = StringUtils.indent(caseOption);
+                        curr = f + curr + "\n";
+                        temp.add(curr);
+                    }
                 }
-            }
-            if (caseOptions.isEmpty()) {
-                temp.addAll(res);
-            }
+                if (caseOptions.isEmpty()) {
+                    temp.addAll(res);
+                }
 
-            res = new HashSet(temp);
+                res = new HashSet(temp);
 
-            List<String> r = new ArrayList<>(res);
-            Collections.shuffle(r, GeneratorConfig.getRandom());
-            res = new HashSet<>(r.subList(0, Math.min(5, r.size())));
+                List<String> r = new ArrayList<>(res);
+                Collections.shuffle(r, GeneratorConfig.getRandom());
+                res = new HashSet<>(r.subList(0, Math.min(5, r.size())));
+            }
         }
 
         temp = new ArrayList<>();
@@ -165,7 +167,6 @@ public class MatchStatement extends BaseStatement {
         }
 
         res = new HashSet(temp);
-
 
         temp = new ArrayList<>();
         for (String f : res) {
@@ -208,9 +209,12 @@ public class MatchStatement extends BaseStatement {
     @Override
     public String toString() {
         String res = String.format("match %s {\n", test.toString());
-        for (MatchStatementCase c : distinctCases) {
-            res = res + StringUtils.indent(c.toString());
+        if (getNoOfUses() > 0) {
+            for (MatchStatementCase c : distinctCases) {
+                res = res + StringUtils.indent(c.toString());
+            }
         }
+        res = res + StringUtils.indent(defaultCase.toString());
         res = res + "\n}\n";
         return res;
     }

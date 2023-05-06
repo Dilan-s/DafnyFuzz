@@ -32,6 +32,11 @@ public class BlockStatement extends BaseStatement {
         return symbolTable;
     }
 
+    public void addStatementFirst(Statement statement) {
+        body.add(0, statement);
+        expanded.add(0, statement.expand());
+    }
+
     public void addStatement(Statement statement) {
         body.add(statement);
         expanded.add(statement.expand());
