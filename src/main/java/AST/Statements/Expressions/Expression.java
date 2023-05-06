@@ -35,4 +35,8 @@ public interface Expression {
     default boolean requireUpdate() {
         return false;
     }
+
+    default String minimizedTestCase() {
+        return toString();
+    }
 }

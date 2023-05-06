@@ -34,19 +34,19 @@ import java.util.stream.Collectors;
 
 public class RandomExpressionGenerator {
 
-    public static double PROB_LITERAL_EXPRESSION = 30.0;
-    public static double PROB_OPERATOR_EXPRESSION = 40.0;
+    public static double PROB_LITERAL_EXPRESSION = 27.0;
+    public static double PROB_OPERATOR_EXPRESSION = 30.0;
     public static double PROB_VARIABLE_EXPRESSION = 60.0;
-    public static double PROB_SEQ_INDEX_EXPRESSION = 15.0;
-    public static double PROB_DMAP_SELECTION_EXPRESSION = 15.0;
-    public static double PROB_SEQ_SUBSEQUENCE_EXPRESSION = 15.0;
-    public static double PROB_SEQ_UPDATE_EXPRESSION = 15.0;
-    public static double PROB_DMAP_UPDATE_EXPRESSION = 15.0;
-    public static double PROB_IF_ELSE_EXPRESSION = 15.0;
+    public static double PROB_SEQ_INDEX_EXPRESSION = 10.0;
+    public static double PROB_DMAP_SELECTION_EXPRESSION = 10.0;
+    public static double PROB_SEQ_SUBSEQUENCE_EXPRESSION = 10.0;
+    public static double PROB_SEQ_UPDATE_EXPRESSION = 10.0;
+    public static double PROB_DMAP_UPDATE_EXPRESSION = 10.0;
+    public static double PROB_IF_ELSE_EXPRESSION = 10.0;
     public static double PROB_CALL_EXPRESSION = 10.0;
-    public static double PROB_MATCH_EXPRESSION = 10.0;
+    public static double PROB_MATCH_EXPRESSION = 5.0;
 
-    private static final int MAX_MATCH_CASES_VALUES = 5;
+    private static final int MAX_MATCH_CASES_VALUES = 2;
     public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.7;
     public static final int MAX_EXPRESSION_DEPTH = 3;
 
@@ -71,16 +71,16 @@ public class RandomExpressionGenerator {
 
             } else if ((probTypeOfExpression -= PROB_VARIABLE_EXPRESSION) < 0) {
                 //variable
+                PROB_VARIABLE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 VariableExpression expression = generateVariableExpression(type, symbolTable);
                 if (expression != null) {
-                    PROB_VARIABLE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     ret = expression;
                 }
             } else if ((probTypeOfExpression -= PROB_OPERATOR_EXPRESSION) < 0 && type.operatorExists()) {
                 //Operator
+                PROB_OPERATOR_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 OperatorExpression expression = generateOperatorExpression(type, symbolTable);
                 if (expression != null) {
-                    PROB_OPERATOR_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     ret = expression;
                 }
             } else if ((probTypeOfExpression -= PROB_SEQ_INDEX_EXPRESSION) < 0) {
@@ -114,8 +114,8 @@ public class RandomExpressionGenerator {
                 PROB_CALL_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateCallExpression(symbolTable, List.of(type));
             } else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
-                //call
-                PROB_CALL_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                //match
+                PROB_MATCH_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateMatchExpression(symbolTable, type);
             }
         }
@@ -129,7 +129,9 @@ public class RandomExpressionGenerator {
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
         Type t = typeGenerator.generateMatchType(symbolTable).concrete(symbolTable);
 
+        expressionDepth += MAX_EXPRESSION_DEPTH;
         Expression test = generateExpression(t, symbolTable);
+        expressionDepth -= MAX_EXPRESSION_DEPTH;
 
         List<MatchExpressionCase> cases = new ArrayList<>();
         for (int i = 0; i < noOfCases; i++) {

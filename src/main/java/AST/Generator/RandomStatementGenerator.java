@@ -5,16 +5,21 @@ import AST.Statements.AssignmentStatement;
 import AST.Statements.BlockStatement;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.IntLiteral;
+import AST.Statements.Expressions.Operator.BinaryOperator;
+import AST.Statements.Expressions.Operator.OperatorExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.IfElseStatement;
 import AST.Statements.MatchStatement;
 import AST.Statements.ReturnStatement;
 import AST.Statements.Statement;
+import AST.Statements.WhileStatement;
 import AST.Statements.util.MatchStatementCase;
 import AST.Statements.util.PrintAll;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -26,10 +31,12 @@ import java.util.stream.Collectors;
 public class RandomStatementGenerator {
 
     private static final int MAX_ASSERT_VALUES = 5;
+    private static final int MAX_MATCH_VALUES = 2;
     public static double PROB_RETURN_STAT = 35.0;
     public static double PROB_ASSIGN_STAT = 30.0;
     public static double PROB_IF_ELSE_STAT = 15.0;
-    public static double PROB_MATCH_STAT = 10.0;
+    public static double PROB_MATCH_STAT = 5.0;
+    public static double PROB_WHILE_STAT = 5.0;
     public static double PROB_ASSERT = 25.0;
 
     public static final double PROB_METHOD_ASSIGN = 0.05;
@@ -37,19 +44,22 @@ public class RandomStatementGenerator {
 
     public static final int MAX_STATEMENT_DEPTH = 4;
     public static final double PROB_NEXT_STAT = 0.85;
-    public static final double PROB_FORCE_RETURN = 0.05;
+    public static final double PROB_FORCE_RETURN = 0.1;
 
     private static int statementDepth = 0;
 
 
-    public Statement generateBody(Method method, SymbolTable symbolTable) {
+    public BlockStatement generateBody(Method method, SymbolTable symbolTable) {
+        return generateBody(method, symbolTable, method.hasReturn());
+    }
+
+    public BlockStatement generateBody(Method method, SymbolTable symbolTable, boolean requireReturn) {
         BlockStatement body = new BlockStatement(symbolTable);
 
         double probContinue = GeneratorConfig.getRandom().nextDouble();
-        boolean hasReturn = method.hasReturn();
         Statement statement = null;
-        while (probContinue < PROB_NEXT_STAT || hasReturn) {
-            statement = generateStatement(method, symbolTable);
+        while (probContinue < PROB_NEXT_STAT || requireReturn) {
+            statement = generateStatement(method, symbolTable, requireReturn);
             body.addStatement(statement);
             if (statement.isReturn()) {
                 break;
@@ -65,18 +75,22 @@ public class RandomStatementGenerator {
         return body;
     }
 
-    private Statement generateStatement(Method method, SymbolTable symbolTable) {
+    private Statement generateStatement(Method method, SymbolTable symbolTable, boolean requireReturn) {
         statementDepth++;
         Statement ret = null;
         while (ret == null) {
-            double ratioSum = PROB_RETURN_STAT + PROB_ASSIGN_STAT +
-                PROB_IF_ELSE_STAT + PROB_ASSERT + PROB_MATCH_STAT;
+            double ratioSum = PROB_RETURN_STAT +
+                PROB_ASSIGN_STAT + PROB_IF_ELSE_STAT +
+                PROB_ASSERT + PROB_MATCH_STAT + PROB_WHILE_STAT;
             double probTypeOfStatement = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
-            if ((statementDepth > MAX_STATEMENT_DEPTH
-                || (probTypeOfStatement -= PROB_RETURN_STAT) < 0)) {
+            if ((statementDepth > MAX_STATEMENT_DEPTH ||
+                (probTypeOfStatement -= PROB_RETURN_STAT) < 0)) {
                 //return
-                ret = generateReturnStatement(method, symbolTable);
+                double probReturnWhenNoReturnRequired = GeneratorConfig.getRandom().nextDouble();
+                if (statementDepth > MAX_STATEMENT_DEPTH || requireReturn || probReturnWhenNoReturnRequired < PROB_FORCE_RETURN) {
+                    ret = generateReturnStatement(method, symbolTable);
+                }
 
             } else if ((probTypeOfStatement -= PROB_ASSIGN_STAT) < 0) {
                 //Assign
@@ -98,21 +112,59 @@ public class RandomStatementGenerator {
                 PROB_MATCH_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateMatchStatement(method, symbolTable);
 
+            } else if ((probTypeOfStatement -= PROB_WHILE_STAT) < 0) {
+                //Match
+                PROB_WHILE_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateWhileStatement(method, symbolTable);
+
             }
         }
         statementDepth--;
         return ret;
     }
 
+    private Statement generateWhileStatement(Method method, SymbolTable symbolTable) {
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+        Int intType = new Int();
+
+        Variable loopVar = new Variable(VariableNameGenerator.generateVariableValueName(intType, symbolTable), intType);
+        VariableExpression loopVarExp = new VariableExpression(symbolTable, loopVar, intType);
+
+        Variable finalVar = new Variable(VariableNameGenerator.generateVariableValueName(intType, symbolTable), intType);
+        VariableExpression finalVarExp = new VariableExpression(symbolTable, loopVar, intType);
+
+        Expression initExp = expressionGenerator.generateExpression(intType, symbolTable);
+        AssignmentStatement initAssign = new AssignmentStatement(symbolTable, List.of(loopVar), initExp);
+
+        Expression finalExp = expressionGenerator.generateExpression(intType, symbolTable);
+        AssignmentStatement finalAssign = new AssignmentStatement(symbolTable, List.of(finalVar), finalExp);
+
+
+        Bool boolType = new Bool();
+//        Expression testRhs = expressionGenerator.generateExpression(boolType, symbolTable);
+//        OperatorExpression testLhs = new OperatorExpression(symbolTable, boolType, BinaryOperator.Less_Than, List.of(loopVarExp, finalExp));
+//        Expression test = new OperatorExpression(symbolTable, boolType, BinaryOperator.And, List.of(testLhs, testRhs));
+
+        OperatorExpression test = new OperatorExpression(symbolTable, boolType, BinaryOperator.Less_Than, List.of(loopVarExp, finalVarExp));
+
+        SymbolTable bodySt = new SymbolTable(symbolTable);
+        BlockStatement body = generateBody(method, bodySt, false);
+        OperatorExpression incr = new OperatorExpression(bodySt, intType, BinaryOperator.Plus, List.of(loopVarExp, new IntLiteral(intType, symbolTable, 1)));
+        AssignmentStatement incrAssign = new AssignmentStatement(bodySt, List.of(loopVar), incr);
+        body.addStatementFirst(incrAssign);
+
+        WhileStatement whileStatement = new WhileStatement(symbolTable, loopVar, finalVar, initAssign, finalAssign, test, body);
+
+        return whileStatement;
+    }
+
     private Statement generateMatchStatement(Method method, SymbolTable symbolTable) {
-        int noOfCases = GeneratorConfig.getRandom().nextInt(MAX_ASSERT_VALUES) + 1;
+        int noOfCases = GeneratorConfig.getRandom().nextInt(MAX_MATCH_VALUES) + 1;
 
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
         Type type = typeGenerator.generateMatchType(symbolTable).concrete(symbolTable);
 
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
-
-//        Expression testExpression = expressionGenerator.generateLiteral(type, symbolTable);
         Expression testExpression = expressionGenerator.generateExpression(type, symbolTable);
 
         List<MatchStatementCase> cases = new ArrayList<>();
@@ -121,14 +173,14 @@ public class RandomStatementGenerator {
 
             Expression exp = expressionGenerator.generateLiteral(type, caseSymbolTable);
 
-            Statement b = generateBody(method, caseSymbolTable);
+            Statement b = generateBody(method, caseSymbolTable, false);
 
             MatchStatementCase c = new MatchStatementCase(caseSymbolTable, exp, b);
             cases.add(c);
         }
 
         SymbolTable defCaseSymbolTable = new SymbolTable(symbolTable);
-        Statement defCaseBody = generateBody(method, defCaseSymbolTable);
+        Statement defCaseBody = generateBody(method, defCaseSymbolTable, false);
         MatchStatementCase defCase = new MatchStatementCase(defCaseSymbolTable, defCaseBody);
         MatchStatement matchStatement = new MatchStatement(symbolTable, testExpression, cases, defCase);
         return matchStatement;
@@ -176,10 +228,10 @@ public class RandomStatementGenerator {
 
         Expression test = expressionGenerator.generateExpression(new Bool(), symbolTable);
 
-        Statement ifStat = generateBody(method, new SymbolTable(symbolTable));
+        Statement ifStat = generateBody(method, new SymbolTable(symbolTable), false);
 
         if (GeneratorConfig.getRandom().nextDouble() < PROB_ELSE_STAT) {
-            Statement elseStat = generateBody(method, new SymbolTable(symbolTable));
+            Statement elseStat = generateBody(method, new SymbolTable(symbolTable), false);
             IfElseStatement statement = new IfElseStatement(symbolTable, test, ifStat, elseStat);
             return statement;
         } else {
