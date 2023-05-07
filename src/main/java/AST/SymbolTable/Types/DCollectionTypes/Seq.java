@@ -132,7 +132,7 @@ public class Seq implements DCollection {
         List<Object> lhsVL = (List<Object>) lhsV;
         List<Object> rhsVL = (List<Object>) rhsV;
 
-        if (lhsVL.size() > rhsVL.size()) {
+        if (lhsVL.size() >= rhsVL.size()) {
             return false;
         }
 

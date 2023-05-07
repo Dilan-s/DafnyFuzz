@@ -9,6 +9,7 @@ import AST.Statements.Expressions.IntLiteral;
 import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.OperatorExpression;
 import AST.Statements.Expressions.VariableExpression;
+import AST.Statements.ForStatement;
 import AST.Statements.IfElseStatement;
 import AST.Statements.MatchStatement;
 import AST.Statements.ReturnStatement;
@@ -32,19 +33,20 @@ public class RandomStatementGenerator {
 
     private static final int MAX_ASSERT_VALUES = 5;
     private static final int MAX_MATCH_VALUES = 2;
-    public static double PROB_RETURN_STAT = 35.0;
+    public static double PROB_RETURN_STAT = 50.0;
     public static double PROB_ASSIGN_STAT = 30.0;
     public static double PROB_IF_ELSE_STAT = 15.0;
-    public static double PROB_MATCH_STAT = 5.0;
-    public static double PROB_WHILE_STAT = 5.0;
-    public static double PROB_ASSERT = 25.0;
+    public static double PROB_MATCH_STAT = 4.0;
+    public static double PROB_WHILE_STAT = 4.0;
+    public static double PROB_FOR_STAT = 4.0;
+    public static double PROB_ASSERT = 12.5;
 
     public static final double PROB_METHOD_ASSIGN = 0.05;
     public static final double PROB_ELSE_STAT = 0.5;
 
     public static final int MAX_STATEMENT_DEPTH = 4;
     public static final double PROB_NEXT_STAT = 0.85;
-    public static final double PROB_FORCE_RETURN = 0.1;
+    public static final double PROB_FORCE_RETURN = 0.2;
 
     private static int statementDepth = 0;
 
@@ -81,7 +83,7 @@ public class RandomStatementGenerator {
         while (ret == null) {
             double ratioSum = PROB_RETURN_STAT +
                 PROB_ASSIGN_STAT + PROB_IF_ELSE_STAT +
-                PROB_ASSERT + PROB_MATCH_STAT + PROB_WHILE_STAT;
+                PROB_ASSERT + PROB_MATCH_STAT + PROB_WHILE_STAT + PROB_FOR_STAT;
             double probTypeOfStatement = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
             if ((statementDepth > MAX_STATEMENT_DEPTH ||
@@ -117,10 +119,33 @@ public class RandomStatementGenerator {
                 PROB_WHILE_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateWhileStatement(method, symbolTable);
 
+            } else if ((probTypeOfStatement -= PROB_FOR_STAT) < 0) {
+                //Match
+                PROB_FOR_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateForStatement(method, symbolTable);
+
             }
         }
         statementDepth--;
         return ret;
+    }
+
+    private Statement generateForStatement(Method method, SymbolTable symbolTable) {
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+        Int intType = new Int();
+
+        SymbolTable forSt = new SymbolTable(symbolTable);
+
+        Variable loopVar = new Variable(VariableNameGenerator.generateVariableValueName(intType, symbolTable), intType);
+
+        Expression initExp = expressionGenerator.generateExpression(intType, symbolTable);
+        Expression finalExp = expressionGenerator.generateExpression(intType, symbolTable);
+
+        forSt.addVariable(loopVar);
+        BlockStatement body = generateBody(method, forSt, false);
+
+        ForStatement forStatement = new ForStatement(symbolTable, initExp, finalExp, loopVar, body);
+        return forStatement;
     }
 
     private Statement generateWhileStatement(Method method, SymbolTable symbolTable) {
@@ -131,7 +156,7 @@ public class RandomStatementGenerator {
         VariableExpression loopVarExp = new VariableExpression(symbolTable, loopVar, intType);
 
         Variable finalVar = new Variable(VariableNameGenerator.generateVariableValueName(intType, symbolTable), intType);
-        VariableExpression finalVarExp = new VariableExpression(symbolTable, loopVar, intType);
+        VariableExpression finalVarExp = new VariableExpression(symbolTable, finalVar, intType);
 
         Expression initExp = expressionGenerator.generateExpression(intType, symbolTable);
         AssignmentStatement initAssign = new AssignmentStatement(symbolTable, List.of(loopVar), initExp);

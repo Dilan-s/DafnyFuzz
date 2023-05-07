@@ -29,7 +29,6 @@ public class SeqIndexExpression implements Expression {
     private Type type;
 
     private Optional<AssignmentStatement> asStatInd;
-    private Optional<CallExpression> callExp;
 
     private boolean update;
 
@@ -41,7 +40,6 @@ public class SeqIndexExpression implements Expression {
         this.update = false;
         setSeqAssignAndIndAssign(seq, index);
         this.asStatInd = Optional.empty();
-        this.callExp = Optional.empty();
 
         expanded = new ArrayList<>();
         expanded.add(asStatSeq.expand());
@@ -73,7 +71,6 @@ public class SeqIndexExpression implements Expression {
         VariableExpression indVarExp = getIndexVariableExpression();
 
         CallExpression exp = new CallExpression(symbolTable, symbolTable.getMethod(String.format("safe_index_%s", seqT.getName())), List.of(seqVarExp, indVarExp));
-        callExp = Optional.of(exp);
         asStatInd = Optional.of(new AssignmentStatement(symbolTable, List.of(indVar), exp));
         List<Statement> expand = asStatInd.get().expand();
         for (Statement stat : expand) {

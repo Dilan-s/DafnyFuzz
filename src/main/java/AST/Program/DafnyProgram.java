@@ -46,6 +46,9 @@ public class DafnyProgram {
         Method safe_subsequence = SafeMethods.safe_subsequence();
         main.addMethod(safe_subsequence);
 
+        Method safe_min_max = SafeMethods.safe_min_max();
+        main.addMethod(safe_min_max);
+
         Statement statement = randomStatementGenerator.generateBody(main, main.getSymbolTable());
         main.setBody(statement);
 

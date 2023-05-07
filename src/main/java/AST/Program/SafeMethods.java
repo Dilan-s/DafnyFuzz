@@ -23,6 +23,38 @@ import java.util.List;
 
 public class SafeMethods {
 
+    public static Method safe_min_max() {
+        Method safe_min_max = new Method(List.of(new Int(), new Int()), "safe_min_max");
+        safe_min_max.addEnsures("((p_safe_min_max_1 < p_safe_min_max_2) ==> ((ret_1 <= ret_2) && (ret_1 == p_safe_min_max_1) && (ret_2 == p_safe_min_max_2))) && ((p_safe_min_max_1 >= p_safe_min_max_2) ==> ((ret_1 <= ret_2) && (ret_1 == p_safe_min_max_2) && (ret_2 == p_safe_min_max_1)))");
+        SymbolTable symbolTable = safe_min_max.getSymbolTable();
+
+        BlockStatement statement = new BlockStatement(symbolTable);
+        safe_min_max.setBody(statement);
+
+
+        String p1 = VariableNameGenerator.generateArgumentName(safe_min_max);
+        Int p1T = new Int();
+        Variable p1Var = new Variable(p1, p1T);
+        VariableExpression p1VarExp = new VariableExpression(symbolTable, p1Var, p1T);
+        safe_min_max.addArgument(p1Var);
+
+        String p2 = VariableNameGenerator.generateArgumentName(safe_min_max);
+        Int p2T = new Int();
+        Variable p2Var = new Variable(p2, p2T);
+        VariableExpression p2VarExp = new VariableExpression(symbolTable, p2Var, p2T);
+        safe_min_max.addArgument(p2Var);
+
+        OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Less_Than, List.of(p1VarExp, p2VarExp));
+
+        IfElseExpression lhs = new IfElseExpression(symbolTable, new Int(), test, p1VarExp, p2VarExp);
+        IfElseExpression rhs = new IfElseExpression(symbolTable, new Int(), test, p2VarExp, p1VarExp);
+        ReturnStatement returnStatement = new ReturnStatement(symbolTable, List.of(lhs, rhs), false);
+
+        statement.addStatement(returnStatement);
+
+        return safe_min_max.getSimpleMethod();
+    }
+
     public static Method safe_subsequence() {
         Method safe_subsequence = new Method(List.of(new Int(), new Int()), "safe_subsequence");
         safe_subsequence.addEnsures("((|p_safe_subsequence_1| > 0) ==> ((0 <= ret_1 < |p_safe_subsequence_1|) && (0 <= ret_2 < |p_safe_subsequence_1|) && ret_1 <= ret_2)) && ((((0 <= p_safe_subsequence_2 < |p_safe_subsequence_1|) ==> (ret_1 == p_safe_subsequence_2)) && ((0 > p_safe_subsequence_2 || p_safe_subsequence_2 >= |p_safe_subsequence_1|) ==> (ret_1 == 0)) && ((0 <= p_safe_subsequence_3 < |p_safe_subsequence_1|) ==> (ret_2 == p_safe_subsequence_3)) && ((0 > p_safe_subsequence_3 || p_safe_subsequence_3 >= |p_safe_subsequence_1|) ==> (ret_2 == 0))) || ((((0 <= p_safe_subsequence_2 < |p_safe_subsequence_1|) ==> (ret_2 == p_safe_subsequence_2)) && ((0 > p_safe_subsequence_2 || p_safe_subsequence_2 >= |p_safe_subsequence_1|) ==> (ret_2 == 0)) && ((0 <= p_safe_subsequence_3 < |p_safe_subsequence_1|) ==> (ret_1 == p_safe_subsequence_3)) && ((0 > p_safe_subsequence_3 || p_safe_subsequence_3 >= |p_safe_subsequence_1|) ==> (ret_1 == 0)))))");
