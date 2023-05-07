@@ -34,16 +34,16 @@ import java.util.stream.Collectors;
 
 public class RandomExpressionGenerator {
 
-    public static double PROB_LITERAL_EXPRESSION = 27.0;
+    public static double PROB_LITERAL_EXPRESSION = 30.0;
     public static double PROB_OPERATOR_EXPRESSION = 30.0;
     public static double PROB_VARIABLE_EXPRESSION = 60.0;
-    public static double PROB_SEQ_INDEX_EXPRESSION = 10.0;
-    public static double PROB_DMAP_SELECTION_EXPRESSION = 10.0;
-    public static double PROB_SEQ_SUBSEQUENCE_EXPRESSION = 10.0;
-    public static double PROB_SEQ_UPDATE_EXPRESSION = 10.0;
-    public static double PROB_DMAP_UPDATE_EXPRESSION = 10.0;
-    public static double PROB_IF_ELSE_EXPRESSION = 10.0;
-    public static double PROB_CALL_EXPRESSION = 10.0;
+    public static double PROB_SEQ_INDEX_EXPRESSION = 8.0;
+    public static double PROB_DMAP_SELECTION_EXPRESSION = 8.0;
+    public static double PROB_SEQ_SUBSEQUENCE_EXPRESSION = 8.0;
+    public static double PROB_SEQ_UPDATE_EXPRESSION = 8.0;
+    public static double PROB_DMAP_UPDATE_EXPRESSION = 8.0;
+    public static double PROB_IF_ELSE_EXPRESSION = 8.0;
+    public static double PROB_CALL_EXPRESSION = 20.0;
     public static double PROB_MATCH_EXPRESSION = 5.0;
 
     private static final int MAX_MATCH_CASES_VALUES = 2;

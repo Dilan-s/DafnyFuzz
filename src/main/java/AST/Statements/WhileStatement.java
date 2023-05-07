@@ -45,7 +45,7 @@ public class WhileStatement extends BaseStatement {
 
     @Override
     public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-
+        super.incrementUse();
         while (true) {
             Object testValue = test.getValue(paramMap, s).get(0);
 
@@ -86,7 +86,7 @@ public class WhileStatement extends BaseStatement {
 
         List<String> testOptions = test.toOutput();
         for (String testOption : testOptions) {
-            res.add(String.format("while %s \n\tdecreases %s - %s;\n{\n", testOption, finalVar.getName(), loopVar.getName()));
+            res.add(String.format("while %s \n\tdecreases %s - %s;\n\tinvariant %s <= %s;\n{\n", testOption, finalVar.getName(), loopVar.getName(), loopVar.getName(), finalVar.getName()));
         }
 
         List<String> temp = new ArrayList<>();
@@ -117,21 +117,25 @@ public class WhileStatement extends BaseStatement {
 
     @Override
     public String minimizedTestCase() {
-        String res = String.format("while %s \n\tdecreases %s - %s;\n{\n", test, finalVar.getName(), loopVar.getName());
-        res = res + StringUtils.indent(body.minimizedTestCase());
-        res = res + "\n}";
+        if (body.getNoOfUses() > 0) {
+            String res = String.format("while %s \n\tdecreases %s - %s;\n\tinvariant %s <= %s;\n{\n", test,
+                finalVar.getName(), loopVar.getName(), loopVar.getName(), finalVar.getName());
+            res = res + StringUtils.indent(body.minimizedTestCase());
+            res = res + "\n}";
 
-        return res;
+            return res;
+        }
+        return "";
     }
 
     @Override
     public boolean requireUpdate() {
-        return initAssign.requireUpdate() || test.requireUpdate();
+        return initAssign.requireUpdate() || test.requireUpdate() || body.requireUpdate();
     }
 
     @Override
     public String toString() {
-        String res = String.format("while %s \n\tdecreases %s - %s;\n{\n", test, finalVar.getName(), loopVar.getName());
+        String res = String.format("while %s \n\tdecreases %s - %s;\n\tinvariant %s <= %s;\n{\n", test, finalVar.getName(), loopVar.getName(), loopVar.getName(), finalVar.getName());
         res = res + StringUtils.indent(body.toString());
         res = res + "\n}";
 

@@ -39,7 +39,7 @@ while [ true ]; do
   echo "Test number $x" >> errors/compErrors/py.txt
 
   cd "$directory"
-  timeout $t java -cp out/ Main.GenerateProgram $x
+  timeout -s SIGKILL $t java -cp out/ Main.GenerateProgram $x
   if [ $? -ne 0 ]
   then
     echo "Failed to create dafny file in $t seconds"
@@ -50,7 +50,7 @@ while [ true ]; do
   # css
   #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
   cd "$directory"
-  timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify tests-minimized/test-minimized.dfy > tmp.txt 2>&1
+  timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify tests-minimized/test-minimized.dfy > tmp.txt 2>&1
   if [ $? -eq 4 ]
   then
     echo "Verification error found in test $x file $y"
@@ -68,7 +68,7 @@ while [ true ]; do
 
     # GO
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/go.txt
+    timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/go.txt
     if [ $? -eq 0 ]
     then
       echo "Created GO files"
@@ -83,7 +83,7 @@ while [ true ]; do
 
     # js
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/js.txt
+    timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/js.txt
     if [ $? -eq 0 ]
     then
       echo "Created JS files"
@@ -96,7 +96,7 @@ while [ true ]; do
 
     # java
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy  > tmp.txt 2>>errors/compErrors/java.txt
+    timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy  > tmp.txt 2>>errors/compErrors/java.txt
     if [ $? -eq 0 ]
     then
       echo "Created Java files"
@@ -111,7 +111,7 @@ while [ true ]; do
 
     # py
     cd "$directory"
-    timeout $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>>errors/compErrors/py.txt
+    timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>>errors/compErrors/py.txt
     if [ $? -eq 0 ]
     then
       echo "Created Python files"
