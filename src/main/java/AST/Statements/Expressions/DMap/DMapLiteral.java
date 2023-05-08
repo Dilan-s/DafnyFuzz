@@ -2,6 +2,7 @@ package AST.Statements.Expressions.DMap;
 
 import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DMapLiteral implements Expression {
+public class DMapLiteral extends BaseExpression {
 
     private final SymbolTable symbolTable;
     private final Type type;
@@ -29,6 +30,7 @@ public class DMapLiteral implements Expression {
     private List<List<Statement>> expanded;
 
     public DMapLiteral(SymbolTable symbolTable, Type type, List<DMapEntry> entries) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.entries = entries;
@@ -47,7 +49,7 @@ public class DMapLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
         Map<Object, Object> m = new HashMap<>();
 
@@ -103,6 +105,13 @@ public class DMapLiteral implements Expression {
     public String toString() {
         return String.format("map[%s]", entriesInMap.stream()
             .map(x -> x.getKey() + " := " + x.getValue())
+            .collect(Collectors.joining(", ")));
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        return String.format("map[%s]", entriesInMap.stream()
+            .map(x -> x.getKey().minimizedTestCase() + " := " + x.getValue().minimizedTestCase())
             .collect(Collectors.joining(", ")));
     }
 

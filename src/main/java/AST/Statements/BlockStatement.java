@@ -58,8 +58,7 @@ public class BlockStatement extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        super.incrementUse();
+    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         for (int i = 0, bodySize = body.size(); i < bodySize; i++) {
             Statement statement = body.get(i);
             List<Statement> ss = statement.expand();

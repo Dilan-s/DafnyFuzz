@@ -18,6 +18,8 @@ public interface Operator {
 
     String formExpression(List<Expression> args);
 
+    String formMinimizedExpression(List<Expression> args);
+
     List<Type> getType();
 
     void semanticCheck(Method method, List<Expression> expressions) throws SemanticException;

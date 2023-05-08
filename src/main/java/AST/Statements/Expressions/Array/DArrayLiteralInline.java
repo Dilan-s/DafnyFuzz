@@ -3,6 +3,7 @@ package AST.Statements.Expressions.Array;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DArrayLiteralInline implements Expression {
+public class DArrayLiteralInline extends BaseExpression {
 
     private final Type type;
     private SymbolTable symbolTable;
@@ -31,6 +32,7 @@ public class DArrayLiteralInline implements Expression {
     private List<List<Statement>> expanded;
 
     public DArrayLiteralInline(SymbolTable symbolTable, Type type, List<Expression> values) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
@@ -87,7 +89,7 @@ public class DArrayLiteralInline implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
 
@@ -107,11 +109,12 @@ public class DArrayLiteralInline implements Expression {
         return r;
     }
 
-    private class ArrayInitValues implements Expression {
+    private class ArrayInitValues extends BaseExpression {
 
         private final List<Expression> values;
 
         public ArrayInitValues(List<Expression> values) {
+            super();
             this.values = values;
         }
 
@@ -120,7 +123,7 @@ public class DArrayLiteralInline implements Expression {
             return List.of(type);
         }
         @Override
-        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();
@@ -142,6 +145,15 @@ public class DArrayLiteralInline implements Expression {
         public String toString() {
             String value = values.stream()
                 .map(Expression::toString)
+                .collect(Collectors.joining(", "));
+            DCollection t = (DCollection) type;
+            return String.format("new %s[%d] [%s]", t.getInnerType().getVariableType(), values.size(), value);
+        }
+
+        @Override
+        public String minimizedTestCase() {
+            String value = values.stream()
+                .map(Expression::minimizedTestCase)
                 .collect(Collectors.joining(", "));
             DCollection t = (DCollection) type;
             return String.format("new %s[%d] [%s]", t.getInnerType().getVariableType(), values.size(), value);

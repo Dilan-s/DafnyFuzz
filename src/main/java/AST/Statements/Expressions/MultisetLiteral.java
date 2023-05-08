@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MultisetLiteral implements Expression {
+public class MultisetLiteral extends BaseExpression {
 
     private final Type type;
     private SymbolTable symbolTable;
@@ -46,6 +46,7 @@ public class MultisetLiteral implements Expression {
     }
 
     private MultisetLiteral(SymbolTable symbolTable, Type type) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.expanded = new ArrayList<>();
@@ -63,6 +64,19 @@ public class MultisetLiteral implements Expression {
         } else {
             String value = values.stream()
                 .map(Expression::toString)
+                .collect(Collectors.joining(", "));
+
+            return String.format("multiset{%s}", value);
+        }
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        if (collection.isPresent()) {
+            return String.format("multiset(%s)", collection.get().minimizedTestCase());
+        } else {
+            String value = values.stream()
+                .map(Expression::minimizedTestCase)
                 .collect(Collectors.joining(", "));
 
             return String.format("multiset{%s}", value);
@@ -138,7 +152,7 @@ public class MultisetLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         if (collection.isPresent()) {

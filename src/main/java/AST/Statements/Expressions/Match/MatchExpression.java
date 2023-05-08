@@ -1,6 +1,7 @@
 package AST.Statements.Expressions.Match;
 
 import AST.Generator.GeneratorConfig;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.Statements.util.MatchStatementCase;
@@ -18,7 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MatchExpression implements Expression {
+public class MatchExpression extends BaseExpression {
 
     private SymbolTable symbolTable;
     private Type type;
@@ -28,18 +29,17 @@ public class MatchExpression implements Expression {
     private List<MatchExpressionCase> distinctCases;
     private MatchExpressionCase defaultCase;
     private boolean requireDefault;
-    private int uses;
 
     private List<List<Statement>> expanded;
 
     public MatchExpression(SymbolTable symbolTable, Type type, Expression test, List<MatchExpressionCase> cases, MatchExpressionCase defaultCase) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.test = test;
         this.cases = cases;
         this.distinctCases = new ArrayList<>(cases);
         this.defaultCase = defaultCase;
-        this.uses = 0;
 
         this.expanded = new ArrayList<>();
         expanded.add(test.expand());
@@ -80,8 +80,7 @@ public class MatchExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
-        this.uses++;
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
         Object testValue = test.getValue(paramsMap, s).get(0);
 
@@ -138,7 +137,7 @@ public class MatchExpression implements Expression {
             res.add(String.format("(match %s {\n", s));
         }
 
-        if (uses > 0) {
+        if (getNoOfUses() > 0) {
             for (MatchExpressionCase mECase : distinctCases) {
                 temp = new ArrayList<>();
                 List<String> caseOutputs = mECase.toOutput();
@@ -186,7 +185,7 @@ public class MatchExpression implements Expression {
     @Override
     public String toString() {
         String res = String.format("(match %s {\n", test.toString());
-        if (uses > 0) {
+        if (getNoOfUses() > 0) {
             for (MatchExpressionCase c : distinctCases) {
                 res = res + StringUtils.indent(c.toString()) + "\n";
             }
@@ -194,5 +193,29 @@ public class MatchExpression implements Expression {
         res = res + StringUtils.indent(defaultCase.toString()) + "\n";
         res = res + "})";
         return res;
+    }
+
+    @Override
+    public String minimizedTestCase() {
+
+        List<MatchExpressionCase> cases = new ArrayList<>();
+        for (MatchExpressionCase c : distinctCases) {
+            if (c.getNoOfUses() > 0) {
+                cases.add(c);
+            }
+        }
+        cases.add(defaultCase);
+
+        if (cases.size() == 1) {
+            MatchExpressionCase matchExpressionCase = cases.get(0);
+            return matchExpressionCase.getValueExp().minimizedTestCase();
+        } else {
+            String res = String.format("(match %s {\n", test.toString());
+            for (MatchExpressionCase c : cases) {
+                res = res + StringUtils.indent(c.minimizedTestCase()) + "\n";
+            }
+            res = res + "})";
+            return res;
+        }
     }
 }

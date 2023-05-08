@@ -2,6 +2,7 @@ package AST.Statements.Expressions.Array;
 
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DArrayLiteralByElements implements Expression {
+public class DArrayLiteralByElements extends BaseExpression {
 
     private final SymbolTable symbolTable;
     private final Type type;
@@ -27,6 +28,7 @@ public class DArrayLiteralByElements implements Expression {
     private List<List<Statement>> expanded;
 
     public DArrayLiteralByElements(SymbolTable symbolTable, Type type, List<Expression> values) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
@@ -64,7 +66,7 @@ public class DArrayLiteralByElements implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         List<Object> l = new ArrayList<>();
@@ -103,11 +105,12 @@ public class DArrayLiteralByElements implements Expression {
         return assignments.stream().anyMatch(Statement::requireUpdate) || statement.requireUpdate();
     }
 
-    private class ArrayInitValues implements Expression {
+    private class ArrayInitValues extends BaseExpression {
 
         private final List<Expression> values;
 
         public ArrayInitValues(List<Expression> values) {
+            super();
             this.values = values;
         }
 
@@ -116,7 +119,7 @@ public class DArrayLiteralByElements implements Expression {
             return List.of(type);
         }
         @Override
-        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();

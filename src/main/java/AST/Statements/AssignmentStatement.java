@@ -85,7 +85,22 @@ public class AssignmentStatement extends BaseStatement {
 
     @Override
     public String minimizedTestCase() {
-        return toString();
+        String rhs = values.stream()
+            .map(Expression::minimizedTestCase)
+            .collect(Collectors.joining(", "));
+        if (declared) {
+            String lhs = variables.stream()
+                .map(Variable::getName)
+                .collect(Collectors.joining(", "));
+
+            return String.format("%s := %s;", lhs, rhs);
+        } else {
+            String lhs = variables.stream()
+                .map(Variable::toString)
+                .collect(Collectors.joining(", "));
+
+            return String.format("var %s := %s;", lhs, rhs);
+        }
     }
 
     @Override
@@ -140,8 +155,7 @@ public class AssignmentStatement extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        super.incrementUse();
+    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<Object> expValues = new ArrayList<>();
         for (Expression value : values) {
             List<Object> expressionValue = value.getValue(paramMap, s);

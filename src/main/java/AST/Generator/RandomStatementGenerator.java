@@ -159,11 +159,9 @@ public class RandomStatementGenerator {
         VariableExpression finalVarExp = new VariableExpression(symbolTable, finalVar, intType);
 
         Expression initExp = expressionGenerator.generateExpression(intType, symbolTable);
-        AssignmentStatement initAssign = new AssignmentStatement(symbolTable, List.of(loopVar), initExp);
 
         Expression finalExp = expressionGenerator.generateExpression(intType, symbolTable);
         AssignmentStatement finalAssign = new AssignmentStatement(symbolTable, List.of(finalVar), finalExp);
-
 
         Bool boolType = new Bool();
 //        Expression testRhs = expressionGenerator.generateExpression(boolType, symbolTable);
@@ -174,6 +172,9 @@ public class RandomStatementGenerator {
 
         SymbolTable bodySt = new SymbolTable(symbolTable);
         BlockStatement body = generateBody(method, bodySt, false);
+
+        AssignmentStatement initAssign = new AssignmentStatement(symbolTable, List.of(loopVar), initExp);
+
         OperatorExpression incr = new OperatorExpression(bodySt, intType, BinaryOperator.Plus, List.of(loopVarExp, new IntLiteral(intType, symbolTable, 1)));
         AssignmentStatement incrAssign = new AssignmentStatement(bodySt, List.of(loopVar), incr);
         body.addStatementFirst(incrAssign);

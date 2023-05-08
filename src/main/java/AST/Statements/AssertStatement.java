@@ -24,8 +24,7 @@ public class AssertStatement extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        super.incrementUse();
+    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<String> conjuncts = new ArrayList<>();
         for (Variable v : variables) {
             Object val = v.getValue(paramMap).get(0);

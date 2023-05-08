@@ -2,6 +2,7 @@ package AST.Statements.Expressions.DSeq;
 
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
@@ -18,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class SeqIndexExpression implements Expression {
+public class SeqIndexExpression extends BaseExpression {
 
     private AssignmentStatement asStatIndPre;
     private AssignmentStatement asStatSeq;
@@ -35,6 +36,7 @@ public class SeqIndexExpression implements Expression {
     private List<List<Statement>> expanded;
 
     public SeqIndexExpression(SymbolTable symbolTable, Type type, Expression seq, Expression index) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.update = false;
@@ -128,7 +130,7 @@ public class SeqIndexExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         Object seqVarValue = seqVar.getValue(paramsMap).get(0);

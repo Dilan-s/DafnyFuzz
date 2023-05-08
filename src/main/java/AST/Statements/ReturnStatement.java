@@ -62,7 +62,14 @@ public class ReturnStatement extends BaseStatement {
 
     @Override
     public String minimizedTestCase() {
-        return toString();
+        List<String> code = new ArrayList<>();
+
+        String returnValues = values.stream()
+            .map(Expression::minimizedTestCase)
+            .collect(Collectors.joining(", "));
+
+        code.add(String.format("return %s;", returnValues));
+        return StringUtils.intersperse("\n", code);
     }
 
     @Override
@@ -108,8 +115,7 @@ public class ReturnStatement extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        super.incrementUse();
+    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<Object> list = new ArrayList<>();
         for (Expression x : values) {
             List<Object> value = x.getValue(paramMap, s);

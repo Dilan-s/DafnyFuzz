@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class IfElseExpression implements Expression {
+public class IfElseExpression extends BaseExpression {
 
     private Type type;
     private final Expression test;
@@ -29,6 +29,7 @@ public class IfElseExpression implements Expression {
     private List<List<Statement>> expanded;
 
     public IfElseExpression(SymbolTable symbolTable, Type type, Expression test, Expression ifExp, Expression elseExp) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.test = test;
@@ -39,12 +40,26 @@ public class IfElseExpression implements Expression {
         expanded.add(test.expand());
         expanded.add(ifExp.expand());
         expanded.add(elseExp.expand());
-
     }
 
     @Override
     public List<Type> getTypes() {
         return List.of(type);
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        if (ifExp.getNoOfUses() > 0 && elseExp.getNoOfUses() > 0) {
+            return String.format("(if (%s) then (%s) else (%s))", test.minimizedTestCase(), ifExp.minimizedTestCase(), elseExp.minimizedTestCase());
+        }
+        if (elseExp.getNoOfUses() > 0) {
+            return String.format("(%s)", elseExp.minimizedTestCase());
+        }
+        if (ifExp.getNoOfUses() > 0) {
+            return String.format("(%s)", ifExp.minimizedTestCase());
+        }
+
+        return toString();
     }
 
     @Override
@@ -127,7 +142,7 @@ public class IfElseExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         Object testValue = test.getValue(paramsMap, s).get(0);

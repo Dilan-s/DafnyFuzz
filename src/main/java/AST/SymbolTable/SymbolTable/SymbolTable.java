@@ -36,6 +36,10 @@ public class SymbolTable {
         variables.put(variable.getName(), variable);
     }
 
+    public void removeVariable(Variable variable) {
+        variables.remove(variable.getName(), variable);
+    }
+
     public void addMethod(Method method) {
         if (enclosingSymbolTable == null) {
             methods.put(method.getName(), method);
@@ -73,10 +77,10 @@ public class SymbolTable {
         }
         return currST;
     }
-
     public List<Variable> getAllVariables(Type t) {
         return getAllVariables(t, true);
     }
+
     public List<Variable> getAllVariables(Type t, boolean enclosing) {
         List<Variable> vars = variables.values()
             .stream()

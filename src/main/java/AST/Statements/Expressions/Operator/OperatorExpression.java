@@ -1,6 +1,7 @@
 package AST.Statements.Expressions.Operator;
 
 import AST.Generator.GeneratorConfig;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class OperatorExpression implements Expression {
+public class OperatorExpression extends BaseExpression {
 
     private final Operator operator;
     private final List<Expression> args;
@@ -30,6 +31,7 @@ public class OperatorExpression implements Expression {
     private List<List<Statement>> expanded;
 
     public OperatorExpression(SymbolTable symbolTable, Type type, Operator operator, List<Expression> args, boolean convertToCall) {
+        super();
         this.symbolTable = symbolTable;
         this.replacementExpression = Optional.empty();
         this.operator = operator;
@@ -60,6 +62,14 @@ public class OperatorExpression implements Expression {
             return replacementExpression.get().toString();
         }
         return operator.formExpression(args);
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        if (replacementExpression.isPresent()) {
+            return replacementExpression.get().minimizedTestCase();
+        }
+        return operator.formMinimizedExpression(args);
     }
 
     @Override
@@ -120,7 +130,7 @@ public class OperatorExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         if (replacementExpression.isPresent()) {

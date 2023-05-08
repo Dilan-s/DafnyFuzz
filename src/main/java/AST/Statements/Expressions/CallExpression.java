@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CallExpression implements Expression {
+public class CallExpression extends BaseExpression {
 
     private SymbolTable symbolTable;
     private Method method;
@@ -27,6 +27,7 @@ public class CallExpression implements Expression {
     private List<List<Statement>> expanded;
 
     public CallExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
+        super();
         this.symbolTable = symbolTable;
         this.method = method;
         this.variables = new ArrayList<>();
@@ -110,19 +111,20 @@ public class CallExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         return assignedVariables.stream()
             .map(v -> v.getValue(paramsMap))
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
     }
 
-    private class CallMethodExpression implements Expression {
+    private class CallMethodExpression extends BaseExpression {
 
         private Method method;
         private List<Variable> args;
 
         public CallMethodExpression(Method method, List<Variable> args) {
+            super();
             this.method = method;
             this.args = args;
         }
@@ -150,7 +152,7 @@ public class CallExpression implements Expression {
         }
 
         @Override
-        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();

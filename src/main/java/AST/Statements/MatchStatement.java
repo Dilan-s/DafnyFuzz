@@ -48,8 +48,7 @@ public class MatchStatement extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        super.incrementUse();
+    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         Object testValue = test.getValue(paramMap).get(0);
         if (testValue == null) {
             return null;
@@ -194,7 +193,7 @@ public class MatchStatement extends BaseStatement {
             return res;
         } else if (usedCases.size() > 1) {
 
-            String res = String.format("match %s {\n", test.toString());
+            String res = String.format("match %s {\n", test.minimizedTestCase());
             for (MatchStatementCase c : usedCases) {
                 res = res + StringUtils.indent(c.minimizedTestCase());
             }
