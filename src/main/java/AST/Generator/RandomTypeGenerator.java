@@ -5,7 +5,6 @@ import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.BaseType;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
-import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.DCollectionTypes.Multiset;
@@ -22,14 +21,130 @@ public class RandomTypeGenerator {
 
     public static final int MAX_TYPE_DEPTH = 2;
     public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Real()); //, new Char()
-    public static double PROB_PRIMITIVE = 40.0;
-    public static final List<UserDefinedType> USER_DEFINED_TYPES = List.of(new Tuple());
-    public static double PROB_USER_DEFINED = 5.0;
-    public static final List<DCollection> COLLECTION_TYPES = List.of(new DSet(), new Seq(), new Multiset(), new DArray());
-    public static double PROB_COLLECTION = 20.0;
-    public static final List<DMap> DMAPS = List.of(new DMap());
-    public static double PROB_DMAP = 7.0;
+
+    public static double PROB_INT = 40.0;
+    public static double PROB_BOOL = 40.0;
+    public static double PROB_REAL = 10.0;
+    public static double PROB_DMAP = 15.0;
+    public static double PROB_DARRAY = 10.0;
+    public static double PROB_DSET = 15.0;
+    public static double PROB_SEQ = 15.0;
+    public static double PROB_MULTISET = 15.0;
+    public static double PROB_TUPLE = 25.0;
+
+    public static double PROB_SWARM = 0.05;
     private static int typeDepth = 0;
+
+
+    private Type generateType() {
+        Type t = null;
+        boolean swarm = GeneratorConfig.getRandom().nextDouble() < PROB_SWARM;
+        while (t == null) {
+
+
+            if (typeDepth > MAX_TYPE_DEPTH) {
+                int index = GeneratorConfig.getRandom()
+                    .nextInt(List.of(new Int(), new Bool(), new Real()).size());
+                t = PRIMITIVE_TYPES.get(index);
+
+            } else {
+                double ratioSum = PROB_INT + PROB_BOOL + PROB_REAL + PROB_DMAP + PROB_DARRAY
+                    + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE;
+                double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
+
+                if (swarm) {
+                    reset();
+                }
+
+                if ((probType -= PROB_INT) < 0) {
+                    // int
+                    PROB_INT *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new Int();
+                    if (swarm) {
+                        PROB_INT *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
+                    }
+
+                } else if ((probType -= PROB_BOOL) < 0) {
+                    // bool
+                    PROB_BOOL *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new Bool();
+                    if (swarm) {
+                        PROB_BOOL *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
+                    }
+
+                } else if ((probType -= PROB_REAL) < 0) {
+                    // real
+                    PROB_REAL *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new Real();
+                    if (swarm) {
+                        PROB_REAL *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
+                    }
+
+                } else if ((probType -= PROB_DMAP) < 0) {
+                    // map
+                    PROB_DMAP *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new DMap();
+                    if (swarm) {
+                        PROB_DMAP *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
+
+                } else if ((probType -= PROB_DARRAY) < 0) {
+                    // array
+                    PROB_DARRAY *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new DArray();
+                    if (swarm) {
+                        PROB_DARRAY *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
+
+                } else if ((probType -= PROB_DSET) < 0) {
+                    // set
+                    PROB_DSET *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new DSet();
+                    if (swarm) {
+                        PROB_DSET *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
+
+                } else if ((probType -= PROB_SEQ) < 0) {
+                    // seq
+                    PROB_SEQ *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new Seq();
+                    if (swarm) {
+                        PROB_SEQ *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
+
+                } else if ((probType -= PROB_MULTISET) < 0) {
+                    // multiset
+                    PROB_MULTISET *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new Multiset();
+                    if (swarm) {
+                        PROB_MULTISET *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
+
+                } else if ((probType -= PROB_TUPLE) < 0) {
+                    // tuple
+                    PROB_TUPLE *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new Tuple();
+                    if (swarm) {
+                        PROB_TUPLE *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
+                }
+            }
+        }
+
+        return t;
+    }
+
+    private void reset() {
+        PROB_INT = 40.0;
+        PROB_BOOL = 40.0;
+        PROB_REAL = 10.0;
+        PROB_DMAP = 15.0;
+        PROB_DARRAY = 10.0;
+        PROB_DSET = 15.0;
+        PROB_SEQ = 15.0;
+        PROB_MULTISET = 15.0;
+        PROB_TUPLE = 25.0;
+    }
 
     public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
         typeDepth++;
@@ -41,35 +156,6 @@ public class RandomTypeGenerator {
         }
         typeDepth--;
         return types;
-    }
-
-    private Type generateType() {
-        Type t = null;
-        while (t == null) {
-            double ratioSum = PROB_COLLECTION + PROB_DMAP + PROB_PRIMITIVE + PROB_USER_DEFINED;
-            double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
-
-            if (typeDepth > MAX_TYPE_DEPTH || (probType -= PROB_PRIMITIVE) < 0) {
-                int index = GeneratorConfig.getRandom().nextInt(PRIMITIVE_TYPES.size());
-                t = PRIMITIVE_TYPES.get(index);
-
-            } else if ((probType -= PROB_DMAP) < 0) {
-                PROB_DMAP *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                int index = GeneratorConfig.getRandom().nextInt(DMAPS.size());
-                t = DMAPS.get(index);
-
-            } else if ((probType -= PROB_COLLECTION) < 0) {
-                PROB_COLLECTION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                int index = GeneratorConfig.getRandom().nextInt(COLLECTION_TYPES.size());
-                t = COLLECTION_TYPES.get(index);
-
-            } else if ((probType -= PROB_USER_DEFINED) < 0) {
-                PROB_USER_DEFINED *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                int index = GeneratorConfig.getRandom().nextInt(USER_DEFINED_TYPES.size());
-                t = USER_DEFINED_TYPES.get(index);
-            }
-        }
-        return t;
     }
 
     public List<Type> generateMethodTypes(int noOfArgs, SymbolTable symbolTable) {
