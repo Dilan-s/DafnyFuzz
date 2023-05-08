@@ -10,13 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class BoolLiteral implements Expression {
+public class BoolLiteral extends BaseExpression {
 
     private final Type type;
     private boolean value;
     private SymbolTable symbolTable;
 
     public BoolLiteral(Type type, SymbolTable symbolTable, boolean value) {
+        super();
         this.type = type;
         this.symbolTable = symbolTable;
         this.value = value;
@@ -33,7 +34,7 @@ public class BoolLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
         r.add(value);
         return r;

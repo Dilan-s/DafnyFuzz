@@ -58,8 +58,7 @@ public class ForStatement extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        super.incrementUse();
+    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         Integer initVarValue = (Integer) initVar.getValue(paramMap).get(0);
         Integer finalVarValue = (Integer) finalVar.getValue(paramMap).get(0);
 

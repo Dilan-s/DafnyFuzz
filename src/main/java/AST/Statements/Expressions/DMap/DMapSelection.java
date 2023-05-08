@@ -3,6 +3,7 @@ package AST.Statements.Expressions.DMap;
 import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IfElseExpression;
 import AST.Statements.Expressions.Operator.BinaryOperator;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DMapSelection implements Expression {
+public class DMapSelection extends BaseExpression {
 
     private final SymbolTable symbolTable;
     private Type type;
@@ -32,6 +33,7 @@ public class DMapSelection implements Expression {
     private List<List<Statement>> expanded;
 
     public DMapSelection(SymbolTable symbolTable, Type type, Expression map, Expression index, Expression def) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         generateVariableCalls(map, index, def);
@@ -71,7 +73,7 @@ public class DMapSelection implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         return ifElseExp.getValue(paramsMap, s);
     }
 
@@ -105,5 +107,10 @@ public class DMapSelection implements Expression {
     @Override
     public String toString() {
         return ifElseExp.toString();
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        return ifElseExp.minimizedTestCase();
     }
 }

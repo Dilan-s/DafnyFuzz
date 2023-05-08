@@ -28,6 +28,10 @@ public interface Expression {
 
     List<Statement> expand();
 
+    void incrementUse();
+
+    int getNoOfUses();
+
     default List<String> toOutput() {
         return List.of(toString());
     }

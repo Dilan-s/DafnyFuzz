@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class CharLiteral implements Expression {
+public class CharLiteral extends BaseExpression {
 
     private final char value;
     private final Type type;
     private SymbolTable symbolTable;
 
     public CharLiteral(Type type, SymbolTable symbolTable, char value) {
+        super();
         this.type = type;
         this.symbolTable = symbolTable;
         this.value = value;
@@ -39,7 +40,7 @@ public class CharLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
         r.add(value);
         return r;

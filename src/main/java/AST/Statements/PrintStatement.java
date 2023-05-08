@@ -49,8 +49,22 @@ public class PrintStatement extends BaseStatement {
     }
 
     @Override
+    public boolean minimizedReturn() {
+        return super.minimizedReturn();
+    }
+
+    @Override
     public String minimizedTestCase() {
-        return toString();
+        List<String> code = new ArrayList<>();
+
+        String printValues = values.stream()
+            .filter(x -> x.getTypes().stream().allMatch(Type::isPrintable))
+            .map(Expression::minimizedTestCase)
+            .collect(Collectors.joining(", \" \", "));
+        if (!printValues.isEmpty()) {
+            code.add(String.format("print %s, \"\\n\";", printValues));
+        }
+        return StringUtils.intersperse("\n", code);
     }
 
     @Override
@@ -97,8 +111,7 @@ public class PrintStatement extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        super.incrementUse();
+    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<String> joiner = new ArrayList<>();
 
         for (Expression exp : values) {

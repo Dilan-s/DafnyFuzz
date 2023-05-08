@@ -4,6 +4,7 @@ import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SeqUpdateExpression implements Expression {
+public class SeqUpdateExpression extends BaseExpression {
 
     private final Expression seq;
     private SymbolTable symbolTable;
@@ -35,6 +36,7 @@ public class SeqUpdateExpression implements Expression {
 
 
     public SeqUpdateExpression(SymbolTable symbolTable, Expression seq, Expression ind, Expression exp) {
+        super();
         this.symbolTable = symbolTable;
         this.seq = seq;
         this.exp = exp;
@@ -81,6 +83,11 @@ public class SeqUpdateExpression implements Expression {
     }
 
     @Override
+    public String minimizedTestCase() {
+        return String.format("%s[%s := %s]", seqVar.getName(), indVar.getName(), exp.minimizedTestCase());
+    }
+
+    @Override
     public List<String> toOutput() {
         Set<String> res = new HashSet<>();
         List<String> temp = new ArrayList<>();
@@ -115,7 +122,7 @@ public class SeqUpdateExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         Object seqVarValue = seqVar.getValue(paramsMap).get(0);

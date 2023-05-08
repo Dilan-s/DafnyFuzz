@@ -760,13 +760,23 @@ public enum BinaryOperator implements Operator {
         this.retTypes = retType;
     }
 
-
     @Override
     public String formExpression(List<Expression> args) {
         String res = args.get(0).toString();
         for (int i = 1; i < args.size(); i++) {
             Expression rhs = args.get(i);
-            res = String.format("(%s %s %s)", res, operator, rhs);
+            res = String.format("(%s %s %s)", res, operator, rhs.toString());
+
+        }
+        return res;
+    }
+
+    @Override
+    public String formMinimizedExpression(List<Expression> args) {
+        String res = args.get(0).minimizedTestCase();
+        for (int i = 1; i < args.size(); i++) {
+            Expression rhs = args.get(i);
+            res = String.format("(%s %s %s)", res, operator, rhs.minimizedTestCase());
 
         }
         return res;

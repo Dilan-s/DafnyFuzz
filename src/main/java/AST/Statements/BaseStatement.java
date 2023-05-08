@@ -20,4 +20,12 @@ public abstract class BaseStatement implements Statement {
     public int getNoOfUses() {
         return useFreq;
     }
+
+    @Override
+    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+        incrementUse();
+        return execute(paramMap, s, true);
+    }
+
+    protected abstract List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused);
 }

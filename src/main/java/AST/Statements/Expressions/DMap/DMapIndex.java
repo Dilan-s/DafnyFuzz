@@ -2,6 +2,7 @@ package AST.Statements.Expressions.DMap;
 
 import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
@@ -17,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DMapIndex implements Expression {
+public class DMapIndex extends BaseExpression {
 
     private final SymbolTable symbolTable;
     private final Type type;
@@ -27,6 +28,7 @@ public class DMapIndex implements Expression {
     private List<List<Statement>> expanded;
 
     public DMapIndex(SymbolTable symbolTable, Type type, Expression map, Expression index) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.map = map;
@@ -43,7 +45,7 @@ public class DMapIndex implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         Object mapVarValue = map.getValue(paramsMap).get(0);
@@ -99,5 +101,10 @@ public class DMapIndex implements Expression {
     @Override
     public String toString() {
         return map.toString() + "[" + index.toString() + "]";
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        return map.minimizedTestCase() + "[" + index.minimizedTestCase() + "]";
     }
 }

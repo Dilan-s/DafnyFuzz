@@ -1,6 +1,7 @@
 package AST.Statements.Expressions.Match;
 
 import AST.Generator.GeneratorConfig;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MatchExpressionCase implements Expression {
+public class MatchExpressionCase extends BaseExpression {
 
     private SymbolTable symbolTable;
     private Type type;
@@ -25,6 +26,7 @@ public class MatchExpressionCase implements Expression {
     private List<List<Statement>> expanded;
 
     public MatchExpressionCase(SymbolTable symbolTable, Type type, Expression test, Expression value) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.test = test;
@@ -51,8 +53,12 @@ public class MatchExpressionCase implements Expression {
         return List.of(type);
     }
 
+    public Expression getValueExp() {
+        return value;
+    }
+
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         return value.getValue(paramsMap, s);
     }
 
@@ -92,5 +98,10 @@ public class MatchExpressionCase implements Expression {
     @Override
     public String toString() {
         return String.format("case %s => %s", test == null ? "_" : test.toString(), value.toString());
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        return String.format("case %s => %s", test == null ? "_" : test.minimizedTestCase(), value.minimizedTestCase());
     }
 }

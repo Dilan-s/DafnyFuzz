@@ -2,6 +2,7 @@ package AST.Statements.Expressions.DSeq;
 
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
@@ -18,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class SeqSubsequenceExpression implements Expression {
+public class SeqSubsequenceExpression extends BaseExpression {
 
     private final Expression i;
     private final Expression j;
@@ -41,6 +42,7 @@ public class SeqSubsequenceExpression implements Expression {
     private List<List<Statement>> expanded;
 
     public SeqSubsequenceExpression(SymbolTable symbolTable, Expression seq, Expression i, Expression j) {
+        super();
         this.symbolTable = symbolTable;
         this.i = i;
         this.j = j;
@@ -140,7 +142,17 @@ public class SeqSubsequenceExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    public String minimizedTestCase() {
+        if (loVar.isPresent() && hiVar.isPresent() && callExp.isPresent() && statLoHi.isPresent()) {
+            return String.format("%s[%s..%s]", seqVar.getName(), loVar.get().getName(), hiVar.get().getName());
+        } else if (this.min != null && this.max != null) {
+            return String.format("%s[%s..%s]", seqVar.getName(), min.minimizedTestCase(), max.minimizedTestCase());
+        }
+        return String.format("%s[%s..%s]", seqVar.getName(), i.minimizedTestCase(), j.minimizedTestCase());
+    }
+
+    @Override
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         Object seqVarValue = seqVar.getValue(paramsMap).get(0);

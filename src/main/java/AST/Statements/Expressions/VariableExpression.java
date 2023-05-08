@@ -10,13 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class VariableExpression implements Expression {
+public class VariableExpression extends BaseExpression {
 
     private Variable variable;
     private Type type;
     private SymbolTable symbolTable;
 
     public VariableExpression(SymbolTable symbolTable, Variable variable, Type type) {
+        super();
         this.symbolTable = symbolTable;
         this.variable = variable;
         this.type = type;
@@ -33,7 +34,7 @@ public class VariableExpression implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         if (paramsMap.containsKey(variable)) {
             return paramsMap.get(variable).getValue(paramsMap);
         }

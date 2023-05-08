@@ -44,8 +44,7 @@ public class WhileStatement extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
-        super.incrementUse();
+    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         while (true) {
             Object testValue = test.getValue(paramMap, s).get(0);
 

@@ -3,6 +3,7 @@ package AST.Statements.Expressions.Tuple;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
+import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TupleLiteral implements Expression {
+public class TupleLiteral extends BaseExpression {
 
     private final SymbolTable symbolTable;
     private final Type type;
@@ -32,6 +33,7 @@ public class TupleLiteral implements Expression {
     private List<List<Statement>> expanded;
 
     public TupleLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
@@ -67,7 +69,7 @@ public class TupleLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         List<Object> l = new ArrayList<>();
@@ -105,11 +107,12 @@ public class TupleLiteral implements Expression {
         return values.stream().anyMatch(Expression::requireUpdate) || statement.requireUpdate();
     }
 
-    private class TupleInitValues implements Expression {
+    private class TupleInitValues extends BaseExpression {
 
         private final List<Expression> values;
 
         public TupleInitValues(List<Expression> values) {
+            super();
             this.values = values;
         }
 
@@ -118,7 +121,7 @@ public class TupleLiteral implements Expression {
             return List.of(type);
         }
         @Override
-        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();
@@ -140,6 +143,14 @@ public class TupleLiteral implements Expression {
         public String toString() {
             String value = values.stream()
                 .map(Expression::toString)
+                .collect(Collectors.joining(", "));
+            return String.format("(%s)", value);
+        }
+
+        @Override
+        public String minimizedTestCase() {
+            String value = values.stream()
+                .map(Expression::minimizedTestCase)
                 .collect(Collectors.joining(", "));
             return String.format("(%s)", value);
         }

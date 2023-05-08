@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DSetLiteral implements Expression {
+public class DSetLiteral extends BaseExpression {
 
     private final Type type;
     private final List<Expression> values;
@@ -25,6 +25,7 @@ public class DSetLiteral implements Expression {
     private List<List<Statement>> expanded;
 
     public DSetLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
@@ -58,6 +59,14 @@ public class DSetLiteral implements Expression {
     public String toString() {
         String value = values.stream()
             .map(Expression::toString)
+            .collect(Collectors.joining(", "));
+        return String.format("{%s}", value);
+    }
+
+    @Override
+    public String minimizedTestCase() {
+        String value = values.stream()
+            .map(Expression::minimizedTestCase)
             .collect(Collectors.joining(", "));
         return String.format("{%s}", value);
     }
@@ -103,7 +112,7 @@ public class DSetLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
 
         Set<Object> set = new HashSet<>();

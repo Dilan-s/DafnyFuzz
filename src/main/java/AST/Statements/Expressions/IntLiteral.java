@@ -12,13 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class IntLiteral implements Expression {
+public class IntLiteral extends BaseExpression {
 
     private final int value;
     private final Type type;
     private SymbolTable symbolTable;
 
     public IntLiteral(Type type, SymbolTable symbolTable, int value) {
+        super();
         this.type = type;
         this.symbolTable = symbolTable;
         this.value = value;
@@ -50,7 +51,7 @@ public class IntLiteral implements Expression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
         r.add(value);
         return r;

@@ -26,8 +26,12 @@ public enum UnaryOperator implements Operator {
     Cardinality("|%s|", List.of(Args.SEQ, Args.DSET, Args.MULTISET, Args.DMAP), new Int()) {
         @Override
         public String formExpression(List<Expression> args) {
-            String res = args.get(0).toString();
-            return String.format("|%s|", res);
+            return String.format("|%s|", args.get(0).toString());
+        }
+
+        @Override
+        public String formMinimizedExpression(List<Expression> args) {
+            return String.format("|%s|", args.get(0).minimizedTestCase());
         }
 
         @Override
@@ -81,8 +85,12 @@ public enum UnaryOperator implements Operator {
     ArrayLength("Length", List.of(Args.DARRAY), new Int()) {
         @Override
         public String formExpression(List<Expression> args) {
-            String res = args.get(0).toString();
-            return String.format("%s.Length", res);
+            return String.format("%s.Length", args.get(0).toString());
+        }
+
+        @Override
+        public String formMinimizedExpression(List<Expression> args) {
+            return String.format("%s.Length", args.get(0).minimizedTestCase());
         }
 
         @Override
@@ -118,8 +126,12 @@ public enum UnaryOperator implements Operator {
     RealFloor("Floor", List.of(Args.REAL), new Int()) {
         @Override
         public String formExpression(List<Expression> args) {
-            String res = args.get(0).toString();
-            return String.format("(%s).Floor", res);
+            return String.format("(%s).Floor", args.get(0).toString());
+        }
+
+        @Override
+        public String formMinimizedExpression(List<Expression> args) {
+            return String.format("(%s).Floor", args.get(0).minimizedTestCase());
         }
 
         @Override
@@ -155,8 +167,12 @@ public enum UnaryOperator implements Operator {
     Negate("!", List.of(Args.BOOL), new Bool()) {
         @Override
         public String formExpression(List<Expression> args) {
-            String res = args.get(0).toString();
-            return String.format("!(%s)", res);
+            return String.format("!(%s)", args.get(0).toString());
+        }
+
+        @Override
+        public String formMinimizedExpression(List<Expression> args) {
+            return String.format("!(%s)", args.get(0).minimizedTestCase());
         }
 
         @Override
@@ -182,6 +198,16 @@ public enum UnaryOperator implements Operator {
         }
     },
     KeysMap("Keys", List.of(Args.DMAP), new DSet()) {
+        @Override
+        public String formExpression(List<Expression> args) {
+            return String.format("(%s).Keys", args.get(0).toString());
+        }
+
+        @Override
+        public String formMinimizedExpression(List<Expression> args) {
+            return String.format("(%s).Keys", args.get(0).minimizedTestCase());
+        }
+
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
             DSet set = (DSet) expected;
@@ -213,14 +239,18 @@ public enum UnaryOperator implements Operator {
             Collections.shuffle(r, GeneratorConfig.getRandom());
             return r.subList(0, Math.min(5, res.size()));
         }
-
-        @Override
-        public String formExpression(List<Expression> args) {
-            Expression res = args.get(0);
-            return String.format("(%s).Keys", res);
-        }
     },
     ValuesMap("Values", List.of(Args.DMAP), new DSet()) {
+        @Override
+        public String formExpression(List<Expression> args) {
+            return String.format("(%s).Values", args.get(0).toString());
+        }
+
+        @Override
+        public String formMinimizedExpression(List<Expression> args) {
+            return String.format("(%s).Values", args.get(0).minimizedTestCase());
+        }
+
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
             DSet set = (DSet) expected;
@@ -252,12 +282,6 @@ public enum UnaryOperator implements Operator {
             Collections.shuffle(r, GeneratorConfig.getRandom());
             return r.subList(0, Math.min(5, res.size()));
         }
-
-        @Override
-        public String formExpression(List<Expression> args) {
-            Expression res = args.get(0);
-            return String.format("(%s).Values", res);
-        }
     },
     ;
 
@@ -275,18 +299,6 @@ public enum UnaryOperator implements Operator {
         this.operator = operator;
         this.typeArgs = typeArgs;
         this.retTypes = retTypes;
-    }
-
-
-    @Override
-    public String formExpression(List<Expression> args) {
-        String res = args.get(0).toString();
-        for (int i = 1; i < args.size(); i++) {
-            Expression rhs = args.get(i);
-            res = String.format("(%s %s %s)", res, operator, rhs);
-
-        }
-        return res;
     }
 
     @Override
