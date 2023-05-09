@@ -53,9 +53,10 @@ public class AssertStatement extends BaseStatement {
     @Override
     public String toString() {
         if (disjuncts.size() == 0) {
-            return "assert true;";
+            return "assert true;\nexpect true;";
         }
-        return String.format("assert %s;", String.join(" || ", disjuncts));
+        String cond = String.join(" || ", disjuncts);
+        return String.format("assert %s;\nexpect %s;", cond, cond);
     }
 
     @Override
