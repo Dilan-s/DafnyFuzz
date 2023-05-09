@@ -159,20 +159,21 @@ public class RandomTypeGenerator {
     }
 
     public List<Type> generateMethodTypes(int noOfArgs, SymbolTable symbolTable) {
-        typeDepth += MAX_TYPE_DEPTH;
+        typeDepth++;
         List<Type> types = new ArrayList<>();
 
         int i = 0;
         while (i < noOfArgs) {
             Type t = generateTypes(1, symbolTable).get(0);
+            Type concrete = t.concrete(symbolTable);
 
-            if (t.validMethodType()) {
-                types.add(t.concrete(symbolTable));
+            if (concrete.validMethodType()) {
+                types.add(concrete);
                 i++;
             }
         }
 
-        typeDepth -= MAX_TYPE_DEPTH;
+        typeDepth--;
         return types;
     }
 

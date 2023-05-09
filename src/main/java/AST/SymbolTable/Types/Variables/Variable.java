@@ -1,7 +1,9 @@
 package AST.SymbolTable.Types.Variables;
 
 import AST.SymbolTable.Identifier;
+import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,5 +60,23 @@ public class Variable implements Identifier {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public List<Variable> getSymbolTableArgs() {
+        List<Variable> vars = new ArrayList<>();
+        if (type.equals(new DArray())) {
+            DArray dArray = (DArray) this.type;
+            for (int i = 0; i < DArray.MIN_SIZE_OF_ARRAY; i++) {
+                vars.addAll(new VariableArrayIndex(this, dArray.getInnerType(), i).getSymbolTableArgs());
+            }
+        } else if (type.equals(new Tuple())) {
+            Tuple tuple = (Tuple) this.type;
+            for (int i = 0; i < tuple.getNoOfType(); i++) {
+                vars.addAll(new VariableDatatypeIndex(this, tuple.getType(i), i).getSymbolTableArgs());
+            }
+
+        }
+        vars.add(this);
+        return vars;
     }
 }

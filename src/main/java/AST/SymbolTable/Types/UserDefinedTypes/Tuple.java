@@ -160,4 +160,8 @@ public class Tuple implements UserDefinedType {
 
         return tupleOther.typeList.equals(typeList);
     }
+
+    public int getNoOfType() {
+        return typeList.size();
+    }
 }

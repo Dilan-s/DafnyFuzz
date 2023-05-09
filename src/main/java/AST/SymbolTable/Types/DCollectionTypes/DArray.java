@@ -14,8 +14,9 @@ import java.util.List;
 
 public class DArray implements DCollection {
 
-    public static final int MAX_SIZE_OF_ARRAY = 5;
+    public static final int MAX_SIZE_OF_ARRAY = 3;
     public static final double PROB_EXPAND = 0.9;
+    public static final int MIN_SIZE_OF_ARRAY = 3;
     private Type type;
 
     public DArray(Type type) {
@@ -74,7 +75,7 @@ public class DArray implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + 1;
+        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + MIN_SIZE_OF_ARRAY;
 
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {

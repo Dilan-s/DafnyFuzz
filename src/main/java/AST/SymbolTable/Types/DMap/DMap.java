@@ -67,7 +67,7 @@ public class DMap implements Type {
 
     @Override
     public boolean validMethodType() {
-        return keyType.validMethodType() && keyType.isPrintable() && valueType.validMethodType() && valueType.isPrintable() && !keyType.equals(new DMap());
+        return keyType.validMethodType() && keyType.isPrintable() && valueType.validMethodType() && valueType.isPrintable() && !keyType.equals(new DMap()) && !valueType.equals(new DMap());
     }
 
     @Override

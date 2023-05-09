@@ -111,8 +111,10 @@ public class RandomExpressionGenerator {
 
             } else if ((probTypeOfExpression -= PROB_CALL_EXPRESSION) < 0) {
                 //call
-                PROB_CALL_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                ret = generateCallExpression(symbolTable, List.of(type));
+                if (type.validMethodType()) {
+                    PROB_CALL_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateCallExpression(symbolTable, List.of(type));
+                }
             } else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
                 //match
                 PROB_MATCH_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;

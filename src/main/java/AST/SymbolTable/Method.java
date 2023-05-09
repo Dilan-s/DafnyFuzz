@@ -85,7 +85,9 @@ public class Method implements Identifier {
 
     public void addArgument(Variable argument) {
         args.add(argument);
-        symbolTable.addVariable(argument);
+        for (Variable arg : argument.getSymbolTableArgs()) {
+            symbolTable.addVariable(arg);
+        }
     }
 
     public List<Type> getReturnTypes() {

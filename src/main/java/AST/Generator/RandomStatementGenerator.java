@@ -45,7 +45,7 @@ public class RandomStatementGenerator {
     public static double PROB_BREAK_STAT = 5.0;
     public static double PROB_CONTINUE_STAT = 5.0;
 
-    public static final double PROB_METHOD_ASSIGN = 0.05;
+    public static final double PROB_METHOD_ASSIGN = 0.1;
     public static final double PROB_ELSE_STAT = 0.5;
 
     public static final int MAX_STATEMENT_DEPTH = 4;
@@ -301,14 +301,14 @@ public class RandomStatementGenerator {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
 
-        int noOfReturns = GeneratorConfig.getRandom().nextInt(5) + 1;
-        List<Type> returnTypes = typeGenerator.generateTypes(noOfReturns, symbolTable);
 
+
+        /*
         double probReassign = GeneratorConfig.getRandom().nextDouble();
         boolean canReassign = false;
 
         List<Variable> toReassign = new ArrayList<>();
-/*      for (int i = 0, returnTypesSize = returnTypes.size(); canReassign && i < returnTypesSize; i++) {
+      for (int i = 0, returnTypesSize = returnTypes.size(); canReassign && i < returnTypesSize; i++) {
             Type t = returnTypes.get(i);
             List<Variable> allVariables = symbolTable.getAllVariables(t, false);
             if (allVariables.isEmpty()) {
@@ -328,7 +328,7 @@ public class RandomStatementGenerator {
                 canReassign = false;
                 break;
             }
-        }*/
+        }
 
         if (canReassign) {
             List<Variable> variables = new ArrayList<>();
@@ -341,9 +341,12 @@ public class RandomStatementGenerator {
             AssignmentStatement statement = new AssignmentStatement(symbolTable, variables, value);
             return statement;
         }
+        */
+        int noOfReturns = GeneratorConfig.getRandom().nextInt(5) + 1;
 
         double probCallMethod = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.OPTION_DECAY_FACTOR, statementDepth);
         if (probCallMethod < PROB_METHOD_ASSIGN) {
+            List<Type> returnTypes = typeGenerator.generateMethodTypes(noOfReturns, symbolTable);
             //Create method
 
             CallExpression expression = expressionGenerator.generateCallExpression(symbolTable, returnTypes);
@@ -356,6 +359,7 @@ public class RandomStatementGenerator {
                 return statement;
             }
         }
+        List<Type> returnTypes = typeGenerator.generateTypes(noOfReturns, symbolTable);
         List<Variable> variables = new ArrayList<>();
         List<Expression> value = new ArrayList<>();
 
