@@ -330,9 +330,12 @@ public class RandomExpressionGenerator {
         if (!returnTypes.stream().allMatch(Type::validMethodType)) {
             return null;
         }
-
         RandomMethodGenerator methodGenerator = new RandomMethodGenerator();
+
+        int prevDepth = RandomStatementGenerator.loopDepth;
+        RandomStatementGenerator.loopDepth = 0;
         Method m = methodGenerator.generateMethod(returnTypes, symbolTable);
+        RandomStatementGenerator.loopDepth = prevDepth;
 
         if (m == null) {
             return null;

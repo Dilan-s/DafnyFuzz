@@ -2,6 +2,7 @@ package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -188,7 +189,7 @@ public class IfElseStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         Object testValue = test.getValue(paramMap, s).get(0);
         Boolean testB = (Boolean) testValue;
         if (testB) {
@@ -196,7 +197,7 @@ public class IfElseStatement extends BaseStatement {
         } else if (elseStat.isPresent()) {
             return elseStat.get().execute(paramMap, s);
         }
-        return null;
+        return ReturnStatus.UNKNOWN;
     }
 
     @Override

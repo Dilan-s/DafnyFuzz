@@ -50,8 +50,8 @@ public class PrintAll extends BaseStatement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
-        return null;
+    public ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+        return ReturnStatus.UNKNOWN;
     }
 
     @Override

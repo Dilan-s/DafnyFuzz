@@ -48,6 +48,9 @@ public class Variable implements Identifier {
     }
 
     public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+        if (paramsMap.containsKey(this)) {
+            return paramsMap.get(this).getValue(paramsMap);
+        }
         List<Object> l = new ArrayList<>();
         l.add(value);
         return l;

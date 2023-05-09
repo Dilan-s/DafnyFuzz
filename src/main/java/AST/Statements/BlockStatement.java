@@ -1,6 +1,7 @@
 package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -58,18 +59,18 @@ public class BlockStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         for (int i = 0, bodySize = body.size(); i < bodySize; i++) {
             Statement statement = body.get(i);
             List<Statement> ss = statement.expand();
             for (Statement stat : ss) {
-                List<Object> retValues = stat.execute(paramMap, s);
-                if (retValues != null) {
+                ReturnStatus retValues = stat.execute(paramMap, s);
+                if (retValues != ReturnStatus.UNKNOWN) {
                     return retValues;
                 }
             }
         }
-        return null;
+        return ReturnStatus.UNKNOWN;
     }
 
     @Override

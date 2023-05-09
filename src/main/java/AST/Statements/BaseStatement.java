@@ -1,5 +1,6 @@
 package AST.Statements;
 
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,11 @@ public abstract class BaseStatement implements Statement {
     }
 
     @Override
-    public List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s) {
+    public ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s) {
         incrementUse();
-        return execute(paramMap, s, true);
+        ReturnStatus execute = execute(paramMap, s, true);
+        return execute;
     }
 
-    protected abstract List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused);
+    protected abstract ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused);
 }

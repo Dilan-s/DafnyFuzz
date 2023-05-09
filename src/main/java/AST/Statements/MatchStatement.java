@@ -3,6 +3,7 @@ package AST.Statements;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.MatchStatementCase;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -48,7 +49,7 @@ public class MatchStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         Object testValue = test.getValue(paramMap).get(0);
         if (testValue == null) {
             return null;
@@ -72,7 +73,7 @@ public class MatchStatement extends BaseStatement {
             testValues.add(castTestValue);
 
             if (castTestValue.equals(testValue)) {
-                List<Object> execute = matchStatementCase.execute(paramMap, s);
+                ReturnStatus execute = matchStatementCase.execute(paramMap, s);
                 for (int j = i + 1; j < cases.size(); j++) {
                     matchStatementCase = cases.get(j);
 

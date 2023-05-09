@@ -2,6 +2,7 @@ package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
@@ -155,7 +156,7 @@ public class AssignmentStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<Object> expValues = new ArrayList<>();
         for (Expression value : values) {
             List<Object> expressionValue = value.getValue(paramMap, s);
@@ -169,7 +170,7 @@ public class AssignmentStatement extends BaseStatement {
             Variable v = variables.get(i);
             v.setValue(expV);
         }
-        return null;
+        return ReturnStatus.UNKNOWN;
     }
 
     @Override

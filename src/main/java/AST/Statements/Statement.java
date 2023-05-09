@@ -1,5 +1,6 @@
 package AST.Statements;
 
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ public interface Statement {
         return false;
     }
 
-    List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s);
+    ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s);
 
     List<Statement> expand();
 

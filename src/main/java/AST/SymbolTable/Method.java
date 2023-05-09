@@ -5,6 +5,7 @@ import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -233,7 +234,11 @@ public class Method implements Identifier {
             requiresEnsures.put(arg, param);
         }
 
-        List<Object> execute = body.execute(paramMap, s);
+        ReturnStatus returnStatus = body.execute(paramMap, s);
+        List<Object> execute = new ArrayList<>();
+        if (returnStatus != null) {
+            execute = returnStatus.getValues();
+        }
 
         if (!getName().startsWith("safe") && !getName().equals("Main")) {
             addRequires(requiresEnsures);

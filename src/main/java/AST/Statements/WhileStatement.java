@@ -2,6 +2,7 @@ package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.xml.transform.ErrorListener;
 
 public class WhileStatement extends BaseStatement {
 
@@ -44,22 +46,20 @@ public class WhileStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         while (true) {
             Object testValue = test.getValue(paramMap, s).get(0);
 
-            if (testValue != null) {
-                Boolean testValueB = (Boolean) testValue;
-                if (testValueB) {
-                    List<Object> execute = body.execute(paramMap, s);
-                    if (execute != null) {
-                        return execute;
-                    }
-                } else {
-                    return null;
+            Boolean testValueB = (Boolean) testValue;
+            if (testValueB) {
+                ReturnStatus execute = body.execute(paramMap, s);
+                if (execute == ReturnStatus.RETURN) {
+                    return execute;
+                } else if (execute == ReturnStatus.BREAK) {
+                    return ReturnStatus.UNKNOWN;
                 }
             } else {
-                return null;
+                return ReturnStatus.UNKNOWN;
             }
         }
     }

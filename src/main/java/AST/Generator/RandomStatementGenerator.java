@@ -3,6 +3,8 @@ package AST.Generator;
 import AST.Statements.AssertStatement;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.BlockStatement;
+import AST.Statements.BreakStatement;
+import AST.Statements.ContinueStatement;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IntLiteral;
@@ -36,10 +38,12 @@ public class RandomStatementGenerator {
     public static double PROB_RETURN_STAT = 50.0;
     public static double PROB_ASSIGN_STAT = 30.0;
     public static double PROB_IF_ELSE_STAT = 15.0;
-    public static double PROB_MATCH_STAT = 4.0;
-    public static double PROB_WHILE_STAT = 4.0;
-    public static double PROB_FOR_STAT = 4.0;
+    public static double PROB_MATCH_STAT = 5.0;
+    public static double PROB_WHILE_STAT = 7.0;
+    public static double PROB_FOR_STAT = 7.0;
     public static double PROB_ASSERT = 12.5;
+    public static double PROB_BREAK_STAT = 5.0;
+    public static double PROB_CONTINUE_STAT = 5.0;
 
     public static final double PROB_METHOD_ASSIGN = 0.05;
     public static final double PROB_ELSE_STAT = 0.5;
@@ -48,6 +52,7 @@ public class RandomStatementGenerator {
     public static final double PROB_NEXT_STAT = 0.85;
     public static final double PROB_FORCE_RETURN = 0.2;
 
+    public static int loopDepth = 0;
     private static int statementDepth = 0;
 
 
@@ -81,9 +86,9 @@ public class RandomStatementGenerator {
         statementDepth++;
         Statement ret = null;
         while (ret == null) {
-            double ratioSum = PROB_RETURN_STAT +
-                PROB_ASSIGN_STAT + PROB_IF_ELSE_STAT +
-                PROB_ASSERT + PROB_MATCH_STAT + PROB_WHILE_STAT + PROB_FOR_STAT;
+            double ratioSum = PROB_RETURN_STAT + PROB_ASSIGN_STAT + PROB_IF_ELSE_STAT +
+                PROB_ASSERT + PROB_MATCH_STAT + PROB_WHILE_STAT + PROB_FOR_STAT + PROB_BREAK_STAT +
+                PROB_CONTINUE_STAT;
             double probTypeOfStatement = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
             if ((statementDepth > MAX_STATEMENT_DEPTH ||
@@ -124,10 +129,30 @@ public class RandomStatementGenerator {
                 PROB_FOR_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateForStatement(method, symbolTable);
 
+            } else if ((probTypeOfStatement -= PROB_BREAK_STAT) < 0) {
+                if (loopDepth > 0) {
+                    PROB_BREAK_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateBreakStatement(method, symbolTable);
+                }
+            } else if ((probTypeOfStatement -= PROB_CONTINUE_STAT) < 0) {
+                if (loopDepth > 0) {
+                    PROB_CONTINUE_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateContinueStatement(method, symbolTable);
+                }
             }
         }
         statementDepth--;
         return ret;
+    }
+
+    private Statement generateContinueStatement(Method method, SymbolTable symbolTable) {
+        ContinueStatement continueStatement = new ContinueStatement(symbolTable);
+        return continueStatement;
+    }
+
+    private Statement generateBreakStatement(Method method, SymbolTable symbolTable) {
+        BreakStatement breakStatement = new BreakStatement(symbolTable);
+        return breakStatement;
     }
 
     private Statement generateForStatement(Method method, SymbolTable symbolTable) {
@@ -142,7 +167,10 @@ public class RandomStatementGenerator {
         Expression finalExp = expressionGenerator.generateExpression(intType, symbolTable);
 
         forSt.addVariable(loopVar);
+
+        loopDepth++;
         BlockStatement body = generateBody(method, forSt, false);
+        loopDepth--;
 
         ForStatement forStatement = new ForStatement(symbolTable, initExp, finalExp, loopVar, body);
         return forStatement;
@@ -171,7 +199,10 @@ public class RandomStatementGenerator {
         OperatorExpression test = new OperatorExpression(symbolTable, boolType, BinaryOperator.Less_Than, List.of(loopVarExp, finalVarExp));
 
         SymbolTable bodySt = new SymbolTable(symbolTable);
+
+        loopDepth++;
         BlockStatement body = generateBody(method, bodySt, false);
+        loopDepth--;
 
         AssignmentStatement initAssign = new AssignmentStatement(symbolTable, List.of(loopVar), initExp);
 

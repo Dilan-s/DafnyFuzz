@@ -1,6 +1,7 @@
 package AST.Statements;
 
 import AST.Statements.Expressions.Expression;
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class AssertStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<String> conjuncts = new ArrayList<>();
         for (Variable v : variables) {
             Object val = v.getValue(paramMap).get(0);
@@ -36,7 +37,7 @@ public class AssertStatement extends BaseStatement {
         }
         String e = "(" + String.join(" && ", conjuncts) + ")";
         disjuncts.add(e);
-        return null;
+        return ReturnStatus.UNKNOWN;
     }
 
     @Override

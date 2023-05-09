@@ -5,6 +5,7 @@ import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.CallExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -58,7 +59,7 @@ public class ForStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         Integer initVarValue = (Integer) initVar.getValue(paramMap).get(0);
         Integer finalVarValue = (Integer) finalVar.getValue(paramMap).get(0);
 
@@ -71,23 +72,27 @@ public class ForStatement extends BaseStatement {
 
             for (int i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
                 loopVar.setValue(i);
-                List<Object> execute = body.execute(paramMap, s);
-                if (execute != null) {
+                ReturnStatus execute = body.execute(paramMap, s);
+                if (execute == ReturnStatus.RETURN) {
                     return execute;
+                } else if (execute == ReturnStatus.BREAK) {
+                    return ReturnStatus.UNKNOWN;
                 }
             }
         } else {
             direction = Direction.setDirection(initVarValue, finalVarValue);
             for (int i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
                 loopVar.setValue(i);
-                List<Object> execute = body.execute(paramMap, s);
-                if (execute != null) {
+                ReturnStatus execute = body.execute(paramMap, s);
+                if (execute == ReturnStatus.RETURN) {
                     return execute;
+                } else if (execute == ReturnStatus.BREAK) {
+                    return ReturnStatus.UNKNOWN;
                 }
             }
 
         }
-        return null;
+        return ReturnStatus.UNKNOWN;
     }
 
     private void setMinMaxCall(Map<Variable, Variable> paramMap, StringBuilder s) {

@@ -46,8 +46,8 @@ public class MatchStatementCase extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
-        List<Object> execute = body.execute(paramMap, s);
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+        ReturnStatus execute = body.execute(paramMap, s);
         return execute;
     }
 

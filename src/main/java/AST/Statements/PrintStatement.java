@@ -2,6 +2,7 @@ package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -111,7 +112,7 @@ public class PrintStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<String> joiner = new ArrayList<>();
 
         for (Expression exp : values) {
@@ -132,7 +133,7 @@ public class PrintStatement extends BaseStatement {
             s.append(printValues);
             s.append("\n");
         }
-        return null;
+        return ReturnStatus.UNKNOWN;
     }
 
     @Override

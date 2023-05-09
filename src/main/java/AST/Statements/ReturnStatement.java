@@ -3,6 +3,7 @@ package AST.Statements;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.util.PrintAll;
+import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -115,15 +116,14 @@ public class ReturnStatement extends BaseStatement {
     }
 
     @Override
-    protected List<Object> execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<Object> list = new ArrayList<>();
         for (Expression x : values) {
             List<Object> value = x.getValue(paramMap, s);
-            for (Object object : value) {
-                list.add(object);
-            }
+            list.addAll(value);
         }
-        return list;
+        ReturnStatus returnStatus = ReturnStatus.returnValues(list);
+        return returnStatus;
     }
 
     @Override
