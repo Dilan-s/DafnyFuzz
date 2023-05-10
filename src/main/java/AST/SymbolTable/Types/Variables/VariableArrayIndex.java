@@ -30,7 +30,18 @@ public class VariableArrayIndex extends Variable {
     }
 
     @Override
+    public void setValue(Map<Variable, Variable> paramMap, Object value) {
+        ArrayValue v = (ArrayValue) variable.getValue(paramMap).get(0);
+        v.set(index, value);
+    }
+
+    @Override
     public String getName() {
         return super.getName() + "[" + index + "]";
+    }
+
+    @Override
+    public boolean modified(Variable x) {
+        return variable == x;
     }
 }

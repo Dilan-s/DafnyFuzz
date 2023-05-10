@@ -13,14 +13,25 @@ public class Variable implements Identifier {
 
     private final String name;
     private final Type type;
+    private boolean isConstant;
     private boolean isDeclared;
     private Object value;
+
 
     public Variable(String name, Type type) {
         this.name = name;
         this.type = type;
+        this.isConstant = false;
         this.isDeclared = false;
         this.value = null;
+    }
+
+    public void setConstant() {
+        isConstant = true;
+    }
+
+    public boolean isConstant() {
+        return isConstant;
     }
 
     @Override
@@ -38,7 +49,7 @@ public class Variable implements Identifier {
 
     @Override
     public String toString() {
-        return String.format("%s: %s", name, getType().getVariableType());
+        return String.format("%s: %s", getName(), getType().getVariableType());
     }
 
     public boolean isDeclared() {
@@ -58,7 +69,10 @@ public class Variable implements Identifier {
         return l;
     }
 
-    public void setValue(Object value) {
+    public void setValue(Map<Variable, Variable> paramMap, Object value) {
+        if (paramMap.containsKey(this)) {
+            paramMap.get(this).setValue(paramMap, value);
+        }
         this.value = value;
     }
 
@@ -78,5 +92,9 @@ public class Variable implements Identifier {
         }
         vars.add(this);
         return vars;
+    }
+
+    public boolean modified(Variable x) {
+        return false;
     }
 }

@@ -13,6 +13,7 @@ import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ public class ForStatement extends BaseStatement {
 
     private Optional<Statement> statCallMinMax;
     private Direction direction;
+    private Map<String, Set<String>> loopInvariants;
 
     private List<List<Statement>> expanded;
     private boolean update;
@@ -42,7 +44,9 @@ public class ForStatement extends BaseStatement {
 
         Type loopVarType = loopVar.getType();
         this.initVar = new Variable(VariableNameGenerator.generateVariableValueName(loopVarType, symbolTable), loopVarType);
+        initVar.setConstant();
         this.finalVar = new Variable(VariableNameGenerator.generateVariableValueName(loopVarType, symbolTable), loopVarType);
+        finalVar.setConstant();
 
         assignment = new AssignmentStatement(this.symbolTable,  List.of(initVar, finalVar),  List.of(initExp, finalExp));
 
@@ -52,6 +56,7 @@ public class ForStatement extends BaseStatement {
         this.statCallMinMax = Optional.empty();
         this.direction = null;
         this.update = false;
+        this.loopInvariants = new HashMap<>();
 
         this.expanded = new ArrayList<>();
         expanded.add(assignment.expand());
@@ -71,7 +76,9 @@ public class ForStatement extends BaseStatement {
             }
 
             for (int i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
-                loopVar.setValue(i);
+                loopVar.setValue(paramMap, i);
+                Set<Variable> modSet = body.getModifies();
+                addInvariantForModSet(modSet, paramMap);
                 ReturnStatus execute = body.execute(paramMap, s);
                 if (execute == ReturnStatus.RETURN) {
                     return execute;
@@ -82,7 +89,9 @@ public class ForStatement extends BaseStatement {
         } else {
             direction = Direction.setDirection(initVarValue, finalVarValue);
             for (int i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
-                loopVar.setValue(i);
+                loopVar.setValue(paramMap, i);
+                Set<Variable> modSet = body.getModifies();
+                addInvariantForModSet(modSet, paramMap);
                 ReturnStatus execute = body.execute(paramMap, s);
                 if (execute == ReturnStatus.RETURN) {
                     return execute;
@@ -92,7 +101,41 @@ public class ForStatement extends BaseStatement {
             }
 
         }
+        Set<Variable> modSet = body.getModifies();
+        addInvariantForModSet(modSet, paramMap);
         return ReturnStatus.UNKNOWN;
+    }
+
+    private void addInvariantForModSet(Set<Variable> modSet, Map<Variable, Variable> paramMap) {
+        Set<Variable> vs = modSet.stream()
+            .filter(v -> symbolTable.getAllVariables(v.getType()).contains(v))
+            .filter(v -> v != loopVar)
+            .collect(Collectors.toSet());
+
+        if (!vs.isEmpty()) {
+
+            Object value = loopVar.getValue(paramMap).get(0);
+            String key = loopVar.getType().formatEnsures(loopVar.getName(), value);
+
+            if (!loopInvariants.containsKey(key)) {
+                loopInvariants.put(key, new HashSet<>());
+            }
+            Set<String> invs = loopInvariants.get(key);
+
+            List<String> rhs = new ArrayList<>();
+            for (Variable v : vs) {
+                Object obj = v.getValue(paramMap).get(0);
+                rhs.add(v.getType().formatEnsures(v.getName(), obj));
+            }
+            String rhsV = String.join(" && ", rhs);
+            invs.add(rhsV);
+
+        }
+    }
+
+    @Override
+    public Set<Variable> getModifies() {
+        return body.getModifies();
     }
 
     private void setMinMaxCall(Map<Variable, Variable> paramMap, StringBuilder s) {
@@ -137,8 +180,17 @@ public class ForStatement extends BaseStatement {
         Direction direction = this.direction == null ? Direction.TO : this.direction;
 
         String start = String.format("for %s := %s %s %s \n", loopVar.getName(), initVar.getName(), direction.rep, finalVar.getName());
-        start = start + StringUtils.indent(direction.invariantClause(loopVar, finalVar)) + "\n";
-        start = start + "{\n";
+        start = start + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
+        if (!loopInvariants.isEmpty()) {
+            List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
+                    String.join(" || ", x.getValue())))
+                .collect(Collectors.toList());
+
+            start = start + " && " + String.join(" && ", loopInvariants);
+        }
+
+        start = start + "\n{\n";
         res.add(start);
 
         List<String> temp = new ArrayList<>();
@@ -171,8 +223,17 @@ public class ForStatement extends BaseStatement {
         Direction direction = this.direction == null ? Direction.TO : this.direction;
         if (body.getNoOfUses() > 0) {
             String res = String.format("for %s := %s %s %s \n", loopVar.getName(), initVar.getName(), direction.rep, finalVar.getName());
-            res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar)) + "\n";
-            res = res + "{\n";
+            res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
+            if (!loopInvariants.isEmpty()) {
+                List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                    .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
+                        String.join(" || ", x.getValue())))
+                    .collect(Collectors.toList());
+
+                res = res + " && " + String.join(" && ", loopInvariants);
+            }
+
+            res = res + "\n{\n";
             res = res + StringUtils.indent(body.minimizedTestCase()) + "\n";
             res = res + "}";
             return res;
@@ -184,8 +245,17 @@ public class ForStatement extends BaseStatement {
     public String toString() {
         Direction direction = this.direction == null ? Direction.TO : this.direction;
         String res = String.format("for %s := %s %s %s \n", loopVar.getName(), initVar.getName(), direction.rep, finalVar.getName());
-        res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar)) + "\n";
-        res = res + "{\n";
+        res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
+        if (!loopInvariants.isEmpty()) {
+            List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
+                    String.join(" || ", x.getValue())))
+                .collect(Collectors.toList());
+
+            res = res + " && " + String.join(" && ", loopInvariants);
+        }
+
+        res = res + "\n{\n";
         res = res + StringUtils.indent(body.toString()) + "\n";
         res = res + "}";
         return res;

@@ -51,6 +51,8 @@ public class RandomStatementGenerator {
     public static final int MAX_STATEMENT_DEPTH = 4;
     public static final double PROB_NEXT_STAT = 0.85;
     public static final double PROB_FORCE_RETURN = 0.2;
+//    public static final double PROB_REASSIGN = 0.5;
+    public static final double PROB_REASSIGN = 1.0;
 
     public static int loopDepth = 0;
     private static int statementDepth = 0;
@@ -162,6 +164,7 @@ public class RandomStatementGenerator {
         SymbolTable forSt = new SymbolTable(symbolTable);
 
         Variable loopVar = new Variable(VariableNameGenerator.generateVariableValueName(intType, symbolTable), intType);
+        loopVar.setConstant();
 
         Expression initExp = expressionGenerator.generateExpression(intType, symbolTable);
         Expression finalExp = expressionGenerator.generateExpression(intType, symbolTable);
@@ -181,12 +184,15 @@ public class RandomStatementGenerator {
         Int intType = new Int();
 
         Variable loopVar = new Variable(VariableNameGenerator.generateVariableValueName(intType, symbolTable), intType);
+        loopVar.setConstant();
         VariableExpression loopVarExp = new VariableExpression(symbolTable, loopVar, intType);
 
         Variable finalVar = new Variable(VariableNameGenerator.generateVariableValueName(intType, symbolTable), intType);
+        finalVar.setConstant();
         VariableExpression finalVarExp = new VariableExpression(symbolTable, finalVar, intType);
 
         Expression initExp = expressionGenerator.generateExpression(intType, symbolTable);
+        AssignmentStatement initAssign = new AssignmentStatement(symbolTable, List.of(loopVar), initExp);
 
         Expression finalExp = expressionGenerator.generateExpression(intType, symbolTable);
         AssignmentStatement finalAssign = new AssignmentStatement(symbolTable, List.of(finalVar), finalExp);
@@ -204,7 +210,6 @@ public class RandomStatementGenerator {
         BlockStatement body = generateBody(method, bodySt, false);
         loopDepth--;
 
-        AssignmentStatement initAssign = new AssignmentStatement(symbolTable, List.of(loopVar), initExp);
 
         OperatorExpression incr = new OperatorExpression(bodySt, intType, BinaryOperator.Plus, List.of(loopVarExp, new IntLiteral(intType, symbolTable, 1)));
         AssignmentStatement incrAssign = new AssignmentStatement(bodySt, List.of(loopVar), incr);
@@ -301,47 +306,6 @@ public class RandomStatementGenerator {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
 
-
-
-        /*
-        double probReassign = GeneratorConfig.getRandom().nextDouble();
-        boolean canReassign = false;
-
-        List<Variable> toReassign = new ArrayList<>();
-      for (int i = 0, returnTypesSize = returnTypes.size(); canReassign && i < returnTypesSize; i++) {
-            Type t = returnTypes.get(i);
-            List<Variable> allVariables = symbolTable.getAllVariables(t, false);
-            if (allVariables.isEmpty()) {
-                canReassign = false;
-                break;
-            }
-            boolean toAdd = true;
-            for (int j = 0, allVariablesSize = allVariables.size(); toAdd && j < allVariablesSize; j++) {
-                Variable v = allVariables.get(j);
-                if (!toReassign.contains(v)) {
-                    toReassign.add(v);
-                    toAdd = false;
-                }
-            }
-
-            if (toAdd) {
-                canReassign = false;
-                break;
-            }
-        }
-
-        if (canReassign) {
-            List<Variable> variables = new ArrayList<>();
-            List<Expression> value = new ArrayList<>();
-            for (Variable v : toReassign) {
-                Type type = v.getType().concrete(symbolTable);
-                variables.add(v);
-                value.add(expressionGenerator.generateExpression(type, symbolTable));
-            }
-            AssignmentStatement statement = new AssignmentStatement(symbolTable, variables, value);
-            return statement;
-        }
-        */
         int noOfReturns = GeneratorConfig.getRandom().nextInt(5) + 1;
 
         double probCallMethod = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.OPTION_DECAY_FACTOR, statementDepth);
@@ -351,28 +315,65 @@ public class RandomStatementGenerator {
 
             CallExpression expression = expressionGenerator.generateCallExpression(symbolTable, returnTypes);
             if (expression != null) {
-                List<Variable> variables = returnTypes.stream()
-                    .map(x -> new Variable(VariableNameGenerator.generateVariableValueName(x, symbolTable), x))
-                    .collect(Collectors.toList());
+                List<Variable> variables = generateAssignVariables(returnTypes, symbolTable);
 
                 AssignmentStatement statement = new AssignmentStatement(symbolTable, variables, expression);
                 return statement;
             }
         }
         List<Type> returnTypes = typeGenerator.generateTypes(noOfReturns, symbolTable);
-        List<Variable> variables = new ArrayList<>();
-        List<Expression> value = new ArrayList<>();
 
-        for (Type t : returnTypes) {
-            Type concrete = t.concrete(symbolTable);
-            Expression expression = expressionGenerator.generateExpression(concrete, symbolTable);
+        List<Type> concreteRetTypes = returnTypes.stream()
+            .map(t -> t.concrete(symbolTable))
+            .collect(Collectors.toList());
 
-            variables.add(new Variable(VariableNameGenerator.generateVariableValueName(t, symbolTable), t));
-            value.add(expression);
-        }
+        List<Expression> value = concreteRetTypes.stream()
+            .map(concrete -> expressionGenerator.generateExpression(concrete, symbolTable))
+            .collect(Collectors.toList());
+
+        List<Variable> variables = generateAssignVariables(concreteRetTypes, symbolTable);
 
         AssignmentStatement statement = new AssignmentStatement(symbolTable, variables, value);
         return statement;
     }
+
+    private List<Variable> generateAssignVariables(List<Type> types, SymbolTable symbolTable) {
+
+        double probReassign = GeneratorConfig.getRandom().nextDouble();
+
+        if (probReassign < PROB_REASSIGN && types.stream().allMatch(Type::validMethodType)) {
+            List<Variable> variables = new ArrayList<>();
+            for (Type t : types) {
+                List<Variable> varsInScope = symbolTable.getAllVariables(t).stream()
+                    .filter(v -> !v.isConstant())
+                    .collect(Collectors.toList());
+                Collections.shuffle(varsInScope, GeneratorConfig.getRandom());
+
+                boolean assigned = false;
+
+                for (int i = 0; !assigned && i < varsInScope.size(); i++) {
+                    Variable v = varsInScope.get(i);
+                    if (!variables.contains(v)) {
+                        variables.add(v);
+                        assigned = true;
+                    }
+                }
+                if (!assigned) {
+                    return generateNewAssignVariables(types, symbolTable);
+                }
+            }
+            return variables;
+        }
+        return generateNewAssignVariables(types, symbolTable);
+    }
+
+    private List<Variable> generateNewAssignVariables(List<Type> types, SymbolTable symbolTable) {
+        List<Variable> variables = types.stream()
+            .map(t -> new Variable(VariableNameGenerator.generateVariableValueName(t, symbolTable), t))
+            .collect(Collectors.toList());
+        return variables;
+    }
+
+
 
 }

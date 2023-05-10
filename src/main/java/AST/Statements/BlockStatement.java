@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BlockStatement extends BaseStatement {
 
@@ -71,6 +72,16 @@ public class BlockStatement extends BaseStatement {
             }
         }
         return ReturnStatus.UNKNOWN;
+    }
+
+    @Override
+    public Set<Variable> getModifies() {
+        return body.stream()
+            .map(Statement::expand)
+            .flatMap(Collection::stream)
+            .map(Statement::getModifies)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
     }
 
     @Override

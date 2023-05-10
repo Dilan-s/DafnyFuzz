@@ -51,6 +51,11 @@ public class MatchStatementCase extends BaseStatement {
         return execute;
     }
 
+    @Override
+    public Set<Variable> getModifies() {
+        return body.getModifies();
+    }
+
     public Expression getTest() {
         return test;
     }

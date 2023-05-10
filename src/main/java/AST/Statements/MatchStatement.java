@@ -95,6 +95,16 @@ public class MatchStatement extends BaseStatement {
     }
 
     @Override
+    public Set<Variable> getModifies() {
+        Set<Variable> res = distinctCases.stream()
+            .map(MatchStatementCase::getModifies)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+        res.addAll(defaultCase.getModifies());
+        return res;
+    }
+
+    @Override
     public List<Statement> expand() {
         int j = 0;
         if (test.requireUpdate()) {

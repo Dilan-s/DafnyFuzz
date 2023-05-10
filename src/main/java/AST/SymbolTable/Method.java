@@ -2,8 +2,6 @@ package AST.SymbolTable;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
@@ -31,6 +29,7 @@ public class Method implements Identifier {
 
     private final Set<String> requires;
     private final Set<String> ensures;
+    private Set<String> modifies;
 
     private int noOfUses;
 
@@ -41,6 +40,7 @@ public class Method implements Identifier {
         this.args = args;
         this.requires = new HashSet<>();
         this.ensures = new HashSet<>();
+        this.modifies = new HashSet<>();
 
         this.retArgs = returnTypes.stream()
             .filter(x -> !x.equals(new Void()))
@@ -85,8 +85,10 @@ public class Method implements Identifier {
 
     public void addArgument(Variable argument) {
         args.add(argument);
+        argument.setConstant();
         for (Variable arg : argument.getSymbolTableArgs()) {
             symbolTable.addVariable(arg);
+            arg.setDeclared();
         }
     }
 
@@ -113,6 +115,12 @@ public class Method implements Identifier {
 
     public void setBody(Statement body) {
         this.body = body;
+
+        Set<Variable> modifiedByBody = body.getModifies();
+        this.modifies = args.stream()
+            .filter(x -> modifiedByBody.stream().anyMatch(y -> y.modified(x)))
+            .map(Variable::getName)
+            .collect(Collectors.toSet());
     }
 
     @Override
@@ -207,6 +215,9 @@ public class Method implements Identifier {
         }
         if (!ensures.isEmpty()) {
             res = res + StringUtils.indent("ensures " + StringUtils.intersperse(" && ", ensures)) + ";\n";
+        }
+        if (!modifies.isEmpty()) {
+            res = res + StringUtils.indent("modifies " + StringUtils.intersperse(", ", modifies)) + ";\n";
         }
 
         res = res + "{";

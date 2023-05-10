@@ -39,4 +39,8 @@ public class ArrayValue {
     public Object get(int index) {
         return contents.get(index);
     }
+
+    public void set(int index, Object value) {
+        contents.set(index, value);
+    }
 }

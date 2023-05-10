@@ -10,6 +10,7 @@ import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class WhileStatement extends BaseStatement {
     private Statement finalAssign;
     private Expression test;
     private Statement body;
+    private Map<String, Set<String>> loopInvariants;
 
     private List<List<Statement>> expanded;
 
@@ -37,6 +39,7 @@ public class WhileStatement extends BaseStatement {
         this.finalAssign = finalAssign;
         this.test = test;
         this.body = body;
+        this.loopInvariants = new HashMap<>();
 
         this.expanded = new ArrayList<>();
         expanded.add(initAssign.expand());
@@ -46,11 +49,18 @@ public class WhileStatement extends BaseStatement {
     }
 
     @Override
+    public Set<Variable> getModifies() {
+        return body.getModifies();
+    }
+
+    @Override
     protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         while (true) {
             Object testValue = test.getValue(paramMap, s).get(0);
 
             Boolean testValueB = (Boolean) testValue;
+            Set<Variable> modSet = body.getModifies();
+            addInvariantForModSet(modSet, paramMap);
             if (testValueB) {
                 ReturnStatus execute = body.execute(paramMap, s);
                 if (execute == ReturnStatus.RETURN) {
@@ -61,6 +71,33 @@ public class WhileStatement extends BaseStatement {
             } else {
                 return ReturnStatus.UNKNOWN;
             }
+        }
+    }
+
+    private void addInvariantForModSet(Set<Variable> modSet, Map<Variable, Variable> paramMap) {
+        Set<Variable> vs = modSet.stream()
+            .filter(v -> symbolTable.getAllVariables(v.getType()).contains(v))
+            .filter(v -> v != loopVar)
+            .collect(Collectors.toSet());
+
+        if (!vs.isEmpty()) {
+
+            Object value = loopVar.getValue(paramMap).get(0);
+            String key = loopVar.getType().formatEnsures(loopVar.getName(), value);
+
+            if (!loopInvariants.containsKey(key)) {
+                loopInvariants.put(key, new HashSet<>());
+            }
+            Set<String> invs = loopInvariants.get(key);
+
+            List<String> rhs = new ArrayList<>();
+            for (Variable v : vs) {
+                Object obj = v.getValue(paramMap).get(0);
+                rhs.add(v.getType().formatEnsures(v.getName(), obj));
+            }
+            String rhsV = String.join(" && ", rhs);
+            invs.add(rhsV);
+
         }
     }
 
@@ -85,7 +122,24 @@ public class WhileStatement extends BaseStatement {
 
         List<String> testOptions = test.toOutput();
         for (String testOption : testOptions) {
-            res.add(String.format("while %s \n\tdecreases %s - %s;\n\tinvariant %s <= %s;\n{\n", testOption, finalVar.getName(), loopVar.getName(), loopVar.getName(), finalVar.getName()));
+            String curr = String.format("while %s \n", testOption);
+            curr = curr + StringUtils.indent(String.format("decreases %s - %s;", finalVar.getName(), loopVar.getName())) + "\n";
+            curr = curr + StringUtils.indent(String.format("invariant %s <= %s", loopVar.getName(), finalVar.getName()));
+
+            if (!loopInvariants.isEmpty()) {
+
+                List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                    .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
+                        String.join(" || ", x.getValue())))
+                    .collect(Collectors.toList());
+
+                curr = curr + " && " + String.join(" && ", loopInvariants);
+            }
+
+
+            curr = curr + ";\n{\n";
+
+            res.add(curr);
         }
 
         List<String> temp = new ArrayList<>();
@@ -117,8 +171,21 @@ public class WhileStatement extends BaseStatement {
     @Override
     public String minimizedTestCase() {
         if (body.getNoOfUses() > 0) {
-            String res = String.format("while %s \n\tdecreases %s - %s;\n\tinvariant %s <= %s;\n{\n", test,
-                finalVar.getName(), loopVar.getName(), loopVar.getName(), finalVar.getName());
+            String res = String.format("while %s \n", test);
+            res = res + StringUtils.indent(String.format("decreases %s - %s;", finalVar.getName(), loopVar.getName())) + "\n";
+            res = res + StringUtils.indent(String.format("invariant %s <= %s", loopVar.getName(), finalVar.getName()));
+
+            if (!loopInvariants.isEmpty()) {
+
+                List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                    .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
+                        String.join(" || ", x.getValue())))
+                    .collect(Collectors.toList());
+
+                res = res + " && " + String.join(" && ", loopInvariants);
+            }
+
+            res = res + ";\n{\n";
             res = res + StringUtils.indent(body.minimizedTestCase());
             res = res + "\n}";
 
@@ -134,7 +201,20 @@ public class WhileStatement extends BaseStatement {
 
     @Override
     public String toString() {
-        String res = String.format("while %s \n\tdecreases %s - %s;\n\tinvariant %s <= %s;\n{\n", test, finalVar.getName(), loopVar.getName(), loopVar.getName(), finalVar.getName());
+        String res = String.format("while %s \n", test);
+        res = res + StringUtils.indent(String.format("decreases %s - %s;", finalVar.getName(), loopVar.getName())) + "\n";
+        res = res + StringUtils.indent(String.format("invariant %s <= %s", loopVar.getName(), finalVar.getName()));
+
+        if (!loopInvariants.isEmpty()) {
+
+            List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
+                    String.join(" || ", x.getValue())))
+                .collect(Collectors.toList());
+
+            res = res + " && " + String.join(" && ", loopInvariants);
+        }
+        res = res + ";\n{\n";
         res = res + StringUtils.indent(body.toString());
         res = res + "\n}";
 

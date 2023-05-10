@@ -1,5 +1,6 @@
 package AST.SymbolTable.Types.Variables;
 
+import AST.Statements.Expressions.Array.ArrayValue;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,22 @@ public class VariableDatatypeIndex extends Variable {
         return l;
     }
 
+
+    @Override
+    public void setValue(Map<Variable, Variable> paramMap, Object value) {
+        List<Object> v = (List<Object>) variable.getValue(paramMap).get(0);
+        v.set(index, value);
+    }
+
     @Override
     public String getName() {
         return super.getName() + "." + index;
     }
+
+    @Override
+    public boolean modified(Variable x) {
+        return variable == x;
+    }
+
+
 }

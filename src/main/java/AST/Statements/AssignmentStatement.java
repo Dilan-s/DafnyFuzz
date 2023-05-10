@@ -85,6 +85,11 @@ public class AssignmentStatement extends BaseStatement {
     }
 
     @Override
+    public Set<Variable> getModifies() {
+        return new HashSet<>(variables);
+    }
+
+    @Override
     public String minimizedTestCase() {
         String rhs = values.stream()
             .map(Expression::minimizedTestCase)
@@ -168,7 +173,7 @@ public class AssignmentStatement extends BaseStatement {
         for (int i = 0; i < variables.size(); i++) {
             Object expV = expValues.get(i);
             Variable v = variables.get(i);
-            v.setValue(expV);
+            v.setValue(paramMap, expV);
         }
         return ReturnStatus.UNKNOWN;
     }

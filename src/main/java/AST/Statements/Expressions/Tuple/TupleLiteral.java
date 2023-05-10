@@ -54,6 +54,7 @@ public class TupleLiteral extends BaseExpression {
             Type valType = t.getType(i);
             VariableDatatypeIndex v = new VariableDatatypeIndex(variable, valType, i);
             v.setDeclared();
+            v.setConstant();
             new AssignmentStatement(symbolTable, List.of(v), values.get(i));
         }
     }

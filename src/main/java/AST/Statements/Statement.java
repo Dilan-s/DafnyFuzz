@@ -2,8 +2,10 @@ package AST.Statements;
 
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface Statement {
 
@@ -29,5 +31,9 @@ public interface Statement {
 
     default boolean requireUpdate() {
         return false;
+    }
+
+    default Set<Variable> getModifies() {
+        return new HashSet<>();
     }
 }

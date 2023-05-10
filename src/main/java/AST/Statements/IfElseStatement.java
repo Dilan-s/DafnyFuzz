@@ -201,6 +201,15 @@ public class IfElseStatement extends BaseStatement {
     }
 
     @Override
+    public Set<Variable> getModifies() {
+        Set<Variable> res = ifStat.getModifies();
+        if (elseStat.isPresent()) {
+            res.addAll(elseStat.get().getModifies());
+        }
+        return res;
+    }
+
+    @Override
     public boolean requireUpdate() {
         return test.requireUpdate();
     }
