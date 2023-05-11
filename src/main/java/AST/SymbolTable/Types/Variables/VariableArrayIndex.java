@@ -38,6 +38,7 @@ public class VariableArrayIndex extends Variable {
     @Override
     public String getName() {
         return super.getName() + "[" + index + "]";
+//        return String.format("(%s)[%d]", super.getName(), index);
     }
 
     @Override

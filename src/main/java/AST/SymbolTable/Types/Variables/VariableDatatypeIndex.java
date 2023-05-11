@@ -46,5 +46,10 @@ public class VariableDatatypeIndex extends Variable {
         return variable == x;
     }
 
-
+    @Override
+    public List<Variable> getSymbolTableArgs() {
+        List<Variable> symbolTableArgs = super.getSymbolTableArgs();
+        symbolTableArgs.forEach(Variable::setConstant);
+        return symbolTableArgs;
+    }
 }
