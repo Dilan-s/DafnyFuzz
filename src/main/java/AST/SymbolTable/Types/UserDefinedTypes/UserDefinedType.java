@@ -13,4 +13,14 @@ public interface UserDefinedType extends Type {
     default boolean isCollection() {
         return false;
     }
+
+    @Override
+    default Boolean lessThan(Object lhsV, Object rhsV) {
+        return null;
+    }
+
+    @Override
+    default Boolean equal(Object lhsV, Object rhsV) {
+        return null;
+    }
 }

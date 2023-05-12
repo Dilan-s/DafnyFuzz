@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class VariableDatatypeIndex extends Variable {
+public class VariableTupleIndex extends Variable {
 
     private final int index;
     private final Variable variable;
 
-    public VariableDatatypeIndex(Variable variable, Type type, int index) {
+    public VariableTupleIndex(Variable variable, Type type, int index) {
         super(variable.getName(), type);
         this.variable = variable;
         this.index = index;

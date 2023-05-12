@@ -39,11 +39,6 @@ public class Bool implements BaseType {
     }
 
     @Override
-    public Type concrete(SymbolTable symbolTable) {
-        return new Bool();
-    }
-
-    @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
         return false;
     }

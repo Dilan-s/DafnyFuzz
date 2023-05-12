@@ -54,7 +54,7 @@ public class DArrayLiteralInline extends BaseExpression {
         for (int i = 0; i < values.size(); i++) {
             VariableArrayIndex v = new VariableArrayIndex(variable, valType, i);
             v.setDeclared();
-            new AssignmentStatement(symbolTable, List.of(v), values.get(i));
+            symbolTable.addVariable(v);
         }
     }
 
@@ -90,23 +90,7 @@ public class DArrayLiteralInline extends BaseExpression {
 
     @Override
     protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
-        List<Object> r = new ArrayList<>();
-
-
-        List<Object> l = new ArrayList<>();
-        for (int i = 0; i < values.size(); i++) {
-            Expression exp = values.get(i);
-            List<Object> value = exp.getValue(paramsMap, s);
-            for (Object v : value) {
-                if (v == null) {
-                    r.add(null);
-                    return r;
-                }
-                l.add(v);
-            }
-        }
-        r.add(new ArrayValue(variable.getName(), l));
-        return r;
+        return variable.getValue(paramsMap);
     }
 
     private class ArrayInitValues extends BaseExpression {

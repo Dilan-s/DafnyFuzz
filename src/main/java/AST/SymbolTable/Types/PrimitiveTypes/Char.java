@@ -45,11 +45,6 @@ public class Char implements BaseType {
     }
 
     @Override
-    public Type concrete(SymbolTable symbolTable) {
-        return new Char();
-    }
-
-    @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
         Character lhs = (Character) lhsV;
         Character rhs = (Character) rhsV;

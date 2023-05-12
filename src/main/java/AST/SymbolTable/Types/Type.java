@@ -19,7 +19,9 @@ public interface Type extends Identifier {
         return true;
     }
 
-    Type concrete(SymbolTable symbolTable);
+    default Type concrete(SymbolTable symbolTable) {
+        return this;
+    }
 
     boolean isCollection();
 

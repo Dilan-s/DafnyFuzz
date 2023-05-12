@@ -7,6 +7,8 @@ import AST.Statements.Statement;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
+import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
+import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

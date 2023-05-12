@@ -1,6 +1,5 @@
 package AST.Generator;
 
-import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.BaseType;
@@ -12,8 +11,8 @@ import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
-import AST.SymbolTable.Types.UserDefinedTypes.UserDefinedType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +20,8 @@ public class RandomTypeGenerator {
 
     public static final int MAX_TYPE_DEPTH = 2;
     public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Real()); //, new Char()
+    public static final List<DataType> DEFINED_DATA_TYPES = new ArrayList<>();
+    private static final double PROB_REUSE_DATATYPE = 0.75;
 
     public static double PROB_INT = 40.0;
     public static double PROB_BOOL = 40.0;
@@ -31,6 +32,7 @@ public class RandomTypeGenerator {
     public static double PROB_SEQ = 15.0;
     public static double PROB_MULTISET = 15.0;
     public static double PROB_TUPLE = 25.0;
+    public static double PROB_DATATYPE = 25.0;
 
     public static double PROB_SWARM = 0.05;
     private static int typeDepth = 0;
@@ -49,7 +51,7 @@ public class RandomTypeGenerator {
 
             } else {
                 double ratioSum = PROB_INT + PROB_BOOL + PROB_REAL + PROB_DMAP + PROB_DARRAY
-                    + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE;
+                    + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE + PROB_DATATYPE;
                 double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
                 if (swarm) {
@@ -127,6 +129,20 @@ public class RandomTypeGenerator {
                     if (swarm) {
                         PROB_TUPLE *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
                     }
+                } else if ((probType -= PROB_DATATYPE) < 0) {
+                    PROB_DATATYPE *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    double prob_reuse = GeneratorConfig.getRandom().nextDouble();
+                    if (!DEFINED_DATA_TYPES.isEmpty() && prob_reuse < PROB_REUSE_DATATYPE) {
+                        int ind = GeneratorConfig.getRandom().nextInt(DEFINED_DATA_TYPES.size());
+                        t = DEFINED_DATA_TYPES.get(ind);
+//                        ind = GeneratorConfig.getRandom().nextInt(dataType.noOfRules());
+//                        t = dataType.getRule(ind);
+                    } else {
+                        String datatypeName = VariableNameGenerator.generateDatatypeName();
+                        DataType dataType = new DataType(datatypeName);
+                        t = dataType;
+                        DEFINED_DATA_TYPES.add(dataType);
+                    }
                 }
             }
         }
@@ -144,6 +160,7 @@ public class RandomTypeGenerator {
         PROB_SEQ = 15.0;
         PROB_MULTISET = 15.0;
         PROB_TUPLE = 25.0;
+        PROB_DATATYPE = 25.0;
     }
 
     public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
@@ -182,7 +199,7 @@ public class RandomTypeGenerator {
         while (t == null) {
             t = generateTypes(1, symbolTable).get(0);
 
-            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap())) {
+            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap()) || t.equals(new DataType())) {
                 t = null;
             }
         }

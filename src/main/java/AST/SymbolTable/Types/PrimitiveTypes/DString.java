@@ -44,11 +44,6 @@ public class DString implements BaseType {
     }
 
     @Override
-    public Type concrete(SymbolTable symbolTable) {
-        return new DString();
-    }
-
-    @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
         return false;
     }

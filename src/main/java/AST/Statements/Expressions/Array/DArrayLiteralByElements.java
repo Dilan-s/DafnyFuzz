@@ -67,21 +67,7 @@ public class DArrayLiteralByElements extends BaseExpression {
 
     @Override
     protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
-        List<Object> r = new ArrayList<>();
-
-        List<Object> l = new ArrayList<>();
-        for (Expression exp : values) {
-            List<Object> value = exp.getValue(paramsMap, s);
-            for (Object v : value) {
-                if (v == null) {
-                    r.add(null);
-                    return r;
-                }
-                l.add(v);
-            }
-        }
-        r.add(new ArrayValue(variable.getName(), l));
-        return r;
+        return variable.getValue(paramsMap);
     }
 
     @Override
@@ -125,12 +111,8 @@ public class DArrayLiteralByElements extends BaseExpression {
             List<Object> l = new ArrayList<>();
             for (Expression exp : values) {
                 List<Object> value = exp.getValue(paramsMap, s);
-                for (Object v : value) {
-                    if (v == null) {
-                        r.add(null);
-                        return r;
-                    }
-                    l.add(v);
+                for (Object nullValue : value) {
+                    l.add(null);
                 }
             }
             r.add(new ArrayValue(variable.getName(), l));
