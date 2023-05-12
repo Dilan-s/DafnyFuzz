@@ -93,7 +93,7 @@ public class WhileStatement extends BaseStatement {
             List<String> rhs = new ArrayList<>();
             for (Variable v : vs) {
                 Object obj = v.getValue(paramMap).get(0);
-                rhs.add(v.getType().formatEnsures(v.getName(), obj));
+                rhs.add(String.format("(%s)", v.getType().formatEnsures(v.getName(), obj)));
             }
             String rhsV = String.join(" && ", rhs);
             invs.add(rhsV);
@@ -129,8 +129,7 @@ public class WhileStatement extends BaseStatement {
             if (!loopInvariants.isEmpty()) {
 
                 List<String> loopInvariants = this.loopInvariants.entrySet().stream()
-                    .map(x -> String.format("((%s) ==> (%s))", x.getKey(),
-                        String.join(" || ", x.getValue())))
+                    .map(x -> String.format("((%s) ==> (%s))", x.getKey(), String.join(" || ", x.getValue())))
                     .collect(Collectors.toList());
 
                 curr = curr + " && (" + String.join(" && ", loopInvariants) + ")";
