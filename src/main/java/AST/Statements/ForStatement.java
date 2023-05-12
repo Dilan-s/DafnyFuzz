@@ -226,7 +226,7 @@ public class ForStatement extends BaseStatement {
             res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
             if (!loopInvariants.isEmpty()) {
                 List<String> loopInvariants = this.loopInvariants.entrySet().stream()
-                    .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
+                    .map(x -> String.format("((%s) ==> (%s))", x.getKey(),
                         String.join(" || ", x.getValue())))
                     .collect(Collectors.toList());
 
@@ -248,7 +248,7 @@ public class ForStatement extends BaseStatement {
         res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
         if (!loopInvariants.isEmpty()) {
             List<String> loopInvariants = this.loopInvariants.entrySet().stream()
-                .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
+                .map(x -> String.format("((%s) ==> (%s))", x.getKey(),
                     String.join(" || ", x.getValue())))
                 .collect(Collectors.toList());
 
