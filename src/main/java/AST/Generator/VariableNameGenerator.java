@@ -11,7 +11,10 @@ public class VariableNameGenerator {
     private static final Map<String, Integer> returnValues = new HashMap<>();
     private static final Map<String, Integer> parameterValues = new HashMap<>();
     private static final Map<String, Integer> variableValues = new HashMap<>();
+    private static final Map<String, Integer> datatypeValues = new HashMap<>();
+    private static final Map<String, Integer> datatypeFieldValues = new HashMap<>();
     private static Integer methodName = 0;
+    private static Integer datatypeName = 0;
 
     public static String generateReturnVariableName(String method) {
         Integer i = returnValues.getOrDefault(method, 1);
@@ -38,5 +41,24 @@ public class VariableNameGenerator {
     public static String generateMethodName() {
         methodName++;
         return String.format("m_method_%d", methodName);
+    }
+
+    public static String generateDatatypeName() {
+        datatypeName++;
+        return String.format("DT_%d", datatypeName);
+    }
+
+    public static String generateDatatypeRuleName(String datatypeName) {
+        Integer i = datatypeValues.getOrDefault(datatypeName, 1);
+        datatypeValues.put(datatypeName, i + 1);
+        String format = String.format("%s_%d", datatypeName, i);
+        return format;
+    }
+
+    public static String generateDatatypeRuleFieldName(String datatypeRuleName) {
+        Integer i = datatypeFieldValues.getOrDefault(datatypeRuleName, 1);
+        datatypeFieldValues.put(datatypeRuleName, i + 1);
+        String format = String.format("%s_%d", datatypeRuleName, i);
+        return format;
     }
 }

@@ -1,6 +1,7 @@
 package AST.SymbolTable;
 
 import AST.Generator.GeneratorConfig;
+import AST.Generator.RandomTypeGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Statement;
 import AST.Statements.util.ReturnStatus;
@@ -8,6 +9,7 @@ import AST.StringUtils;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -153,12 +155,25 @@ public class Method implements Identifier {
         return toCode(true);
     }
 
-    public List<String> toOutput(boolean printMethods) {
+    public List<String> toOutput(boolean printAll) {
         Set<String> res = new HashSet<>();
         List<String> temp = new ArrayList<>();
 
         res.add("");
-        if (printMethods) {
+        if (printAll) {
+            String dataTypes = "";
+            for (DataType d : RandomTypeGenerator.DEFINED_DATA_TYPES) {
+                dataTypes = dataTypes + d.declaration() + "\n";
+            }
+            temp = new ArrayList<>();
+            for (String f : res) {
+                temp.add(f + dataTypes);
+            }
+            if (dataTypes.isEmpty()) {
+                temp.addAll(res);
+            }
+            res = new HashSet<>(temp);
+
             List<Method> allMethods = symbolTable.getAllMethods();
 
             for (Method m : allMethods) {
@@ -353,6 +368,10 @@ public class Method implements Identifier {
         List<String> code = new ArrayList<>();
 
         if (printMethods) {
+            for (DataType d : RandomTypeGenerator.DEFINED_DATA_TYPES) {
+                code.add(d.declaration());
+            }
+
             List<Method> allMethods = symbolTable.getAllMethods();
             for (Method m : allMethods) {
                 if (m.getNoOfUses() > 0) {

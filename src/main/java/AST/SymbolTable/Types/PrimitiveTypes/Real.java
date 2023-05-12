@@ -71,11 +71,6 @@ public class Real implements BaseType {
     }
 
     @Override
-    public Type concrete(SymbolTable symbolTable) {
-        return new Real();
-    }
-
-    @Override
     public String formatEnsures(String variableName, Object object) {
         if (object == null) {
             return null;

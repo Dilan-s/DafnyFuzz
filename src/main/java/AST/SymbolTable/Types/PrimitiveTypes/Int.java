@@ -53,11 +53,6 @@ public class Int implements BaseType {
     }
 
     @Override
-    public Type concrete(SymbolTable symbolTable) {
-        return new Int();
-    }
-
-    @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
         Integer lhs = (Integer) lhsV;
         Integer rhs = (Integer) rhsV;

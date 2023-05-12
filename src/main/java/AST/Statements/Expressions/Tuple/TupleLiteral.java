@@ -7,12 +7,10 @@ import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import AST.SymbolTable.Types.Variables.Variable;
-import AST.SymbolTable.Types.Variables.VariableArrayIndex;
-import AST.SymbolTable.Types.Variables.VariableDatatypeIndex;
+import AST.SymbolTable.Types.Variables.VariableTupleIndex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +50,7 @@ public class TupleLiteral extends BaseExpression {
 
         for (int i = 0; i < values.size(); i++) {
             Type valType = t.getType(i);
-            VariableDatatypeIndex v = new VariableDatatypeIndex(variable, valType, i);
+            VariableTupleIndex v = new VariableTupleIndex(variable, valType, i);
             v.setDeclared();
             v.setConstant();
             new AssignmentStatement(symbolTable, List.of(v), values.get(i));
