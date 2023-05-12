@@ -187,7 +187,7 @@ public class ForStatement extends BaseStatement {
                     String.join(" || ", x.getValue())))
                 .collect(Collectors.toList());
 
-            start = start + " && " + String.join(" && ", loopInvariants);
+            start = start + " && (" + String.join(" && ", loopInvariants) + ")";
         }
 
         start = start + "\n{\n";
@@ -230,7 +230,7 @@ public class ForStatement extends BaseStatement {
                         String.join(" || ", x.getValue())))
                     .collect(Collectors.toList());
 
-                res = res + " && " + String.join(" && ", loopInvariants);
+                res = res + " && (" + String.join(" && ", loopInvariants) + ")";
             }
 
             res = res + "\n{\n";
@@ -252,7 +252,7 @@ public class ForStatement extends BaseStatement {
                     String.join(" || ", x.getValue())))
                 .collect(Collectors.toList());
 
-            res = res + " && " + String.join(" && ", loopInvariants);
+            res = res + " && (" + String.join(" && ", loopInvariants) + ")";
         }
 
         res = res + "\n{\n";
@@ -324,9 +324,9 @@ public class ForStatement extends BaseStatement {
 
         public String invariantClause(Variable loopVar, Variable finalVar) {
             if (this == DOWNTO) {
-                return String.format("invariant %s - %s >= 0", loopVar.getName(), finalVar.getName());
+                return String.format("invariant (%s - %s >= 0)", loopVar.getName(), finalVar.getName());
             } else {
-                return String.format("invariant %s - %s >= 0", finalVar.getName(), loopVar.getName());
+                return String.format("invariant (%s - %s >= 0)", finalVar.getName(), loopVar.getName());
             }
         }
 

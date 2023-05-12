@@ -124,7 +124,7 @@ public class WhileStatement extends BaseStatement {
         for (String testOption : testOptions) {
             String curr = String.format("while %s \n", testOption);
             curr = curr + StringUtils.indent(String.format("decreases %s - %s;", finalVar.getName(), loopVar.getName())) + "\n";
-            curr = curr + StringUtils.indent(String.format("invariant %s <= %s", loopVar.getName(), finalVar.getName()));
+            curr = curr + StringUtils.indent(String.format("invariant (%s <= %s)", loopVar.getName(), finalVar.getName()));
 
             if (!loopInvariants.isEmpty()) {
 
@@ -133,7 +133,7 @@ public class WhileStatement extends BaseStatement {
                         String.join(" || ", x.getValue())))
                     .collect(Collectors.toList());
 
-                curr = curr + " && " + String.join(" && ", loopInvariants);
+                curr = curr + " && (" + String.join(" && ", loopInvariants) + ")";
             }
 
 
@@ -173,7 +173,7 @@ public class WhileStatement extends BaseStatement {
         if (body.getNoOfUses() > 0) {
             String res = String.format("while %s \n", test);
             res = res + StringUtils.indent(String.format("decreases %s - %s;", finalVar.getName(), loopVar.getName())) + "\n";
-            res = res + StringUtils.indent(String.format("invariant %s <= %s", loopVar.getName(), finalVar.getName()));
+            res = res + StringUtils.indent(String.format("invariant (%s <= %s)", loopVar.getName(), finalVar.getName()));
 
             if (!loopInvariants.isEmpty()) {
 
@@ -182,7 +182,7 @@ public class WhileStatement extends BaseStatement {
                         String.join(" || ", x.getValue())))
                     .collect(Collectors.toList());
 
-                res = res + " && " + String.join(" && ", loopInvariants);
+                res = res + " && (" + String.join(" && ", loopInvariants) + ")";
             }
 
             res = res + ";\n{\n";
@@ -203,7 +203,7 @@ public class WhileStatement extends BaseStatement {
     public String toString() {
         String res = String.format("while %s \n", test);
         res = res + StringUtils.indent(String.format("decreases %s - %s;", finalVar.getName(), loopVar.getName())) + "\n";
-        res = res + StringUtils.indent(String.format("invariant %s <= %s", loopVar.getName(), finalVar.getName()));
+        res = res + StringUtils.indent(String.format("invariant (%s <= %s)", loopVar.getName(), finalVar.getName()));
 
         if (!loopInvariants.isEmpty()) {
 
@@ -212,7 +212,7 @@ public class WhileStatement extends BaseStatement {
                     String.join(" || ", x.getValue())))
                 .collect(Collectors.toList());
 
-            res = res + " && " + String.join(" && ", loopInvariants);
+            res = res + " && (" + String.join(" && ", loopInvariants) + ")";
         }
         res = res + ";\n{\n";
         res = res + StringUtils.indent(body.toString());
