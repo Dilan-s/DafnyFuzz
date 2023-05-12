@@ -127,7 +127,7 @@ public class ForStatement extends BaseStatement {
                 Object obj = v.getValue(paramMap).get(0);
                 rhs.add(String.format("(%s)", v.getType().formatEnsures(v.getName(), obj)));
             }
-            String rhsV = String.join(" && ", rhs);
+            String rhsV = "(" + String.join(" && ", rhs) + ")";
             invs.add(rhsV);
 
         }
