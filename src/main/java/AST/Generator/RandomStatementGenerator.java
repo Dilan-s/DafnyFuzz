@@ -352,9 +352,12 @@ public class RandomStatementGenerator {
                 boolean assigned = false;
 
                 for (int i = 0; !assigned && i < varsInScope.size(); i++) {
-                    Variable v = varsInScope.get(i);
-                    if (!variables.contains(v)) {
-                        variables.add(v);
+                    Variable vToAssign = varsInScope.get(i);
+                    List<Variable> vs = vToAssign.getRelatedAssignment();
+                    if (vs.stream().noneMatch(vAttempt -> variables.stream()
+                        .anyMatch(p -> p.getRelatedAssignment().contains(vAttempt)))) {
+
+                        variables.add(vToAssign);
                         assigned = true;
                     }
                 }

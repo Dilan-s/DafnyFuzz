@@ -103,7 +103,7 @@ public class OperatorExpression extends BaseExpression {
 
     @Override
     public boolean requireUpdate() {
-        return this.update || args.stream().anyMatch(Expression::requireUpdate);
+        return this.update || args.stream().anyMatch(Expression::requireUpdate) || (replacementExpression.isPresent() && replacementExpression.get().requireUpdate());
     }
 
     private void generateMethodCallReplacement(Map<Variable, Variable> paramsMap, StringBuilder s) {

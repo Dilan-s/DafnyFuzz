@@ -49,6 +49,12 @@ public class VariableDataTypeIndex extends Variable {
     }
 
     @Override
+    public List<Variable> getRelatedAssignment() {
+        return List.of(variable, this);
+    }
+
+
+    @Override
     public List<Variable> getSymbolTableArgs() {
         List<Variable> symbolTableArgs = super.getSymbolTableArgs();
         symbolTableArgs.forEach(Variable::setConstant);

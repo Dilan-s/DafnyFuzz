@@ -15,11 +15,13 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SeqUpdateExpression extends BaseExpression {
 
@@ -34,6 +36,7 @@ public class SeqUpdateExpression extends BaseExpression {
     private Expression exp;
     private CallExpression callExp;
 
+    private List<List<Statement>> expanded;
 
     public SeqUpdateExpression(SymbolTable symbolTable, Expression seq, Expression ind, Expression exp) {
         super();
@@ -41,6 +44,11 @@ public class SeqUpdateExpression extends BaseExpression {
         this.seq = seq;
         this.exp = exp;
         generateVariableCalls(this.seq, ind);
+
+        this.expanded = new ArrayList<>();
+        expanded.add(seqAssign.expand());
+        expanded.add(indAssign.expand());
+        expanded.add(exp.expand());
     }
 
     private void generateVariableCalls(Expression seq, Expression ind) {
@@ -64,12 +72,17 @@ public class SeqUpdateExpression extends BaseExpression {
 
     @Override
     public List<Statement> expand() {
-        List<Statement> r = new ArrayList<>();
+        if (seqAssign.requireUpdate()) {
+            expanded.set(0, seqAssign.expand());
+        }
+        if (indAssign.requireUpdate()) {
+            expanded.set(1, indAssign.expand());
+        }
+        if (exp.requireUpdate()) {
+            expanded.set(2, exp.expand());
+        }
 
-        r.addAll(seqAssign.expand());
-        r.addAll(indAssign.expand());
-        r.addAll(exp.expand());
-        return r;
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     @Override

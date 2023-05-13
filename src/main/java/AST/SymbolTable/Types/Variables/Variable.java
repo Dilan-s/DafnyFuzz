@@ -105,4 +105,8 @@ public class Variable implements Identifier {
     public boolean modified(Variable x) {
         return false;
     }
+
+    public List<Variable> getRelatedAssignment() {
+        return List.of(this);
+    }
 }

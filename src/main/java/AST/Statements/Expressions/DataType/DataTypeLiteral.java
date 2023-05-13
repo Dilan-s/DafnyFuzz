@@ -72,7 +72,7 @@ public class DataTypeLiteral extends BaseExpression {
 
     @Override
     public boolean requireUpdate() {
-        return false;
+        return fields.stream().anyMatch(Expression::requireUpdate) || statement.requireUpdate();
     }
 
     @Override
@@ -203,7 +203,7 @@ public class DataTypeLiteral extends BaseExpression {
 
         @Override
         public boolean requireUpdate() {
-            return fields.stream().anyMatch(Expression::requireUpdate);
+            return false;
         }
     }
 }
