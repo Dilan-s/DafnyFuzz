@@ -35,7 +35,7 @@ public class RandomStatementGenerator {
 
     private static final int MAX_ASSERT_VALUES = 5;
     private static final int MAX_MATCH_VALUES = 2;
-    public static double PROB_RETURN_STAT = 50.0;
+    public static double PROB_RETURN_STAT = 60.0;
     public static double PROB_ASSIGN_STAT = 30.0;
     public static double PROB_IF_ELSE_STAT = 15.0;
     public static double PROB_MATCH_STAT = 5.0;
@@ -50,7 +50,7 @@ public class RandomStatementGenerator {
 
     public static final int MAX_STATEMENT_DEPTH = 4;
     public static final double PROB_NEXT_STAT = 0.85;
-    public static final double PROB_FORCE_RETURN = 0.2;
+    public static final double PROB_FORCE_RETURN = 0.25;
 //    public static final double PROB_REASSIGN = 0.5;
     public static final double PROB_REASSIGN = 1.0;
 

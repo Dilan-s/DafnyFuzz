@@ -25,6 +25,10 @@ public interface Statement {
 
     String minimizedTestCase();
 
+    default String invalidValidationTests() {
+        return minimizedTestCase();
+    }
+
     default boolean minimizedReturn() {
         return isReturn();
     }

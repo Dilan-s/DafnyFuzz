@@ -66,4 +66,13 @@ public class AssertStatement extends BaseStatement {
         }
         return "";
     }
+
+    @Override
+    public String invalidValidationTests() {
+        if (disjuncts.size() == 0) {
+            return "assert false;";
+        }
+        String cond = String.join(" || ", disjuncts);
+        return String.format("assert (%s) && false;", cond);
+    }
 }

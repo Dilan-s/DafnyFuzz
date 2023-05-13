@@ -134,10 +134,13 @@ public class Method implements Identifier {
         return toCode(true);
     }
 
-    public String toCode(boolean printMethods) {
+    public String toCode(boolean printAll) {
         List<String> code = new ArrayList<>();
 
-        if (printMethods) {
+        if (printAll) {
+            for (DataType d : RandomTypeGenerator.DEFINED_DATA_TYPES) {
+                code.add(d.declaration());
+            }
             List<Method> allMethods = symbolTable.getAllMethods();
             for (Method m : allMethods) {
                 code.add(m.toCode(false));
@@ -364,10 +367,10 @@ public class Method implements Identifier {
         return minimizedTestCase(true);
     }
 
-    public String minimizedTestCase(boolean printMethods) {
+    public String minimizedTestCase(boolean printAll) {
         List<String> code = new ArrayList<>();
 
-        if (printMethods) {
+        if (printAll) {
             for (DataType d : RandomTypeGenerator.DEFINED_DATA_TYPES) {
                 code.add(d.declaration());
             }
@@ -386,6 +389,35 @@ public class Method implements Identifier {
 
         code.add(declarationLine());
         code.add(StringUtils.indent(body.minimizedTestCase()));
+        code.add("}\n");
+        return String.join("\n", code);
+    }
+
+    public String invalidValidationTests() {
+        return invalidValidationTests(true);
+    }
+    public String invalidValidationTests(boolean printAll) {
+        List<String> code = new ArrayList<>();
+
+        if (printAll) {
+            for (DataType d : RandomTypeGenerator.DEFINED_DATA_TYPES) {
+                code.add(d.declaration());
+            }
+
+            List<Method> allMethods = symbolTable.getAllMethods();
+            for (Method m : allMethods) {
+                if (m.getNoOfUses() > 0) {
+                    if (m.getName().startsWith("safe")) {
+                        code.add(m.toCode(false));
+                    } else {
+                        code.add(m.invalidValidationTests(false));
+                    }
+                }
+            }
+        }
+
+        code.add(declarationLine());
+        code.add(StringUtils.indent(body.invalidValidationTests()));
         code.add("}\n");
         return String.join("\n", code);
     }

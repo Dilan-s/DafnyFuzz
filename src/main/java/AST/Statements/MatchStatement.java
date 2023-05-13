@@ -213,7 +213,31 @@ public class MatchStatement extends BaseStatement {
         }
 
         return "";
+    }
 
+    @Override
+    public String invalidValidationTests() {
+        List<MatchStatementCase> usedCases = new ArrayList<>();
+        distinctCases.stream().filter(c -> c.getNoOfUses() > 0).forEach(usedCases::add);
+        if (defaultCase.getNoOfUses() > 0) {
+            usedCases.add(defaultCase);
+        }
+
+        if (usedCases.size() == 1) {
+            Statement body = usedCases.get(0).getBody();
+            String res = body.invalidValidationTests();
+            return res;
+        } else if (usedCases.size() > 1) {
+
+            String res = String.format("match %s {\n", test.minimizedTestCase());
+            for (MatchStatementCase c : usedCases) {
+                res = res + StringUtils.indent(c.invalidValidationTests());
+            }
+            res = res + "\n}\n";
+            return res;
+        }
+
+        return "";
     }
 
     @Override

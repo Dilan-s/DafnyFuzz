@@ -2,17 +2,11 @@ package AST.Program;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomStatementGenerator;
-import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
-import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
-import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -20,7 +14,7 @@ import java.util.Random;
 
 public class DafnyProgram {
 
-    private final Random random;
+    public final Random random;
 
     public DafnyProgram(long seed) {
         random = new Random(seed);
@@ -30,7 +24,7 @@ public class DafnyProgram {
         random = new Random();
     }
 
-    public void generateProgram() {
+    public Method generateProgram() {
 
         GeneratorConfig.setRandom(random);
         RandomStatementGenerator randomStatementGenerator = new RandomStatementGenerator();
@@ -54,23 +48,24 @@ public class DafnyProgram {
         Statement statement = randomStatementGenerator.generateBody(main, main.getSymbolTable());
         main.setBody(statement);
 
-        StringBuilder s = new StringBuilder();
-
         main.execute();
-        main.executeWithOutput(s);
-//        System.out.println(s);
+        return main;
+    }
+
+    public void baseTestCase(Method main) {
+        String baseTestCase = main.toString();
         try {
-            Path path = Paths.get("./outputs");
-            FileWriter p = new FileWriter(String.format("%s/expected.txt", path.toAbsolutePath()));
-            p.write(s.toString());
+            Path path = Paths.get("./tests");
+            FileWriter p = new FileWriter(String.format("%s/test.dfy", path.toAbsolutePath()));
+            p.write(baseTestCase);
             p.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void EMIProgramGeneration(Method main) {
         List<String> programOptions = main.toOutput();
-//        System.out.println(programOptions.get(0));
-
         try {
             Path path = Paths.get("./tests");
             for (int i = 0; i < programOptions.size(); i++) {
@@ -81,7 +76,22 @@ public class DafnyProgram {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void expectedOutput(Method main) {
+        StringBuilder s = new StringBuilder();
+        main.executeWithOutput(s);
+        try {
+            Path path = Paths.get("./outputs");
+            FileWriter p = new FileWriter(String.format("%s/expected.txt", path.toAbsolutePath()));
+            p.write(s.toString());
+            p.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void minimizedTestCase(Method main) {
         String minimizedTestCase = main.minimizedTestCase();
         try {
             Path path = Paths.get("./tests-minimized");
@@ -90,6 +100,21 @@ public class DafnyProgram {
             p.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void incorrectValidationTestCase(Method main) {
+        String incorrectValidationTests = main.invalidValidationTests();
+        if (incorrectValidationTests.contains("assert")) {
+            try {
+                Path path = Paths.get("./tests-incorrect");
+                FileWriter p = new FileWriter(
+                    String.format("%s/test-incorrect.dfy", path.toAbsolutePath()));
+                p.write(incorrectValidationTests);
+                p.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

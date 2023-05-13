@@ -115,6 +115,36 @@ public class IfElseStatement extends BaseStatement {
     }
 
     @Override
+    public String invalidValidationTests() {
+        if (elseStat.isEmpty()) {
+            if (ifStat.getNoOfUses() > 0) {
+                return ifStat.invalidValidationTests();
+            }
+            return "";
+        }
+
+        if (ifStat.getNoOfUses() > 0 && elseStat.get().getNoOfUses() == 0) {
+            return ifStat.invalidValidationTests();
+        } else if (ifStat.getNoOfUses() == 0 && elseStat.get().getNoOfUses() > 0) {
+            return elseStat.get().invalidValidationTests();
+        } else {
+
+            List<String> code = new ArrayList<>();
+
+            code.add(String.format("if %s {", test));
+            code.add(StringUtils.indent(ifStat.invalidValidationTests()));
+
+            if (elseStat.isPresent()) {
+                code.add("} else {");
+                code.add(StringUtils.indent(elseStat.get().invalidValidationTests()));
+            }
+
+            code.add("}");
+            return StringUtils.intersperse("\n", code);
+        }
+    }
+
+    @Override
     public List<String> toOutput() {
         Set<String> res = new HashSet<>();
         List<String> temp = new ArrayList<>();
