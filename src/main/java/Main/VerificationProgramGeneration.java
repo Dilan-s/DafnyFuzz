@@ -2,9 +2,8 @@ package Main;
 
 import AST.Program.DafnyProgram;
 import AST.SymbolTable.Method;
-import java.util.Random;
 
-public class GenerateProgram {
+public class VerificationProgramGeneration {
 
     public static void main(String[] args) {
         DafnyProgram dafnyProgram;
@@ -14,10 +13,8 @@ public class GenerateProgram {
             dafnyProgram = new DafnyProgram();
         }
         Method main = dafnyProgram.generateProgram();
-        dafnyProgram.expectedOutput(main);
-        dafnyProgram.EMIProgramGeneration(main);
-        dafnyProgram.baseTestCase(main);
         dafnyProgram.minimizedTestCase(main);
         dafnyProgram.incorrectValidationTestCase(main);
     }
+
 }

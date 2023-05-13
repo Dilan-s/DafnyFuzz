@@ -11,9 +11,11 @@ rm -rf outputs || true
 rm -rf tests || true
 rm -rf errors || true
 rm -rf tests-minimized || true
+rm -rf tests-incorrect || true
 
 mkdir tests || true
 mkdir tests-minimized || true
+mkdir tests-incorrect || true
 mkdir outputs || true
 mkdir errors || true
 mkdir errors/verificationErrors
@@ -50,20 +52,52 @@ while [ true ]; do
   # css
   #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
   cd "$directory"
-  timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify tests-minimized/test-minimized.dfy > tmp.txt 2>&1
-  if [ $? -eq 4 ]
-  then
-    echo "Verification error found in test $x file $y"
-    mkdir "errors/verificationErrors/$x" || true
-    cp tests-minimized/test-minimized.dfy "errors/verificationErrors/$x/test$y.dfy"
-    cat tmp.txt > "errors/verificationErrors/$x/test$y-verificationOutput.dfy"
-  fi
+  y=0
+  for file in tests-minimized/*
+  do
+    echo "Expecting validation to succeed for $file"
+
+    timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify $file > tmp.txt 2>&1
+    if [ $? -eq 4 ]
+    then
+      echo "Verification error found in test $x - correct validation of the file $file"
+      mkdir "errors/verificationErrors/$x" || true
+      mkdir "errors/verificationErrors/$x/correct" || true
+      cp $file "errors/verificationErrors/$x/correct/test-$y.dfy"
+      cat tmp.txt > "errors/verificationErrors/$x/correct/verificationOutput-$y.txt"
+    fi
+    rm -rf test.dfy || true
+    rm -rf tmp.txt || true
+    y=$(( $y + 1))
+  done
+
+  cd "$directory"
+  y=0
+  for file in tests-incorrect/*
+  do
+    echo "Expecting validation to fail for $file"
+    cp "$file" test.dfy
+
+    timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify test.dfy > tmp.txt 2>&1
+    code=$?
+    if [[ $code -ne 4 && $code -lt 5 ]]
+    then
+      echo "Verification error found in test $x - incorrect validation of file $file"
+      mkdir "errors/verificationErrors/$x" || true
+      mkdir "errors/verificationErrors/$x/incorrect" || true
+      cp $file "errors/verificationErrors/$x/incorrect/test-$y.dfy"
+      cat tmp.txt > "errors/verificationErrors/$x/incorrect/verificationOutput-$y.txt"
+    fi
+    rm -rf test.dfy || true
+    rm -rf tmp.txt || true
+    y=$(( $y + 1))
+  done
 
   cd "$directory"
   y=0
   for file in tests/*.dfy
   do
-    echo "$file"
+    echo "Attempting to run $file"
     cp "$file" test.dfy
 
     # GO
@@ -144,7 +178,9 @@ while [ true ]; do
   rm -rf tests/* || true
   rm -rf outputs/* || true
   rm -rf tests-minimized/* || true
+  rm -rf tests-incorrect/* || true
   x=$(( $x + 1 ))
 
 done
 
+rm -rf test.dfy tmp.txt || true

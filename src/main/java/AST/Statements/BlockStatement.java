@@ -137,6 +137,32 @@ public class BlockStatement extends BaseStatement {
         return StringUtils.intersperse("\n", code);
     }
 
+
+    @Override
+    public String invalidValidationTests() {
+        List<String> code = new ArrayList<>();
+        boolean goToNext = true;
+        for (int i = 0; goToNext && i < body.size(); i++) {
+            Statement b = body.get(i);
+            if (b.getNoOfUses() > 0) {
+                List<Statement> expand = b.expand();
+                for (int j = 0; j < expand.size(); j++) {
+                    Statement s = expand.get(j);
+                    String val = s.invalidValidationTests();
+                    if (!val.isEmpty()) {
+                        code.add(val);
+                    }
+
+                    if (s.minimizedReturn()) {
+                        goToNext = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return StringUtils.intersperse("\n", code);
+    }
+
     @Override
     public List<String> toOutput() {
         Set<String> res = new HashSet<>();

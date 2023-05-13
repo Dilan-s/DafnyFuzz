@@ -242,6 +242,29 @@ public class ForStatement extends BaseStatement {
     }
 
     @Override
+    public String invalidValidationTests() {
+        Direction direction = this.direction == null ? Direction.TO : this.direction;
+        if (body.getNoOfUses() > 0) {
+            String res = String.format("for %s := %s %s %s \n", loopVar.getName(), initVar.getName(), direction.rep, finalVar.getName());
+            res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
+            if (!loopInvariants.isEmpty()) {
+                List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                    .map(x -> String.format("((%s) ==> (%s))", x.getKey(),
+                        String.join(" || ", x.getValue())))
+                    .collect(Collectors.toList());
+
+                res = res + " && (" + String.join(" && ", loopInvariants) + ")";
+            }
+
+            res = res + "\n{\n";
+            res = res + StringUtils.indent(body.invalidValidationTests()) + "\n";
+            res = res + "}";
+            return res;
+        }
+        return "";
+    }
+
+    @Override
     public String toString() {
         Direction direction = this.direction == null ? Direction.TO : this.direction;
         String res = String.format("for %s := %s %s %s \n", loopVar.getName(), initVar.getName(), direction.rep, finalVar.getName());
