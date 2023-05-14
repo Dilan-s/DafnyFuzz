@@ -25,8 +25,8 @@ touch "errors/compErrors/$language.txt"
 directory=$(pwd)
 
 t=180
-x=30
-while [ $x -le 32 ]; do
+x=0
+while [ true ]; do
     cd "$directory"
     
     echo "Test number $x"
