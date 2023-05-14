@@ -23,6 +23,7 @@ test.js
 outputs
 tests
 tests-minimized
+tests-incorrect
 package-lock.json
 DafnyRuntime.h
 errors
