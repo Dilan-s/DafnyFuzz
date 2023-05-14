@@ -20,13 +20,13 @@ mkdir tests || true
 mkdir outputs || true
 mkdir errors || true
 mkdir errors/compErrors
-touch "errors/compErrors/$langauge.txt"
+touch "errors/compErrors/$language.txt"
 
 directory=$(pwd)
 
 t=180
-x=0
-while [ true ]; do
+x=30
+while [ $x -le 32 ]; do
     cd "$directory"
     
     echo "Test number $x"
@@ -35,35 +35,35 @@ while [ true ]; do
     timeout -s SIGKILL $t java -cp out/ Main.ExpectedProgramGeneration $x
     if [ $? -ne 0 ]
     then
-	echo "Failed to create dafny file in $t seconds"
-	x=$(( $x + 1 ))
-	continue;
+        echo "Failed to create dafny file in $t seconds"
+        x=$(( $x + 1 ))
+        continue;
     fi
 
     cd "$directory"
     y=0
     if [ "$(ls -A tests/)" ];
     then
-	for file in tests/*.dfy
-	do
-	    echo "Attempting to run $file in $language"
-	    cp "$file" test.dfy
+        for file in tests/*.dfy
+        do
+            echo "Attempting to run $file in $language"
+            cp "$file" test.dfy
 
-	    ./singleFileTest.sh -l $language -n $x -f $y -t $t
+            ./singleFileTest.sh -l $language -n $x -f $y -t $t
 
-	    rm -rf test.dfy
-	    y=$(( y + 1 ))
-	done
+            rm -rf test.dfy
+            y=$(( y + 1 ))
+        done
     fi
 
     java -cp out/ Main.CompareOutputs $x "./outputs"
     if [ $? -eq 1 ]
     then
-	mkdir "errors/$x"
-	mkdir "errors/$x/outputs"
-	mkdir "errors/$x/tests"
-	cp outputs/* "errors/$x/outputs"
-	cp tests/* "errors/$x/tests"
+        mkdir "errors/$x"
+        mkdir "errors/$x/outputs"
+        mkdir "errors/$x/tests"
+        cp outputs/* "errors/$x/outputs"
+        cp tests/* "errors/$x/tests"
     fi
     
     rm -rf tests/* || true
