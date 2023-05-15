@@ -30,7 +30,7 @@ while [ true ]; do
     cd "$directory"
     
     echo "Test number $x"
-    echo "Test number $x" >> "errors/compErrors/$langauge.txt"
+    echo "Test number $x" >> "errors/compErrors/$language.txt"
 
     timeout -s SIGKILL $t java -cp out/ Main.ExpectedProgramGeneration $x
     if [ $? -ne 0 ]
