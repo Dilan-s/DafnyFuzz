@@ -46,7 +46,7 @@ elif [ "$language" = "js" ]; then
         rm -rf test.js || true
     fi
 elif [ "$language" = "java" ]; then
-    timeout -s SIGKILL $t Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/java.txt
+    timeout -s SIGKILL $t Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ];
     then
         java -jar test.jar > "outputs/output-java-$fileno.txt" 2>>errors/compErrors/java.txt
@@ -58,3 +58,4 @@ elif [ "$language" = "java" ]; then
     fi
 fi
 
+rm -rf tmp.txt || true
