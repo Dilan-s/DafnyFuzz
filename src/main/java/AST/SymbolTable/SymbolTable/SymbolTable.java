@@ -36,10 +36,6 @@ public class SymbolTable {
         variables.put(variable.getName(), variable);
     }
 
-    public void removeVariable(Variable variable) {
-        variables.remove(variable.getName(), variable);
-    }
-
     public void addMethod(Method method) {
         if (enclosingSymbolTable == null) {
             methods.put(method.getName(), method);
@@ -117,5 +113,22 @@ public class SymbolTable {
 
     public SymbolTable getEnclosingSymbolTable() {
         return enclosingSymbolTable;
+    }
+
+    public boolean variableInScope(Variable v) {
+        return getAllVariablesInCurrentScope().contains(v);
+    }
+
+    public void replaceVariables(List<Variable> remove, List<Variable> replace) {
+        if (variables.keySet().containsAll(remove.stream().map(Variable::getName).collect(Collectors.toList()))) {
+            for (Variable v : remove) {
+                variables.remove(v.getName(), v);
+            }
+            for (Variable v : replace) {
+                addVariable(v);
+            }
+        } else if (enclosingSymbolTable != null) {
+            enclosingSymbolTable.replaceVariables(remove, replace);
+        }
     }
 }

@@ -2,9 +2,12 @@ package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.StringLiteral;
+import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
@@ -19,20 +22,17 @@ import java.util.stream.Collectors;
 public class PrintStatement extends BaseStatement {
 
     private final SymbolTable symbolTable;
-    private final List<Expression> values;
+    private final List<Variable> variables;
+    private List<Expression> values;
     private List<List<Statement>> expanded;
 
     public PrintStatement(SymbolTable symbolTable) {
         super();
         this.symbolTable = symbolTable;
         this.values = new ArrayList<>();
+        this.variables = symbolTable.getAllVariablesInCurrentScope();
         this.expanded = new ArrayList<>();
         expanded.add(List.of(this));
-    }
-
-    public void addValue(Expression expression) {
-        values.add(expression);
-        expanded.add(expanded.size() - 1, expression.expand());
     }
 
     @Override
@@ -113,6 +113,18 @@ public class PrintStatement extends BaseStatement {
 
     @Override
     protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+        if (values.isEmpty()) {
+            values = new ArrayList<>();
+            variables.stream().filter(v -> symbolTable.variableInScope(v)).forEach(v -> {
+                StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
+                VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
+                values.add(stringLiteral);
+                expanded.set(expanded.size() - 1, stringLiteral.expand());
+                values.add(expression);
+                expanded.set(expanded.size() - 1, expression.expand());
+            });
+        }
+
         List<String> joiner = new ArrayList<>();
 
         for (Expression exp : values) {
@@ -138,7 +150,7 @@ public class PrintStatement extends BaseStatement {
 
     @Override
     public boolean requireUpdate() {
-        return values.stream().anyMatch(Expression::requireUpdate);
+        return values != null && values.stream().anyMatch(Expression::requireUpdate);
     }
 
     @Override

@@ -1,6 +1,9 @@
 package AST.SymbolTable.Types.Variables;
 
+import AST.Statements.Expressions.Array.ArrayValue;
+import AST.Statements.Expressions.DataType.DataTypeValue;
 import AST.SymbolTable.Identifier;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
@@ -10,11 +13,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Variable implements Identifier {
 
     private final String name;
-    private final Type type;
+    private Type type;
     private boolean isConstant;
     private boolean isDeclared;
     private Object value;
@@ -71,9 +75,51 @@ public class Variable implements Identifier {
         return l;
     }
 
-    public void setValue(Map<Variable, Variable> paramMap, Object value) {
+    public void setValue(SymbolTable symbolTable, Map<Variable, Variable> paramMap, Object value) {
         if (paramMap.containsKey(this)) {
-            paramMap.get(this).setValue(paramMap, value);
+            paramMap.get(this).setValue(symbolTable, paramMap, value);
+        }
+        Object o = getValue(paramMap).get(0);
+        if (o != null) {
+            List<Variable> remove = new ArrayList<>();
+            List<Variable> replace = new ArrayList<>();
+            if (type.equals(new DArray())) {
+                DArray dArray = (DArray) this.type;
+                ArrayValue prevV = (ArrayValue) o;
+                for (int i = 0; i < prevV.size(); i++) {
+                    VariableArrayIndex variableArrayIndex = new VariableArrayIndex(this, dArray.getInnerType(), i);
+                    remove.add(variableArrayIndex);
+                }
+                ArrayValue newV = (ArrayValue) value;
+                for (int i = 0; i < newV.size(); i++) {
+                    VariableArrayIndex variableArrayIndex = new VariableArrayIndex(this, dArray.getInnerType(), i);
+                    replace.add(variableArrayIndex);
+                }
+            } else if (type.equals(new DataTypeRule())) {
+                DataTypeValue newV = (DataTypeValue) value;
+                DataTypeValue prevV = (DataTypeValue) o;
+
+                DataTypeRule dataTypeRule = (DataTypeRule) prevV.getType();
+                List<Type> fieldTypes = dataTypeRule.getFieldTypes();
+                List<String> fieldNames = dataTypeRule.getFieldNames();
+
+                for (int i = 0; i < fieldTypes.size(); i++) {
+                    VariableDataTypeIndex variableDataTypeIndex = new VariableDataTypeIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
+                    remove.add(variableDataTypeIndex);
+                }
+
+                dataTypeRule = (DataTypeRule) newV.getType();
+                this.type = dataTypeRule;
+                fieldTypes = dataTypeRule.getFieldTypes();
+                fieldNames = dataTypeRule.getFieldNames();
+
+                for (int i = 0; i < fieldTypes.size(); i++) {
+                    VariableDataTypeIndex variableDataTypeIndex = new VariableDataTypeIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
+                    replace.add(variableDataTypeIndex);
+                }
+
+            }
+            symbolTable.replaceVariables(remove, replace);
         }
         this.value = value;
     }
@@ -108,5 +154,19 @@ public class Variable implements Identifier {
 
     public List<Variable> getRelatedAssignment() {
         return List.of(this);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Variable)) {
+            return false;
+        }
+        Variable other = (Variable) obj;
+        return other.name.equals(name) && other.type.equals(type);
     }
 }

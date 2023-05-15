@@ -163,6 +163,7 @@ public class AssignmentStatement extends BaseStatement {
     @Override
     protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<Object> expValues = new ArrayList<>();
+
         for (Expression value : values) {
             List<Object> expressionValue = value.getValue(paramMap, s);
             for (Object object : expressionValue) {
@@ -173,7 +174,7 @@ public class AssignmentStatement extends BaseStatement {
         for (int i = 0; i < variables.size(); i++) {
             Object expV = expValues.get(i);
             Variable v = variables.get(i);
-            v.setValue(paramMap, expV);
+            v.setValue(symbolTable, paramMap, expV);
         }
         return ReturnStatus.UNKNOWN;
     }

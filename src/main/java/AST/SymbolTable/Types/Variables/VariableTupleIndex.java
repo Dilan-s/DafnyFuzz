@@ -1,10 +1,12 @@
 package AST.SymbolTable.Types.Variables;
 
 import AST.Statements.Expressions.Array.ArrayValue;
+import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class VariableTupleIndex extends Variable {
 
@@ -31,7 +33,7 @@ public class VariableTupleIndex extends Variable {
 
 
     @Override
-    public void setValue(Map<Variable, Variable> paramMap, Object value) {
+    public void setValue(SymbolTable symbolTable, Map<Variable, Variable> paramMap, Object value) {
         List<Object> v = (List<Object>) variable.getValue(paramMap).get(0);
         v.set(index, value);
     }
@@ -57,5 +59,19 @@ public class VariableTupleIndex extends Variable {
         List<Variable> symbolTableArgs = super.getSymbolTableArgs();
         symbolTableArgs.forEach(Variable::setConstant);
         return symbolTableArgs;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(variable, index);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof VariableTupleIndex)) {
+            return false;
+        }
+        VariableTupleIndex other = (VariableTupleIndex) obj;
+        return other.variable.equals(variable) && other.index == index;
     }
 }

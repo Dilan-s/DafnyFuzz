@@ -74,9 +74,10 @@ public class ForStatement extends BaseStatement {
                 initVarValue = (Integer) initVar.getValue(paramMap).get(0);
                 finalVarValue = (Integer) finalVar.getValue(paramMap).get(0);
             }
+            loopVar.setValue(symbolTable, paramMap, initVarValue);
 
             for (int i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
-                loopVar.setValue(paramMap, i);
+                loopVar.setValue(symbolTable, paramMap, i);
                 Set<Variable> modSet = body.getModifies();
                 addInvariantForModSet(modSet, paramMap);
                 ReturnStatus execute = body.execute(paramMap, s);
@@ -88,8 +89,9 @@ public class ForStatement extends BaseStatement {
             }
         } else {
             direction = Direction.setDirection(initVarValue, finalVarValue);
+            loopVar.setValue(symbolTable, paramMap, initVarValue);
             for (int i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
-                loopVar.setValue(paramMap, i);
+                loopVar.setValue(symbolTable, paramMap, i);
                 Set<Variable> modSet = body.getModifies();
                 addInvariantForModSet(modSet, paramMap);
                 ReturnStatus execute = body.execute(paramMap, s);

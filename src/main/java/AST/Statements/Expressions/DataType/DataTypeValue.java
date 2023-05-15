@@ -46,4 +46,8 @@ public class DataTypeValue {
     public int size() {
         return values.size();
     }
+
+    public Type getType() {
+        return type;
+    }
 }

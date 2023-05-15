@@ -19,24 +19,12 @@ import java.util.stream.Collectors;
 
 public class PrintAll extends BaseStatement {
 
-    private final List<Variable> variables;
-    private final PrintStatement printStat;
+    private PrintStatement printStat;
     private SymbolTable symbolTable;
 
     public PrintAll(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
-        this.variables = symbolTable.getAllVariablesInCurrentScope().stream()
-            .filter(v -> v.getType().isPrintable())
-            .collect(Collectors.toList());
-
         this.printStat = new PrintStatement(symbolTable);
-
-        variables.forEach(v -> {
-            StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
-            VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
-            printStat.addValue(stringLiteral);
-            printStat.addValue(expression);
-        });
     }
 
     @Override
