@@ -24,6 +24,7 @@ touch errors/compErrors/go.txt
 touch errors/compErrors/java.txt
 touch errors/compErrors/js.txt
 touch errors/compErrors/py.txt
+touch errors/compErrors/cs.txt
 
 
 
@@ -39,6 +40,7 @@ while [ true ]; do
   echo "Test number $x" >> errors/compErrors/js.txt
   echo "Test number $x" >> errors/compErrors/java.txt
   echo "Test number $x" >> errors/compErrors/py.txt
+  echo "Test number $x" >> errors/compErrors/cs.txt
 
   cd "$directory"
   timeout -s SIGKILL $t java -cp out/ Main.GenerateProgram $x
@@ -48,9 +50,7 @@ while [ true ]; do
     x=$(( $x + 1 ))
     continue;
   fi
-#  cp test.dfy tests/"test$x.dfy"
-  # css
-  #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
+
   cd "$directory"
   y=0
   if [ "$(ls -A tests-minimized/)" ];
@@ -59,7 +59,7 @@ while [ true ]; do
     do
       echo "Expecting validation to succeed for $file"
 
-      timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify $file > tmp.txt 2>&1
+      timeout -s SIGKILL $t Dafny verify $file > tmp.txt 2>&1
       if [ $? -eq 4 ]
       then
         echo "Verification error found in test $x - correct validation of the file $file"
@@ -81,7 +81,7 @@ while [ true ]; do
     do
       echo "Expecting validation to fail for $file"
 
-      timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny verify $file > tmp.txt 2>&1
+      timeout -s SIGKILL $t Dafny verify $file > tmp.txt 2>&1
       code=$?
       if [[ $code -ne 4 && $code -lt 5 ]]
       then
@@ -107,7 +107,7 @@ while [ true ]; do
 
       # GO
       cd "$directory"
-      timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/go.txt
+      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/go.txt
       if [ $? -eq 0 ]
       then
         echo "Created GO files"
@@ -122,7 +122,7 @@ while [ true ]; do
 
       # js
       cd "$directory"
-      timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/js.txt
+      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/js.txt
       if [ $? -eq 0 ]
       then
         echo "Created JS files"
@@ -135,7 +135,7 @@ while [ true ]; do
 
       # java
       cd "$directory"
-      timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy  > tmp.txt 2>>errors/compErrors/java.txt
+      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 test.dfy  > tmp.txt 2>>errors/compErrors/java.txt
       if [ $? -eq 0 ]
       then
         echo "Created Java files"
@@ -150,7 +150,7 @@ while [ true ]; do
 
       # py
       cd "$directory"
-      timeout -s SIGKILL $t ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>>errors/compErrors/py.txt
+      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>>errors/compErrors/py.txt
       if [ $? -eq 0 ]
       then
         echo "Created Python files"
@@ -161,11 +161,19 @@ while [ true ]; do
         echo "Failed to convert to Python in $t seconds"
       fi
 
-      # cpp
-    #  ./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cpp /spillTargetCode:3 test.dfy > tmp.txt 2>&1
-    #  echo "Created C++ files"
-    #  g++ test.cpp test.h DafnyRuntime.h  > tmp.txt 2>&1
-    #  ./a.out > outputs/output-cpp.txt
+      # cs
+      cd "$directory"
+      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:cs /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>>errors/compErrors/cs.txt
+      if [ $? -eq 0 ]
+      then
+        echo "Created CS files"
+        dotnet test.dll > "outputs/output-cs-$y.txt" 2>>errors/compErrors/cs.txt
+        rm -rf test.dll test.runtimeconfig.json || true
+      else
+        rm -rf test.dll test.runtimeconfig.json || true
+        echo "Failed to convert to CS in $t seconds"
+      fi
+
       rm -rf test.dfy || true
       rm -rf tmp.txt || true
       y=$(( $y + 1))

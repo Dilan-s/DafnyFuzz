@@ -115,7 +115,7 @@ public class DArrayLiteralByElements extends BaseExpression {
                     l.add(null);
                 }
             }
-            r.add(new ArrayValue(variable.getName(), l));
+            r.add(new ArrayValue(variable, l));
             return r;
         }
 

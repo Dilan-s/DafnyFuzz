@@ -26,13 +26,13 @@ public class RandomTypeGenerator {
     public static double PROB_INT = 40.0;
     public static double PROB_BOOL = 40.0;
     public static double PROB_REAL = 10.0;
-    public static double PROB_DMAP = 15.0;
+    public static double PROB_DMAP = 10.0;
     public static double PROB_DARRAY = 10.0;
-    public static double PROB_DSET = 15.0;
-    public static double PROB_SEQ = 15.0;
-    public static double PROB_MULTISET = 15.0;
-    public static double PROB_TUPLE = 25.0;
-    public static double PROB_DATATYPE = 25.0;
+    public static double PROB_DSET = 10.0;
+    public static double PROB_SEQ = 10.0;
+    public static double PROB_MULTISET = 10.0;
+    public static double PROB_TUPLE = 20.0;
+    public static double PROB_DATATYPE = 20.0;
 
     public static double PROB_SWARM = 0.05;
     private static int typeDepth = 0;
@@ -135,8 +135,6 @@ public class RandomTypeGenerator {
                     if (!DEFINED_DATA_TYPES.isEmpty() && prob_reuse < PROB_REUSE_DATATYPE) {
                         int ind = GeneratorConfig.getRandom().nextInt(DEFINED_DATA_TYPES.size());
                         t = DEFINED_DATA_TYPES.get(ind);
-//                        ind = GeneratorConfig.getRandom().nextInt(dataType.noOfRules());
-//                        t = dataType.getRule(ind);
                     } else {
                         String datatypeName = VariableNameGenerator.generateDatatypeName();
                         DataType dataType = new DataType(datatypeName);
@@ -170,6 +168,22 @@ public class RandomTypeGenerator {
             Type t = generateType();
             Type concrete = t.concrete(symbolTable);
             types.add(concrete);
+        }
+        typeDepth--;
+        return types;
+    }
+
+    public List<Type> generateMapTypes(int noOfTypes, SymbolTable symbolTable) {
+        typeDepth++;
+        List<Type> types = new ArrayList<>();
+        int i = 0;
+        while (i < noOfTypes) {
+            Type t = generateType();
+            if (!t.equals(new DMap())) {
+                Type concrete = t.concrete(symbolTable);
+                types.add(concrete);
+                i++;
+            }
         }
         typeDepth--;
         return types;

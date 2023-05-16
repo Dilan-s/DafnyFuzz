@@ -3,6 +3,7 @@ package AST.SymbolTable.Types.UserDefinedTypes.DataType;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.DataType.DataTypeLiteral;
+import AST.Statements.Expressions.DataType.DataTypeValue;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.xml.crypto.Data;
 import javax.xml.transform.sax.SAXResult;
 
 public class DataTypeRule implements UserDefinedType {
@@ -40,18 +42,19 @@ public class DataTypeRule implements UserDefinedType {
     public DataTypeRule() {
         this(null, null, null);
     }
+
     public DataTypeRule(Type parentType, String ruleName) {
         this(parentType, ruleName, new ArrayList<>());
     }
 
     @Override
     public boolean isPrintable() {
-        return false;
+        return fields.stream().allMatch(Type::isPrintable);
     }
 
     @Override
     public boolean validMethodType() {
-        return false;
+        return fields.stream().allMatch(Type::validMethodType);
     }
 
     @Override
@@ -74,6 +77,20 @@ public class DataTypeRule implements UserDefinedType {
             exps.add(e);
         }
         return new DataTypeLiteral(symbolTable, this, exps);
+    }
+
+    @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        DataTypeValue vs = (DataTypeValue) value;
+        List<Expression> values = new ArrayList<>();
+        for (int i = 0; i < fields.size(); i++) {
+            Expression exp = fields.get(i).generateExpressionFromValue(symbolTable, vs.get(i));
+            if (exp == null) {
+                return null;
+            }
+            values.add(exp);
+        }
+        return new DataTypeLiteral(symbolTable, this, values);
     }
 
     public int getUses() {
@@ -111,13 +128,60 @@ public class DataTypeRule implements UserDefinedType {
     }
 
     @Override
+    public Boolean equal(Object lhsV, Object rhsV) {
+        DataTypeValue lhsVal = (DataTypeValue) lhsV;
+        DataTypeValue rhsVal = (DataTypeValue) rhsV;
+        if (!lhsVal.getType().equals(rhsVal.getType())) {
+            return false;
+        }
+
+        for (int i = 0; i < fields.size(); i++) {
+            Type type = fields.get(i);
+            if (!type.equal(lhsVal.get(i), rhsVal.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public String formatPrint(Object object) {
-        return null;
+        DataTypeValue val = (DataTypeValue) object;
+        String res = parentType.getName() + "." + ruleName;
+        if (!fields.isEmpty()) {
+            res = res + "(";
+            boolean first = true;
+            for (int i = 0; i < fields.size(); i++) {
+                if (!first) {
+                    res = res + ", ";
+                }
+                first = false;
+                res = res + fields.get(i).formatPrint(val.get(i));
+            }
+            res = res + ")";
+        }
+        return res;
     }
 
     @Override
     public String formatEnsures(String variableName, Object object) {
-        return null;
+        DataTypeValue val = (DataTypeValue) object;
+
+        List<String> res = new ArrayList<>();
+        if (fields.isEmpty()) {
+            res.add(String.format("(%s == %s)", variableName, ruleName));
+        }
+        for (int i = 0; i < fieldNames.size(); i++) {
+            String e = fields.get(i).formatEnsures(String.format("%s.%s", variableName, fieldNames.get(i)), val.get(i));
+            if (e == null) {
+                return null;
+            }
+            res.add(e);
+        }
+
+        String fieldCheck = String.join(" && ", res);
+        String r = String.format("(%s.%s? && (%s))", variableName, ruleName, fieldCheck);
+        return r;
     }
 
     public List<Type> getFieldTypes() {

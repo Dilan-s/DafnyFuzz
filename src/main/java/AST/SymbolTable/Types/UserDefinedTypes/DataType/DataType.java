@@ -44,6 +44,11 @@ public class DataType implements UserDefinedType {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        return null;
+    }
+
+    @Override
     public boolean isPrintable() {
         return false;
     }
@@ -78,7 +83,9 @@ public class DataType implements UserDefinedType {
                 rules.add(rule);
             }
         }
-        return this;
+        int ind = GeneratorConfig.getRandom().nextInt(rules.size());
+        DataTypeRule dataTypeRule = rules.get(ind);
+        return dataTypeRule;
     }
 
     @Override

@@ -42,6 +42,12 @@ public class Real implements BaseType {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        double v = Double.parseDouble(value.toString());
+        return new RealLiteral(this, symbolTable, v);
+    }
+
+    @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
         Double lhs = Double.parseDouble(String.valueOf(lhsV));
         Double rhs = Double.parseDouble(String.valueOf(rhsV));

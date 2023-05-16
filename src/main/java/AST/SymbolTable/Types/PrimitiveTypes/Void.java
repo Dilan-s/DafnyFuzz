@@ -31,6 +31,11 @@ public class Void implements BaseType {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        return null;
+    }
+
+    @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
         return false;
     }

@@ -2,11 +2,14 @@ package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.Operator.BinaryOperator;
+import AST.Statements.Expressions.Operator.OperatorExpression;
 import AST.Statements.Expressions.StringLiteral;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.swing.text.html.Option;
 
 public class PrintStatement extends BaseStatement {
 
@@ -25,9 +29,11 @@ public class PrintStatement extends BaseStatement {
     private final List<Variable> variables;
     private List<Expression> values;
     private List<List<Statement>> expanded;
+    private boolean update;
 
     public PrintStatement(SymbolTable symbolTable) {
         super();
+        this.update = false;
         this.symbolTable = symbolTable;
         this.values = new ArrayList<>();
         this.variables = symbolTable.getAllVariablesInCurrentScope();
@@ -70,72 +76,54 @@ public class PrintStatement extends BaseStatement {
 
     @Override
     public List<String> toOutput() {
-        Set<String> res = new HashSet<>();
-        List<String> temp = new ArrayList<>();
-
-        List<Expression> printValues = values.stream()
-            .filter(x -> x.getTypes().stream().allMatch(Type::isPrintable))
-            .collect(Collectors.toList());
-
-        if (!printValues.isEmpty()) {
-            res.add("print ");
-
-            boolean first = true;
-            for (Expression exp : printValues) {
-                List<String> expOptions = exp.toOutput();
-                temp = new ArrayList<>();
-                for (String f : res) {
-                    for (String expOption : expOptions) {
-                        if (!first) {
-                            expOption = ", \" \", " + expOption;
-                        }
-                        String curr = f + expOption;
-                        temp.add(curr);
-                    }
-                }
-                if (expOptions.isEmpty()) {
-                    temp.addAll(res);
-                }
-                first = false;
-                res = new HashSet(temp);
-            }
-
-            temp = new ArrayList<>();
-            for (String f : res) {
-                temp.add(f + ", \"\\n\";");
-            }
-            res = new HashSet(temp);
-        }
-        List<String> r = new ArrayList<>(res);
-        Collections.shuffle(r, GeneratorConfig.getRandom());
-        return r.subList(0, Math.min(5, res.size()));
+        return List.of(toString());
     }
 
     @Override
     protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         if (values.isEmpty()) {
             values = new ArrayList<>();
-            variables.stream().filter(v -> symbolTable.variableInScope(v)).forEach(v -> {
+            variables.stream().filter(symbolTable::variableInScope).forEach(v -> {
                 StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
                 VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
                 values.add(stringLiteral);
-                expanded.set(expanded.size() - 1, stringLiteral.expand());
+                expanded.add(expanded.size() - 1, stringLiteral.expand());
                 values.add(expression);
-                expanded.set(expanded.size() - 1, expression.expand());
+                expanded.add(expanded.size() - 1, expression.expand());
             });
         }
 
         List<String> joiner = new ArrayList<>();
 
-        for (Expression exp : values) {
+        List<Expression> values = new ArrayList<>(this.values);
+        for (int i = 0; i < values.size(); i++) {
+            Expression exp = values.get(i);
             List<Type> types = exp.getTypes();
+            List<Object> value = exp.getValue(paramMap, s);
             if (types.stream().allMatch(Type::isPrintable)) {
-                List<Object> value = exp.getValue(paramMap, s);
-                for (int i = 0, valueSize = value.size(); i < valueSize; i++) {
-                    Object object = value.get(i);
-                    Type t = types.get(i);
+                for (int j = 0; j < value.size(); j++) {
+                    Object object = value.get(j);
+                    Type t = types.get(j);
                     String str = t.formatPrint(object);
                     joiner.add(str);
+                }
+            } else {
+                for (int j = 0; j < value.size(); j++) {
+                    Object object = value.get(j);
+                    Type t = types.get(j);
+                    Expression newE = t.generateExpressionFromValue(symbolTable, object);
+                    if (newE != null) {
+                        OperatorExpression op = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Equals, List.of(exp, newE));
+                        this.values.set(i, op);
+                        this.expanded.set(i, op.expand());
+                        for (Statement st : op.expand()) {
+                            st.execute(paramMap, new StringBuilder());
+                        }
+
+                        this.update = true;
+                        String str = "true";
+                        joiner.add(str);
+                    }
                 }
             }
         }
@@ -150,7 +138,7 @@ public class PrintStatement extends BaseStatement {
 
     @Override
     public boolean requireUpdate() {
-        return values != null && values.stream().anyMatch(Expression::requireUpdate);
+        return update || (values != null && values.stream().anyMatch(Expression::requireUpdate));
     }
 
     @Override
@@ -161,6 +149,7 @@ public class PrintStatement extends BaseStatement {
                 expanded.set(i, exp.expand());
             }
         }
+        update = false;
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 }

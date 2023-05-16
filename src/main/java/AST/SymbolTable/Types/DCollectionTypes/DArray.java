@@ -7,10 +7,13 @@ import AST.Statements.Expressions.Array.ArrayValue;
 import AST.Statements.Expressions.Array.DArrayLiteralByElements;
 import AST.Statements.Expressions.Array.DArrayLiteralInline;
 import AST.Statements.Expressions.Expression;
+import AST.Statements.Expressions.VariableExpression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DArray implements DCollection {
 
@@ -96,13 +99,27 @@ public class DArray implements DCollection {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        ArrayValue vs = (ArrayValue) value;
+        Variable v = vs.getVariable();
+        if (symbolTable.variableInScope(v)) {
+            return new VariableExpression(symbolTable, v, this);
+        }
+        return null;
+    }
+
+    @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
         return null;
     }
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        return null;
+        ArrayValue lhsAV = (ArrayValue) lhsV;
+        ArrayValue rhsAV = (ArrayValue) rhsV;
+
+        return lhsAV.getName().equals(rhsAV.getName()) &&
+            Objects.equals(lhsAV.getContents(), rhsAV.getContents());
     }
 
     @Override
@@ -160,7 +177,8 @@ public class DArray implements DCollection {
 
     @Override
     public String formatPrint(Object object) {
-        return "";
+        ArrayValue value = (ArrayValue) object;
+        return value.getName();
     }
 
     @Override

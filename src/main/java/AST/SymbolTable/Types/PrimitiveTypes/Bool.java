@@ -34,6 +34,12 @@ public class Bool implements BaseType {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        Boolean b = (Boolean) value;
+        return new BoolLiteral(this, symbolTable, b);
+    }
+
+    @Override
     public boolean operatorExists() {
         return true;
     }

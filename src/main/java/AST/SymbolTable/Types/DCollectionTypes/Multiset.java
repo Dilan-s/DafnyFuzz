@@ -3,6 +3,7 @@ package AST.SymbolTable.Types.DCollectionTypes;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
+import AST.Statements.Expressions.DSeq.SeqLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.MultisetLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -108,6 +109,24 @@ public class Multiset implements DCollection {
         return expression;
     }
 
+
+    @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        Map<Object, Integer> vs = (Map<Object, Integer>) value;
+        List<Expression> values = new ArrayList<>();
+        for (Map.Entry<Object, Integer> v : vs.entrySet()) {
+            Expression exp = type.generateExpressionFromValue(symbolTable, v.getKey());
+            if (exp == null) {
+                return null;
+            }
+            for (int i = 0; i < v.getValue(); i++) {
+                values.add(exp);
+            }
+        }
+        return new MultisetLiteral(symbolTable, this, values);
+    }
+
+
     @Override
     public String getVariableType() {
         if (type == null) {
@@ -133,7 +152,24 @@ public class Multiset implements DCollection {
 
     @Override
     public String formatPrint(Object object) {
-        return "";
+        String res;
+        Map<Object, Integer> value = (Map<Object, Integer>) object;
+        res = "multiset([";
+
+        boolean first = true;
+        for (Map.Entry<Object, Integer> entry : value.entrySet()) {
+
+            for (int i = 0; i < entry.getValue(); i++) {
+                if (!first) {
+                    res = res + ", ";
+                }
+                first = false;
+                res = res + type.formatPrint(entry.getKey());
+            }
+        }
+
+        res = res + "])";
+        return res;
     }
 
     @Override
@@ -277,5 +313,17 @@ public class Multiset implements DCollection {
 
         res = res + "])";
         return variableName + " == " + res;
+    }
+
+    @Override
+    public Object of(Object value) {
+        Map<Object, Integer> r = new HashMap<>();
+
+        Map<Object, Integer> multi = (Map<Object, Integer>) value;
+        for (Map.Entry<Object, Integer> entry : multi.entrySet()) {
+            r.put(type != null ? type.of(entry.getKey()) : entry.getKey(), entry.getValue());
+        }
+
+        return r;
     }
 }

@@ -56,6 +56,17 @@ elif [ "$language" = "java" ]; then
         echo "Failed to convert to Java in $t seconds for test number $testno file $fileno"
         rm -rf test.jar test-java || true
     fi
+elif [ "$language" = "cs" ]; then
+    timeout -s SIGKILL $t Dafny /noVerify /compileTarget:cs /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>&1
+    if [ $? -eq 0 ];
+    then
+        dotnet test.dll > "outputs/output-cs-$fileno.txt" 2>>errors/compErrors/cs.txt
+        rm -rf test.dll test.runtimeconfig.json || true
+        echo "Success CS"
+    else
+        echo "Failed to convert to CS in $t seconds for test number $testno file $fileno"
+        rm -rf test.dll test.runtimeconfig.json || true
+    fi
 fi
 
 rm -rf tmp.txt || true
