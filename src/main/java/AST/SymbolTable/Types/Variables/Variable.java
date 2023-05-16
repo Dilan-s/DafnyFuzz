@@ -71,7 +71,7 @@ public class Variable implements Identifier {
             return paramsMap.get(this).getValue(paramsMap);
         }
         List<Object> l = new ArrayList<>();
-        l.add(value);
+        l.add(value == null ? null : type.of(value));
         return l;
     }
 
@@ -121,6 +121,11 @@ public class Variable implements Identifier {
             }
             symbolTable.replaceVariables(remove, replace);
         }
+        if (type.equals(new DataTypeRule())) {
+            DataTypeValue newV = (DataTypeValue) value;
+            this.type = newV.getType();
+        }
+
         this.value = value;
     }
 

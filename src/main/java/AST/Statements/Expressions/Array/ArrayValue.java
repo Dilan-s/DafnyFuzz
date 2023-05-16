@@ -1,14 +1,17 @@
 package AST.Statements.Expressions.Array;
 
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
 import java.util.Objects;
 
 public class ArrayValue {
     private String name;
+    private Variable variable;
     private List<Object> contents;
 
-    public ArrayValue(String name, List<Object> contents) {
-        this.name = name;
+    public ArrayValue(Variable variable, List<Object> contents) {
+        this.variable = variable;
+        this.name = variable.getName();
         this.contents = contents;
     }
 
@@ -42,5 +45,17 @@ public class ArrayValue {
 
     public void set(int index, Object value) {
         contents.set(index, value);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Object> getContents() {
+        return contents;
+    }
+
+    public Variable getVariable() {
+        return variable;
     }
 }

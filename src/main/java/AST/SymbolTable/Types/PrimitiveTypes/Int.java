@@ -48,6 +48,12 @@ public class Int implements BaseType {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        Integer v = Integer.parseInt(value.toString());
+        return new IntLiteral(this, symbolTable, v);
+    }
+
+    @Override
     public boolean operatorExists() {
         return true;
     }

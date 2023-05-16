@@ -87,6 +87,20 @@ public class DSet implements DCollection {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        Set<Object> vs = (Set<Object>) value;
+        List<Expression> values = new ArrayList<>();
+        for (Object v : vs) {
+            Expression exp = type.generateExpressionFromValue(symbolTable, v);
+            if (exp == null) {
+                return null;
+            }
+            values.add(exp);
+        }
+        return new DSetLiteral(symbolTable, this, values);
+    }
+
+    @Override
     public String getVariableType() {
         if (type == null) {
             return "set";
@@ -161,7 +175,9 @@ public class DSet implements DCollection {
 
     @Override
     public String formatPrint(Object object) {
-        return "";
+        Set<Object> value = (Set<Object>) object;
+        String res = "{" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", ")) + "}";
+        return res;
     }
 
 
@@ -193,4 +209,15 @@ public class DSet implements DCollection {
         return variableName + " == " + res;
     }
 
+    @Override
+    public Object of(Object value) {
+        Set<Object> r = new HashSet<>();
+
+        Set<Object> s = (Set<Object>) value;
+        for (Object v : s) {
+            r.add(type != null ? type.of(v) : v);
+        }
+
+        return r;
+    }
 }

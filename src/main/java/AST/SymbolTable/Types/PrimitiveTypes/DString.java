@@ -7,6 +7,7 @@ import AST.Statements.Expressions.StringLiteral;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.util.Objects;
 import java.util.Random;
 
 public class DString implements BaseType {
@@ -39,6 +40,12 @@ public class DString implements BaseType {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        String v = value.toString();
+        return new StringLiteral(this, symbolTable, v);
+    }
+
+    @Override
     public boolean operatorExists() {
         return false;
     }
@@ -50,7 +57,9 @@ public class DString implements BaseType {
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        return false;
+        String lhsVS = lhsV.toString();
+        String rhsVS = rhsV.toString();
+        return Objects.equals(lhsVS, rhsVS);
     }
 
     @Override

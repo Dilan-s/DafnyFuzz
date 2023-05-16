@@ -41,6 +41,10 @@ public class VariableExpression extends BaseExpression {
         return variable.getValue(paramsMap);
     }
 
+    public Variable getVariable() {
+        return variable;
+    }
+
     @Override
     public List<Statement> expand() {
         return new ArrayList<>();

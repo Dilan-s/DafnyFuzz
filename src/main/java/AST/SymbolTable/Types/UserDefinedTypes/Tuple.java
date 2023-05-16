@@ -58,6 +58,20 @@ public class Tuple implements UserDefinedType {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        List<Object> vs = (List<Object>) value;
+        List<Expression> values = new ArrayList<>();
+        for (int i = 0; i < typeList.size(); i++) {
+            Expression exp = typeList.get(i).generateExpressionFromValue(symbolTable, vs.get(i));
+            if (exp == null) {
+                return null;
+            }
+            values.add(exp);
+        }
+        return new TupleLiteral(symbolTable, this, values);
+    }
+
+    @Override
     public Type concrete(SymbolTable symbolTable) {
         if (typeList == null) {
             int noTypes = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_TUPLE) + MIN_SIZE_OF_TUPLE;
@@ -77,7 +91,14 @@ public class Tuple implements UserDefinedType {
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        return null;
+        List<Object> lhsVL = (List<Object>) lhsV;
+        List<Object> rhsVL = (List<Object>) rhsV;
+        for (int i = 0; i < typeList.size(); i++) {
+            if (!typeList.get(i).equal(lhsVL.get(i), rhsVL.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -127,6 +148,8 @@ public class Tuple implements UserDefinedType {
         }
         return String.join(" && ", res);
     }
+
+
 
     @Override
     public boolean isPrintable() {

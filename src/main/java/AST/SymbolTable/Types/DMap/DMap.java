@@ -7,11 +7,13 @@ import AST.Statements.Expressions.DMap.DMapLiteral;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -95,6 +97,24 @@ public class DMap implements Type {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        Map<Object, Object> v = (Map<Object, Object>) value;
+        List<DMapEntry> entries = new ArrayList<>();
+        for (Entry<Object, Object> entry : v.entrySet()) {
+            Expression kExp = keyType.generateExpressionFromValue(symbolTable, entry.getKey());
+            if (kExp == null) {
+                return null;
+            }
+            Expression vExp = valueType.generateExpressionFromValue(symbolTable, entry.getValue());
+            if (vExp == null) {
+                return null;
+            }
+            entries.add(new DMapEntry(kExp, vExp));
+        }
+        return new DMapLiteral(symbolTable, this, entries);
+    }
+
+    @Override
     public String getVariableType() {
         if (keyType == null || valueType == null) {
             return "map";
@@ -111,18 +131,18 @@ public class DMap implements Type {
     public Type concrete(SymbolTable symbolTable) {
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
         if (keyType == null && valueType == null) {
-            List<Type> types = typeGenerator.generateTypes(2, symbolTable);
-            Type k = types.get(0);
-            Type v = types.get(1);
+            List<Type> types = typeGenerator.generateMapTypes(2, symbolTable);
+            Type k = types.get(0).concrete(symbolTable);
+            Type v = types.get(1).concrete(symbolTable);
 
             return new DMap(k, v);
         } else if (keyType == null) {
-            List<Type> types = typeGenerator.generateTypes(1, symbolTable);
-            Type k = types.get(0);
+            List<Type> types = typeGenerator.generateMapTypes(1, symbolTable);
+            Type k = types.get(0).concrete(symbolTable);
             return new DMap(k, valueType.concrete(symbolTable));
         } else if (valueType == null) {
-            List<Type> types = typeGenerator.generateTypes(1, symbolTable);
-            Type v = types.get(0);
+            List<Type> types = typeGenerator.generateMapTypes(1, symbolTable);
+            Type v = types.get(0).concrete(symbolTable);
             return new DMap(keyType.concrete(symbolTable), v);
         } else {
             return new DMap(keyType.concrete(symbolTable), valueType.concrete(symbolTable));
@@ -142,7 +162,19 @@ public class DMap implements Type {
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        return null;
+        Map<Object, Object> lhsM = (Map<Object, Object>) lhsV;
+        Map<Object, Object> rhsM = (Map<Object, Object>) rhsV;
+
+        if (!Objects.equals(lhsM.keySet(), rhsM.keySet())) {
+            return false;
+        }
+
+        for (Object k : lhsM.keySet()) {
+            if (!valueType.equal(lhsM.get(k), rhsM.get(k))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -152,7 +184,13 @@ public class DMap implements Type {
 
     @Override
     public String formatPrint(Object object) {
-        return "";
+        Map<Object, Object> m = (Map<Object, Object>) object;
+        List<String> mapContents = new ArrayList<>();
+        for (Entry<Object, Object> x : m.entrySet()) {
+            String s = String.format("%s := %s", keyType.formatPrint(x.getKey()), valueType.formatPrint(x.getValue()));
+            mapContents.add(s);
+        }
+        return String.format("map[%s]", String.join(", ", mapContents));
     }
 
 
@@ -218,5 +256,19 @@ public class DMap implements Type {
         }
 
         return m;
+    }
+
+    @Override
+    public Object of(Object value) {
+        Map<Object, Object> r = new HashMap<>();
+
+        Map<Object, Object> m = (Map<Object, Object>) value;
+        for (Map.Entry<Object, Object> entry : m.entrySet()) {
+            Object keyV = keyType != null ? keyType.of(entry.getKey()) : entry.getKey();
+            Object valV = valueType != null ? valueType.of(entry.getValue()) : entry.getValue();
+
+            r.put(keyV, valV);
+        }
+        return r;
     }
 }

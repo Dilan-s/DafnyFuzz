@@ -40,6 +40,12 @@ public class Char implements BaseType {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        Character v = (Character) value;
+        return new CharLiteral(this, symbolTable, v);
+    }
+
+    @Override
     public boolean operatorExists() {
         return true;
     }

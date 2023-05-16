@@ -121,7 +121,7 @@ public class DArrayLiteralInline extends BaseExpression {
                     l.add(v);
                 }
             }
-            r.add(new ArrayValue(variable.getName(), l));
+            r.add(new ArrayValue(variable, l));
             return r;
         }
 

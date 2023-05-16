@@ -20,6 +20,8 @@ test.h
 test.cs
 test-py
 test.js
+test.dll
+test.runtimeconfig.json
 outputs
 tests
 tests-minimized

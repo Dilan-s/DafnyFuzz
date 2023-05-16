@@ -174,7 +174,8 @@ public class AssignmentStatement extends BaseStatement {
         for (int i = 0; i < variables.size(); i++) {
             Object expV = expValues.get(i);
             Variable v = variables.get(i);
-            v.setValue(symbolTable, paramMap, expV);
+            Object value = v.getType().of(expV);
+            v.setValue(symbolTable, paramMap, value);
         }
         return ReturnStatus.UNKNOWN;
     }

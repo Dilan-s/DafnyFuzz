@@ -9,6 +9,8 @@ public interface Type extends Identifier {
 
     Expression generateLiteral(SymbolTable symbolTable);
 
+    Expression generateExpressionFromValue(SymbolTable symbolTable, Object value);
+
     default String getVariableType() {
         return getName();
     }
@@ -47,5 +49,9 @@ public interface Type extends Identifier {
 
     default boolean validMethodType() {
         return true;
+    }
+
+    default Object of(Object value) {
+        return value;
     }
 }

@@ -86,6 +86,20 @@ public class Seq implements DCollection {
     }
 
     @Override
+    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+        List<Object> vs = (List<Object>) value;
+        List<Expression> values = new ArrayList<>();
+        for (Object v : vs) {
+            Expression exp = type.generateExpressionFromValue(symbolTable, v);
+            if (exp == null) {
+                return null;
+            }
+            values.add(exp);
+        }
+        return new SeqLiteral(symbolTable, this, values);
+    }
+
+    @Override
     public String getVariableType() {
         if (type == null) {
             return "seq";
@@ -217,5 +231,17 @@ public class Seq implements DCollection {
     @Override
     public Object intersection(Object lhsV, Object rhsV) {
         return null;
+    }
+
+    @Override
+    public Object of(Object value) {
+        List<Object> r = new ArrayList<>();
+
+        List<Object> vs = (List<Object>) value;
+        for (Object v : vs) {
+            r.add(type != null ? type.of(v) : v);
+        }
+
+        return r;
     }
 }
