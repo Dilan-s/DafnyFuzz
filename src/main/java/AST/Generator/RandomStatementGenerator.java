@@ -89,9 +89,8 @@ public class RandomStatementGenerator {
         Statement ret = null;
         while (ret == null) {
             double ratioSum = PROB_RETURN_STAT + PROB_ASSIGN_STAT + PROB_IF_ELSE_STAT +
-                PROB_ASSERT
-//                + PROB_MATCH_STAT
-                + PROB_WHILE_STAT + PROB_FOR_STAT + PROB_BREAK_STAT +
+                PROB_ASSERT + PROB_WHILE_STAT + PROB_FOR_STAT + PROB_BREAK_STAT +
+//                PROB_MATCH_STAT +
                 PROB_CONTINUE_STAT;
             double probTypeOfStatement = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
@@ -119,12 +118,6 @@ public class RandomStatementGenerator {
                 ret = generateAssertStatement(method, symbolTable);
 
             }
-//            else if ((probTypeOfStatement -= PROB_MATCH_STAT) < 0) {
-//                //Match
-//                PROB_MATCH_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
-//                ret = generateMatchStatement(method, symbolTable);
-//
-//            }
             else if ((probTypeOfStatement -= PROB_WHILE_STAT) < 0) {
                 //Match
                 PROB_WHILE_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
@@ -146,6 +139,12 @@ public class RandomStatementGenerator {
                     ret = generateContinueStatement(method, symbolTable);
                 }
             }
+//            else if ((probTypeOfStatement -= PROB_MATCH_STAT) < 0) {
+//                //Match
+//                PROB_MATCH_STAT *= GeneratorConfig.OPTION_DECAY_FACTOR;
+//                ret = generateMatchStatement(method, symbolTable);
+//
+//            }
         }
         statementDepth--;
         return ret;
