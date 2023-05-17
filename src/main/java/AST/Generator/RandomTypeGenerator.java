@@ -12,6 +12,7 @@ import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
+import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import java.util.ArrayList;
 import java.util.List;
@@ -213,7 +214,7 @@ public class RandomTypeGenerator {
         while (t == null) {
             t = generateTypes(1, symbolTable).get(0);
 
-            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap()) || t.equals(new DataType())) {
+            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap()) || t.equals(new DataType()) || t.equals(new DataTypeRule())) {
                 t = null;
             }
         }

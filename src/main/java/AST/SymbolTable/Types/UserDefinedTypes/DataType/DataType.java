@@ -84,8 +84,11 @@ public class DataType implements UserDefinedType {
                 rules.add(rule);
             }
         }
-        int ind = GeneratorConfig.getRandom().nextInt(rules.size());
-        DataTypeRule dataTypeRule = rules.get(ind);
+        List<DataTypeRule> rs = new ArrayList<>();
+        rs.add(defRule);
+        rs.addAll(rules);
+        int ind = GeneratorConfig.getRandom().nextInt(rs.size());
+        DataTypeRule dataTypeRule = rs.get(ind);
         return dataTypeRule;
     }
 

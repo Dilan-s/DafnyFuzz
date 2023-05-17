@@ -62,7 +62,7 @@ public class RandomExpressionGenerator {
                 PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_DMAP_SELECTION_EXPRESSION +
                 PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION +
                 PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_EXPRESSION
-//                + PROB_MATCH_EXPRESSION
+                + PROB_MATCH_EXPRESSION
                 ;
             double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * ratioSum;
             if (expressionDepth > MAX_EXPRESSION_DEPTH || (probTypeOfExpression -= PROB_LITERAL_EXPRESSION) < 0) {
@@ -117,11 +117,11 @@ public class RandomExpressionGenerator {
                     ret = generateCallExpression(symbolTable, List.of(type));
                 }
             }
-//            else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
-//                //match
-//                PROB_MATCH_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-//                ret = generateMatchExpression(symbolTable, type);
-//            }
+            else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
+                //match
+                PROB_MATCH_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateMatchExpression(symbolTable, type);
+            }
         }
         expressionDepth--;
         return ret;
