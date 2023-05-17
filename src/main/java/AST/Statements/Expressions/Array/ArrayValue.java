@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class ArrayValue {
+    private static int no = 0;
+    private int num;
     private String name;
     private Variable variable;
     private List<Object> contents;
@@ -13,11 +15,17 @@ public class ArrayValue {
         this.variable = variable;
         this.name = variable.getName();
         this.contents = contents;
+        this.num = ArrayValue.no;
+        ArrayValue.no++;
+    }
+
+    public int getNum() {
+        return num;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, contents);
+        return Objects.hash(name, contents, num);
     }
 
     @Override
@@ -27,7 +35,7 @@ public class ArrayValue {
         }
 
         ArrayValue other = (ArrayValue) obj;
-        return other.name.equals(name) && other.contents.equals(contents);
+        return other.name.equals(name) && other.contents.equals(contents) && other.num == num;
     }
 
     public int size() {

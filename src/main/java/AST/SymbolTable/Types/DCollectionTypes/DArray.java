@@ -65,13 +65,13 @@ public class DArray implements DCollection {
             return false;
         }
 
-        DArray dsetOther = (DArray) other;
+        DArray dArray = (DArray) other;
 
-        if (type == null || dsetOther.type == null) {
+        if (type == null || dArray.type == null) {
             return true;
         }
 
-        return dsetOther.type.equals(type);
+        return dArray.type.equals(type);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class DArray implements DCollection {
         ArrayValue rhsAV = (ArrayValue) rhsV;
 
         return lhsAV.getName().equals(rhsAV.getName()) &&
-            Objects.equals(lhsAV.getContents(), rhsAV.getContents());
+            Objects.equals(lhsAV.getContents(), rhsAV.getContents()) && lhsAV.getNum() == rhsAV.getNum();
     }
 
     @Override
