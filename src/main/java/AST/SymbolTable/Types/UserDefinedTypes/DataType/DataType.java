@@ -20,6 +20,7 @@ public class DataType implements UserDefinedType {
     public static final int MAX_NO_OF_TYPES_IN_RULE = 3;
     private String datatypeName;
     private List<DataTypeRule> rules;
+    private DataTypeRule defRule;
 
     public DataType() {
         this(null);
@@ -28,6 +29,7 @@ public class DataType implements UserDefinedType {
     public DataType(String datatypeName) {
         this.datatypeName = datatypeName;
         this.rules = null;
+        this.defRule = null;
     }
 
     @Override
@@ -65,8 +67,7 @@ public class DataType implements UserDefinedType {
             this.rules = new ArrayList<>();
 
             String ruleName = VariableNameGenerator.generateDatatypeRuleName(datatypeName);
-            DataTypeRule defaultRule = new DataTypeRule(this, ruleName);
-            rules.add(defaultRule);
+            defRule = new DataTypeRule(this, ruleName);
 
 
             int noOfRules = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_RULES);
@@ -131,14 +132,17 @@ public class DataType implements UserDefinedType {
     }
 
     public String declaration() {
-        String rules = this.rules.stream()
-            .filter(r -> r.getUses() > 0)
+        List<DataTypeRule> rs = this.rules.stream().filter(r -> r.getUses() > 0)
+            .collect(Collectors.toList());
+        if (rs.isEmpty() && defRule.getUses() == 0) {
+            return "";
+        }
+        rs.add(0, defRule);
+
+        String rules = rs.stream()
             .map(DataTypeRule::declaration)
             .collect(Collectors.joining(" | "));
 
-        if (rules.isEmpty()) {
-            return "";
-        }
         return String.format("datatype %s = %s", datatypeName, rules);
     }
 
