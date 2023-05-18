@@ -6,7 +6,6 @@ import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RandomMethodGenerator {
 
@@ -43,16 +42,15 @@ public class RandomMethodGenerator {
             Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
             m.addArgument(var);
         }
-//        symbolTable.addMethod(m);
+        symbolTable.addMethod(m);
 
         Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
         methodDepth--;
         m.setBody(statement);
 
-        Method msimple = m.getSimpleMethod();
-        symbolTable.addMethod(msimple);
+        //        symbolTable.addMethod(msimple);
 
-        return msimple;
+        return m;
     }
 
 }

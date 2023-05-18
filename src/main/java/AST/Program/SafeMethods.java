@@ -52,7 +52,7 @@ public class SafeMethods {
 
         statement.addStatement(returnStatement);
 
-        return safe_min_max.getSimpleMethod();
+        return safe_min_max;
     }
 
     public static Method safe_subsequence() {
@@ -112,7 +112,7 @@ public class SafeMethods {
         IfElseStatement ifElseStatement = new IfElseStatement(symbolTable, test, ifRet, elseRet);
 
         statement.addStatement(ifElseStatement);
-        return safe_subsequence.getSimpleMethod();
+        return safe_subsequence;
     }
 
     public static Method safe_index_seq() {
@@ -151,7 +151,7 @@ public class SafeMethods {
 
         statement.addStatement(returnStatement);
 
-        return safe_index_seq.getSimpleMethod();
+        return safe_index_seq;
     }
 
     static Method safe_division() {
@@ -189,7 +189,7 @@ public class SafeMethods {
 
         statement.addStatement(returnStatement);
 
-        return safe_div.getSimpleMethod();
+        return safe_div;
     }
 
     static Method safe_modulus() {
@@ -226,6 +226,6 @@ public class SafeMethods {
 
         statement.addStatement(returnStatement);
 
-        return safe_mod.getSimpleMethod();
+        return safe_mod;
     }
 }

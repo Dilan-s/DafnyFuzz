@@ -246,10 +246,6 @@ public class Method implements Identifier {
         symbolTable.addMethod(method);
     }
 
-    public Method getSimpleMethod() {
-        return this;
-    }
-
     public List<Object> execute(List<Variable> params) {
         return execute(params, new StringBuilder());
     }
