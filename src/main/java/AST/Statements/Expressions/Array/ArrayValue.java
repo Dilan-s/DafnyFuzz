@@ -35,7 +35,7 @@ public class ArrayValue {
         }
 
         ArrayValue other = (ArrayValue) obj;
-        return other.name.equals(name) && other.contents.equals(contents) && other.num == num;
+        return other.variable.equals(variable) && other.contents.equals(contents) && other.num == num;
     }
 
     public int size() {

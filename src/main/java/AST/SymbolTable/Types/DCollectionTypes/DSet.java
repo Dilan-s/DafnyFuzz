@@ -194,7 +194,7 @@ public class DSet implements DCollection {
         Set<Object> rhsVS = (Set<Object>) rhsV;
         Set<Object> lhsVS = (Set<Object>) lhsV;
 
-        return rhsVS.containsAll(lhsVS) && lhsVS.containsAll(rhsVS);
+        return rhsVS.equals(lhsVS);
     }
 
     @Override
