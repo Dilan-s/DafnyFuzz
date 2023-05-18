@@ -5,11 +5,11 @@ import AST.Generator.RandomTypeGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.DCollectionTypes.Seq;
+import AST.SymbolTable.Types.GenericType.GenericType;
 import AST.SymbolTable.Types.UserDefinedTypes.UserDefinedType;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -17,10 +17,13 @@ import java.util.stream.Collectors;
 public class DataType implements UserDefinedType {
 
     public static final int MAX_NO_OF_RULES = 5;
-    public static final int MAX_NO_OF_TYPES_IN_RULE = 3;
+    public static final int MAX_NO_OF_TYPES_IN_RULE = 5;
+    private static final int MAX_NO_OF_GENERICS = 3;
+    private static final double USE_GENERIC = 0.9;
     private String datatypeName;
     private List<DataTypeRule> rules;
     private DataTypeRule defRule;
+    private List<GenericType> generics;
 
     public DataType() {
         this(null);
@@ -30,6 +33,7 @@ public class DataType implements UserDefinedType {
         this.datatypeName = datatypeName;
         this.rules = null;
         this.defRule = null;
+        this.generics = null;
     }
 
     @Override
@@ -67,20 +71,35 @@ public class DataType implements UserDefinedType {
             this.rules = new ArrayList<>();
 
             String ruleName = VariableNameGenerator.generateDatatypeRuleName(datatypeName);
-            defRule = new DataTypeRule(this, ruleName);
 
+            int noOfGenerics = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_GENERICS);
+            this.generics = new ArrayList<>();
+            for (int i = 0; i < noOfGenerics; i++) {
+                generics.add(new GenericType(VariableNameGenerator.generateGenericName()));
+            }
+            defRule = new DataTypeRule(this, ruleName, generics);
 
             int noOfRules = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_RULES);
             for (int i = 0; i < noOfRules; i++) {
 
                 int noOfTypes = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_TYPES_IN_RULE);
-                List<Type> types = randomTypeGenerator.generateTypes(noOfTypes, symbolTable);
-                List<Type> concrete = types.stream()
-                    .map(t -> t.concrete(symbolTable))
-                    .collect(Collectors.toList());
+                List<Type> types = new ArrayList<>();
+                while (types.size() < noOfTypes) {
+                    double probGeneric = GeneratorConfig.getRandom().nextDouble();
+                    if (!generics.isEmpty() && probGeneric < USE_GENERIC) {
+                        int t = GeneratorConfig.getRandom().nextInt(generics.size());
+                        types.add(generics.get(t));
+                    } else {
+                        List<Type> ts = randomTypeGenerator.generateTypes(1, symbolTable)
+                            .stream().map(t -> t.equals(new DataType()) ? t : t.concrete(symbolTable))
+                            .collect(Collectors.toList());
+                        types.addAll(ts);
+                    }
+
+                }
 
                 ruleName = VariableNameGenerator.generateDatatypeRuleName(datatypeName);
-                DataTypeRule rule = new DataTypeRule(this, ruleName, concrete);
+                DataTypeRule rule = new DataTypeRule(this, ruleName, types, generics);
                 rules.add(rule);
             }
         }
@@ -88,7 +107,7 @@ public class DataType implements UserDefinedType {
         rs.add(defRule);
         rs.addAll(rules);
         int ind = GeneratorConfig.getRandom().nextInt(rs.size());
-        DataTypeRule dataTypeRule = rs.get(ind);
+        Type dataTypeRule = rs.get(ind).concrete(symbolTable);
         return dataTypeRule;
     }
 
@@ -137,16 +156,18 @@ public class DataType implements UserDefinedType {
     public String declaration() {
         List<DataTypeRule> rs = this.rules.stream().filter(r -> r.getUses() > 0)
             .collect(Collectors.toList());
-        if (rs.isEmpty() && defRule.getUses() == 0) {
-            return "";
-        }
+
         rs.add(0, defRule);
 
         String rules = rs.stream()
             .map(DataTypeRule::declaration)
             .collect(Collectors.joining(" | "));
 
-        return String.format("datatype %s = %s", datatypeName, rules);
+        String genericsRep = generics.isEmpty() ? "" : String.format("<%s>", generics.stream()
+            .map(GenericType::getRepresentation)
+            .collect(Collectors.joining(", ")));
+
+        return String.format("datatype %s%s = %s", datatypeName, genericsRep, rules);
     }
 
 }

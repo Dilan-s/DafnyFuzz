@@ -42,13 +42,13 @@ public class RandomMethodGenerator {
             Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
             m.addArgument(var);
         }
-        symbolTable.addMethod(m);
+//        symbolTable.addMethod(m);
 
         Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
         methodDepth--;
         m.setBody(statement);
 
-        //        symbolTable.addMethod(msimple);
+        symbolTable.addMethod(m);
 
         return m;
     }

@@ -6,15 +6,15 @@ import AST.Statements.Expressions.DataType.DataTypeLiteral;
 import AST.Statements.Expressions.DataType.DataTypeValue;
 import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.GenericType.GenericType;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.UserDefinedType;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.xml.crypto.Data;
-import javax.xml.transform.sax.SAXResult;
 
 public class DataTypeRule implements UserDefinedType {
 
@@ -22,29 +22,44 @@ public class DataTypeRule implements UserDefinedType {
     private String ruleName;
     private int uses;
     private List<Type> fields;
+    private List<GenericType> generics;
+    private Map<GenericType, Type> genericMap;
     private List<String> fieldNames;
 
+    private boolean init;
 
-    public DataTypeRule(Type parentType, String ruleName, List<Type> fields) {
+
+    public DataTypeRule(Type parentType, String ruleName, List<Type> fields, List<GenericType> generics, boolean init, Map<GenericType, Type> genericMap, List<String> fieldNames) {
         this.parentType = parentType;
         this.ruleName = ruleName;
         this.fields = fields;
+        this.generics = generics;
+        this.init = init;
+        this.genericMap = genericMap;
         this.uses = 0;
 
-        this.fieldNames = new ArrayList<>();
-        if (fields != null) {
-            for (int i = 0; i < fields.size(); i++) {
-                fieldNames.add(VariableNameGenerator.generateDatatypeRuleFieldName(ruleName));
+        if (fieldNames == null) {
+            this.fieldNames = new ArrayList<>();
+            if (fields != null) {
+                for (int i = 0; i < fields.size(); i++) {
+                    this.fieldNames.add(VariableNameGenerator.generateDatatypeRuleFieldName(ruleName));
+                }
             }
+        } else {
+            this.fieldNames = fieldNames;
         }
     }
 
     public DataTypeRule() {
-        this(null, null, null);
+        this(null, null, null, null, false, new HashMap<>(), null);
     }
 
-    public DataTypeRule(Type parentType, String ruleName) {
-        this(parentType, ruleName, new ArrayList<>());
+    public DataTypeRule(Type parentType, String ruleName, List<GenericType> generics) {
+        this(parentType, ruleName, new ArrayList<>(), generics);
+    }
+
+    public DataTypeRule(Type parentType, String ruleName, List<Type> fields, List<GenericType> generics) {
+        this(parentType, ruleName, fields, generics, false, new HashMap<>(), null);
     }
 
     @Override
@@ -59,7 +74,13 @@ public class DataTypeRule implements UserDefinedType {
 
     @Override
     public String getVariableType() {
-        return parentType.getVariableType();
+        List<String> gener = generics.stream()
+            .map(x -> genericMap.get(x))
+            .map(Type::getVariableType)
+            .collect(Collectors.toList());
+        String gen = gener.isEmpty() ? "" : String.format("<%s>", String.join(", ", gener));
+        String variableType = String.format("%s%s", parentType.getVariableType(), gen);
+        return variableType;
     }
 
     @Override
@@ -99,7 +120,29 @@ public class DataTypeRule implements UserDefinedType {
 
     @Override
     public Type concrete(SymbolTable symbolTable) {
-        fields = fields.stream().map(f -> f.concrete(symbolTable)).collect(Collectors.toList());
+        if (!init) {
+            List<Type> fs = new ArrayList<>();
+            for (Type f : fields) {
+                Type concrete;
+                if (!genericMap.containsKey(f) && generics.contains(f)) {
+                    concrete = f.concrete(symbolTable);
+                    genericMap.put((GenericType) f, concrete);
+                } else if (genericMap.containsKey(f)) {
+                    concrete = genericMap.get(f);
+                } else {
+                    concrete = f.concrete(symbolTable);
+
+                }
+                fs.add(concrete);
+            }
+            for (GenericType t : generics) {
+                if (!genericMap.containsKey(t)) {
+                    genericMap.put(t, t.concrete(symbolTable));
+                }
+            }
+            this.uses++;
+            return new DataTypeRule(parentType, ruleName, fs, generics, true, genericMap, fieldNames);
+        }
         return this;
     }
 
