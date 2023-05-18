@@ -115,11 +115,11 @@ public class Multiset implements DCollection {
         Map<Object, Integer> vs = (Map<Object, Integer>) value;
         List<Expression> values = new ArrayList<>();
         for (Map.Entry<Object, Integer> v : vs.entrySet()) {
-            Expression exp = type.generateExpressionFromValue(symbolTable, v.getKey());
-            if (exp == null) {
-                return null;
-            }
             for (int i = 0; i < v.getValue(); i++) {
+                Expression exp = type.generateExpressionFromValue(symbolTable, v.getKey());
+                if (exp == null) {
+                    return null;
+                }
                 values.add(exp);
             }
         }
