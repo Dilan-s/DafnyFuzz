@@ -5,6 +5,7 @@ import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.BaseType;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
+import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
@@ -20,12 +21,13 @@ import java.util.List;
 public class RandomTypeGenerator {
 
     public static final int MAX_TYPE_DEPTH = 2;
-    public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Real()); //, new Char()
+    public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Real(), new Char());
     public static final List<DataType> DEFINED_DATA_TYPES = new ArrayList<>();
     private static final double PROB_REUSE_DATATYPE = 0.75;
 
     public static double PROB_INT = 40.0;
     public static double PROB_BOOL = 40.0;
+    public static double PROB_CHAR = 40.0;
     public static double PROB_REAL = 10.0;
     public static double PROB_DMAP = 10.0;
     public static double PROB_DARRAY = 10.0;
@@ -51,8 +53,8 @@ public class RandomTypeGenerator {
                 t = PRIMITIVE_TYPES.get(index);
 
             } else {
-                double ratioSum = PROB_INT + PROB_BOOL + PROB_REAL + PROB_DMAP + PROB_DARRAY
-                    + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE + PROB_DATATYPE;
+                double ratioSum = PROB_INT + PROB_BOOL + PROB_CHAR + PROB_REAL + PROB_DMAP +
+                    PROB_DARRAY + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE + PROB_DATATYPE;
                 double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
                 if (swarm) {
@@ -73,6 +75,14 @@ public class RandomTypeGenerator {
                     t = new Bool();
                     if (swarm) {
                         PROB_BOOL *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
+                    }
+
+                } else if ((probType -= PROB_CHAR) < 0) {
+                    // bool
+                    PROB_CHAR *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new Char();
+                    if (swarm) {
+                        PROB_CHAR *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
                     }
 
                 } else if ((probType -= PROB_REAL) < 0) {
