@@ -24,7 +24,9 @@ public class VariableTupleIndex extends Variable {
         List<Object> l = new ArrayList<>();
         List<Object> value = (List<Object>) variable.getValue(paramsMap).get(0);
         if (value != null) {
-            l.add(value.get(index));
+            Object o = value.get(index);
+            Object v = type.of(o);
+            l.add(v);
         } else {
             l.add(null);
         }

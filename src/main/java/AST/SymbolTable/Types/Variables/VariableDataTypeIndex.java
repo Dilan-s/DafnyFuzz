@@ -26,7 +26,9 @@ public class VariableDataTypeIndex extends Variable {
         List<Object> l = new ArrayList<>();
         DataTypeValue value = (DataTypeValue) variable.getValue(paramsMap).get(0);
         if (value != null) {
-            l.add(value.get(index));
+            Object o = value.get(index);
+            Object v = type.of(o);
+            l.add(v);
         } else {
             l.add(null);
         }

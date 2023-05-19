@@ -18,7 +18,7 @@ import java.util.Objects;
 public class Variable implements Identifier {
 
     private final String name;
-    private Type type;
+    protected Type type;
     private boolean isConstant;
     private boolean isDeclared;
     private Object value;
