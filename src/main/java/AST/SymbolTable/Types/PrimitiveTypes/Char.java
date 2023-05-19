@@ -82,4 +82,9 @@ public class Char implements BaseType {
     public String formatPrintWithNoQuotes(Object v) {
         return String.valueOf(v);
     }
+
+    @Override
+    public boolean isPrintable() {
+        return false;
+    }
 }
