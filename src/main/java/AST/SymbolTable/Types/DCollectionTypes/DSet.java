@@ -75,6 +75,11 @@ public class DSet implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+        if (type.equals(new DArray())) {
+            while (noOfElems == 1) {
+                noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+            }
+        }
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < noOfElems; i++) {
             Type t = type.concrete(symbolTable);
