@@ -8,6 +8,7 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.MultisetLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -117,10 +118,10 @@ public class Multiset implements DCollection {
 
     @Override
     public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
-        Map<Object, Integer> vs = (Map<Object, Integer>) value;
+        Map<Object, BigInteger> vs = (Map<Object, BigInteger>) value;
         List<Expression> values = new ArrayList<>();
-        for (Map.Entry<Object, Integer> v : vs.entrySet()) {
-            for (int i = 0; i < v.getValue(); i++) {
+        for (Map.Entry<Object, BigInteger> v : vs.entrySet()) {
+            for (BigInteger i = BigInteger.ZERO; i.compareTo(v.getValue()) < 0; i = i.add(BigInteger.ONE)) {
                 Expression exp = type.generateExpressionFromValue(symbolTable, v.getKey());
                 if (exp == null) {
                     return null;
@@ -158,13 +159,13 @@ public class Multiset implements DCollection {
     @Override
     public String formatPrint(Object object) {
         String res;
-        Map<Object, Integer> value = (Map<Object, Integer>) object;
+        Map<Object, BigInteger> value = (Map<Object, BigInteger>) object;
         res = "multiset([";
 
         boolean first = true;
-        for (Map.Entry<Object, Integer> entry : value.entrySet()) {
+        for (Map.Entry<Object, BigInteger> entry : value.entrySet()) {
 
-            for (int i = 0; i < entry.getValue(); i++) {
+            for (BigInteger i = BigInteger.ZERO; i.compareTo(entry.getValue()) < 0; i = i.add(BigInteger.ONE)) {
                 if (!first) {
                     res = res + ", ";
                 }
@@ -184,14 +185,14 @@ public class Multiset implements DCollection {
 
     @Override
     public Boolean contains(Object lhsV, Object rhsV) {
-        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
         return rhsVM.containsKey(lhsV);
     }
 
     @Override
     public Boolean disjoint(Object lhsV, Object rhsV) {
-        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
-        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
         for (Object k : lhsVM.keySet()) {
             if (rhsVM.containsKey(k)) {
@@ -203,13 +204,13 @@ public class Multiset implements DCollection {
 
     @Override
     public Object intersection(Object lhsV, Object rhsV) {
-        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
-        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
-        Map<Object, Integer> res = new HashMap<>();
+        Map<Object, BigInteger> res = new HashMap<>();
         for (Object k : lhsVM.keySet()) {
             if (rhsVM.containsKey(k)) {
-                res.put(k, Math.min(lhsVM.get(k), rhsVM.get(k)));
+                res.put(k, lhsVM.get(k).min(rhsVM.get(k)));
             }
         }
         return res;
@@ -217,13 +218,13 @@ public class Multiset implements DCollection {
 
     @Override
     public Object difference(Object lhsV, Object rhsV) {
-        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
-        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
-        Map<Object, Integer> res = new HashMap<>();
+        Map<Object, BigInteger> res = new HashMap<>();
         for (Object k : lhsVM.keySet()) {
-            int freq = lhsVM.get(k) - rhsVM.getOrDefault(k, 0);
-            if (freq > 0) {
+            BigInteger freq = lhsVM.get(k).subtract(rhsVM.getOrDefault(k, BigInteger.ZERO));
+            if (freq.compareTo(BigInteger.ZERO) > 0) {
                 res.put(k, freq);
             }
         }
@@ -232,33 +233,33 @@ public class Multiset implements DCollection {
 
     @Override
     public Object union(Object lhsV, Object rhsV) {
-        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
-        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
-        Map<Object, Integer> res = new HashMap<>();
+        Map<Object, BigInteger> res = new HashMap<>();
         for (Object k : lhsVM.keySet()) {
             res.put(k, lhsVM.get(k));
         }
         for (Object k : rhsVM.keySet()) {
-            res.put(k, rhsVM.get(k) + res.getOrDefault(k, 0));
+            res.put(k, rhsVM.get(k).add(res.getOrDefault(k, BigInteger.ZERO)));
         }
         return res;
     }
 
     @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
-        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
-        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
         boolean atLeastOneSmaller = false;
         for (Object k : lhsVM.keySet()) {
             if (!rhsVM.containsKey(k)) {
                 return false;
             }
-            if (lhsVM.get(k) > rhsVM.get(k)) {
+            if (lhsVM.get(k).compareTo(rhsVM.get(k)) > 0) {
                 return false;
             }
-            if (lhsVM.get(k) < rhsVM.get(k)) {
+            if (lhsVM.get(k).compareTo(rhsVM.get(k)) < 0) {
                 atLeastOneSmaller = true;
             }
         }
@@ -267,14 +268,14 @@ public class Multiset implements DCollection {
 
     @Override
     public Boolean lessThanOrEqual(Object lhsV, Object rhsV) {
-        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
-        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
         for (Object k : lhsVM.keySet()) {
             if (!rhsVM.containsKey(k)) {
                 return false;
             }
-            if (lhsVM.get(k) > rhsVM.get(k)) {
+            if (lhsVM.get(k).compareTo(rhsVM.get(k)) > 0) {
                 return false;
             }
         }
@@ -283,8 +284,8 @@ public class Multiset implements DCollection {
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        Map<Object, Integer> lhsVM = (Map<Object, Integer>) lhsV;
-        Map<Object, Integer> rhsVM = (Map<Object, Integer>) rhsV;
+        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
         for (Object k : lhsVM.keySet()) {
             if (!rhsVM.containsKey(k) || !Objects.equals(lhsVM.get(k), rhsVM.get(k))) {
@@ -301,13 +302,13 @@ public class Multiset implements DCollection {
         }
 
         String res;
-        Map<Object, Integer> value = (Map<Object, Integer>) object;
+        Map<Object, BigInteger> value = (Map<Object, BigInteger>) object;
         res = "multiset([";
 
         boolean first = true;
-        for (Map.Entry<Object, Integer> entry : value.entrySet()) {
+        for (Map.Entry<Object, BigInteger> entry : value.entrySet()) {
 
-            for (int i = 0; i < entry.getValue(); i++) {
+            for (BigInteger i = BigInteger.ZERO; i.compareTo(entry.getValue()) < 0; i = i.add(BigInteger.ONE)) {
                 if (!first) {
                     res = res + ", ";
                 }
@@ -322,10 +323,10 @@ public class Multiset implements DCollection {
 
     @Override
     public Object of(Object value) {
-        Map<Object, Integer> r = new HashMap<>();
+        Map<Object, BigInteger> r = new HashMap<>();
 
-        Map<Object, Integer> multi = (Map<Object, Integer>) value;
-        for (Map.Entry<Object, Integer> entry : multi.entrySet()) {
+        Map<Object, BigInteger> multi = (Map<Object, BigInteger>) value;
+        for (Map.Entry<Object, BigInteger> entry : multi.entrySet()) {
             r.put(type != null ? type.of(entry.getKey()) : entry.getKey(), entry.getValue());
         }
 

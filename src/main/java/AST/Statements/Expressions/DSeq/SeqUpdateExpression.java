@@ -14,6 +14,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -144,12 +145,12 @@ public class SeqUpdateExpression extends BaseExpression {
 
         if (seqVarValue != null && indVarValue != null && expValue != null) {
             List<Object> seqVarL = (List<Object>) seqVarValue;
-            Integer indVarI = (Integer) indVarValue;
+            BigInteger indVarI = (BigInteger) indVarValue;
 
             List<Object> l = new ArrayList<>();
-            l.addAll(seqVarL.subList(0, indVarI));
+            l.addAll(seqVarL.subList(0, indVarI.intValueExact()));
             l.add(expValue);
-            l.addAll(seqVarL.subList(indVarI + 1, seqVarL.size()));
+            l.addAll(seqVarL.subList(indVarI.add(BigInteger.ONE).intValueExact(), seqVarL.size()));
 
             r.add(l);
             return r;

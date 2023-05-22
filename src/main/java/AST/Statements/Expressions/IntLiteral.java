@@ -6,6 +6,7 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,15 +15,19 @@ import java.util.Set;
 
 public class IntLiteral extends BaseExpression {
 
-    private final int value;
+    private final BigInteger value;
     private final Type type;
     private SymbolTable symbolTable;
 
-    public IntLiteral(Type type, SymbolTable symbolTable, int value) {
+    public IntLiteral(Type type, SymbolTable symbolTable, BigInteger value) {
         super();
         this.type = type;
         this.symbolTable = symbolTable;
         this.value = value;
+    }
+
+    public IntLiteral(Type type, SymbolTable symbolTable, int value) {
+        this(type, symbolTable, BigInteger.valueOf(value));
     }
 
     @Override
@@ -39,7 +44,7 @@ public class IntLiteral extends BaseExpression {
     public List<String> toOutput() {
         Set<String> res = new HashSet<>();
         res.add(String.valueOf(value));
-        if (value > 0) {
+        if (value.compareTo(BigInteger.ZERO) > 0) {
             res.add(String.format("0x%X", value));
         }
         return new ArrayList<>(res);

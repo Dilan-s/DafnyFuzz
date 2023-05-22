@@ -10,6 +10,7 @@ import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,18 +66,18 @@ public class ForStatement extends BaseStatement {
 
     @Override
     protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
-        Integer initVarValue = (Integer) initVar.getValue(paramMap).get(0);
-        Integer finalVarValue = (Integer) finalVar.getValue(paramMap).get(0);
+        BigInteger initVarValue = (BigInteger) initVar.getValue(paramMap).get(0);
+        BigInteger finalVarValue = (BigInteger) finalVar.getValue(paramMap).get(0);
 
         if (direction != null) {
             if (!direction.validBounds(initVarValue, finalVarValue)) {
                 setMinMaxCall(paramMap, s);
-                initVarValue = (Integer) initVar.getValue(paramMap).get(0);
-                finalVarValue = (Integer) finalVar.getValue(paramMap).get(0);
+                initVarValue = (BigInteger) initVar.getValue(paramMap).get(0);
+                finalVarValue = (BigInteger) finalVar.getValue(paramMap).get(0);
             }
             loopVar.setValue(symbolTable, paramMap, initVarValue);
 
-            for (int i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
+            for (BigInteger i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
                 loopVar.setValue(symbolTable, paramMap, i);
                 Set<Variable> modSet = body.getModifies();
                 addInvariantForModSet(modSet, paramMap);
@@ -90,7 +91,7 @@ public class ForStatement extends BaseStatement {
         } else {
             direction = Direction.setDirection(initVarValue, finalVarValue);
             loopVar.setValue(symbolTable, paramMap, initVarValue);
-            for (int i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
+            for (BigInteger i = direction.getInitBound(initVarValue); direction.withinFinalBound(i, finalVarValue); i = direction.iterate(i)) {
                 loopVar.setValue(symbolTable, paramMap, i);
                 Set<Variable> modSet = body.getModifies();
                 addInvariantForModSet(modSet, paramMap);
@@ -302,8 +303,8 @@ public class ForStatement extends BaseStatement {
             this.rep = rep;
         }
 
-        public static Direction setDirection(Integer initVarValue, Integer finalVarValue) {
-            if (initVarValue < finalVarValue) {
+        public static Direction setDirection(BigInteger initVarValue, BigInteger finalVarValue) {
+            if (initVarValue.compareTo(finalVarValue) < 0) {
                 return TO;
             } else {
                 return DOWNTO;
@@ -315,35 +316,38 @@ public class ForStatement extends BaseStatement {
             return super.toString();
         }
 
-        public boolean validBounds(Integer lower, Integer upper) {
+        public boolean validBounds(BigInteger lower, BigInteger upper) {
             if (this == DOWNTO) {
-                return lower >= upper;
+                return lower.compareTo(upper) >= 0;
+//                return lower >= upper;
             } else {
-                return lower <= upper;
+                return lower.compareTo(upper) <= 0;
+//                return lower <= upper;
             }
         }
 
-        public int getInitBound(Integer init) {
+        public BigInteger getInitBound(BigInteger init) {
             if (this == DOWNTO) {
-                return init - 1;
+                return init.subtract(BigInteger.ONE);
+//                return init - 1;
             } else {
                 return init;
             }
         }
 
-        public int getFinalBound(Integer fin) {
+        public BigInteger getFinalBound(BigInteger fin) {
             if (this == DOWNTO) {
                 return fin;
             } else {
-                return fin -1;
+                return fin.subtract(BigInteger.ONE);
             }
         }
 
-        public int iterate(int i) {
+        public BigInteger iterate(BigInteger i) {
             if (this == DOWNTO) {
-                return i - 1;
+                return i.subtract(BigInteger.ONE);
             } else {
-                return i + 1;
+                return i.add(BigInteger.ONE);
             }
         }
 
@@ -355,11 +359,13 @@ public class ForStatement extends BaseStatement {
             }
         }
 
-        public boolean withinFinalBound(int i, Integer finalVarValue) {
+        public boolean withinFinalBound(BigInteger i, BigInteger finalVarValue) {
             if (this == DOWNTO) {
-                return i >= finalVarValue;
+                return i.compareTo(finalVarValue) >= 0;
+//                return i >= finalVarValue;
             } else {
-                return i < finalVarValue;
+                return i.compareTo(finalVarValue) < 0;
+//                return i < finalVarValue;
             }
         }
     }

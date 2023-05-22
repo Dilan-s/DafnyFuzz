@@ -5,6 +5,7 @@ import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IntLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.math.BigInteger;
 import java.util.Objects;
 
 public class Int implements BaseType {
@@ -42,14 +43,15 @@ public class Int implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        Integer value = GeneratorConfig.getRandom().nextInt(max);
-        value *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
+        Integer intValue = GeneratorConfig.getRandom().nextInt(max);
+        intValue *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
+        BigInteger value = BigInteger.valueOf(intValue);
         return new IntLiteral(this, symbolTable, value);
     }
 
     @Override
     public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
-        Integer v = Integer.parseInt(value.toString());
+        BigInteger v = new BigInteger(value.toString());
         return new IntLiteral(this, symbolTable, v);
     }
 
@@ -60,16 +62,16 @@ public class Int implements BaseType {
 
     @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
-        Integer lhs = (Integer) lhsV;
-        Integer rhs = (Integer) rhsV;
-        return lhs < rhs;
+        BigInteger lhs = (BigInteger) lhsV;
+        BigInteger rhs = (BigInteger) rhsV;
+        return lhs.compareTo(rhs) < 0;
     }
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        Integer lhs = (Integer) lhsV;
-        Integer rhs = (Integer) rhsV;
-        return Objects.equals(lhs, rhs);
+        BigInteger lhs = (BigInteger) lhsV;
+        BigInteger rhs = (BigInteger) rhsV;
+        return lhs.compareTo(rhs) == 0;
     }
 
     @Override
@@ -82,7 +84,7 @@ public class Int implements BaseType {
         if (object == null) {
             return null;
         }
-        Integer v = Integer.parseInt(object.toString());
+        BigInteger v = new BigInteger(object.toString());
 
         return String.format("(%s == %d)", variableName, v);
     }

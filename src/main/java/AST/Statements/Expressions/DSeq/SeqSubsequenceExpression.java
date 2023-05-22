@@ -12,6 +12,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -165,10 +166,10 @@ public class SeqSubsequenceExpression extends BaseExpression {
                 Object hiVarValue = hiVar.get().getValue(paramsMap).get(0);
 
                 if (loVarValue != null && hiVarValue != null) {
-                    Integer loVarI = (Integer) loVarValue;
-                    Integer hiVarI = (Integer) hiVarValue;
+                    BigInteger loVarI = (BigInteger) loVarValue;
+                    BigInteger hiVarI = (BigInteger) hiVarValue;
 
-                    r.add(seqVarL.subList(loVarI, hiVarI));
+                    r.add(seqVarL.subList(loVarI.intValueExact(), hiVarI.intValueExact()));
                     return r;
                 }
             }
@@ -177,11 +178,11 @@ public class SeqSubsequenceExpression extends BaseExpression {
                 Object minValue = min.getValue(paramsMap).get(0);
                 Object maxValue = max.getValue(paramsMap).get(0);
 
-                if (seqVarValue != null && minValue != null && maxValue != null) {
-                    Integer loVarI = (Integer) minValue;
-                    Integer hiVarI = (Integer) maxValue;
+                if (minValue != null && maxValue != null) {
+                    BigInteger loVarI = (BigInteger) minValue;
+                    BigInteger hiVarI = (BigInteger) maxValue;
 
-                    r.add(seqVarL.subList(loVarI, hiVarI));
+                    r.add(seqVarL.subList(loVarI.intValueExact(), hiVarI.intValueExact()));
                     return r;
 
                 }
@@ -193,17 +194,18 @@ public class SeqSubsequenceExpression extends BaseExpression {
             Object jValue = j.getValue(paramsMap).get(0);
 
             if (iValue != null && jValue != null) {
-                Integer iI = (Integer) iValue;
-                Integer jI = (Integer) jValue;
+                BigInteger iI = (BigInteger) iValue;
+                BigInteger jI = (BigInteger) jValue;
 
-                if (0 <= iI && iI < seqVarL.size() && 0 <= jI && jI < seqVarL.size()) {
-                    this.min = iI < jI ? i : j;
-                    this.max = iI < jI ? j : i;
+                if (iI.compareTo(BigInteger.ZERO) >= 0 && iI.compareTo(BigInteger.valueOf(seqVarL.size())) < 0 &&
+                    jI.compareTo(BigInteger.ZERO) >= 0 && jI.compareTo(BigInteger.valueOf(seqVarL.size())) < 0) {
+                    this.min = iI.compareTo(jI) < 0 ? i : j;
+                    this.max = iI.compareTo(jI) <= 0 ? j : i;
 
-                    Integer minI = iI < jI ? iI : jI;
-                    Integer maxI = iI < jI ? jI : iI;
+                    BigInteger minI = iI.compareTo(jI) < 0 ? iI : jI;
+                    BigInteger maxI = iI.compareTo(jI) <= 0 ? jI : iI;
 
-                    r.add(seqVarL.subList(minI, maxI));
+                    r.add(seqVarL.subList(minI.intValueExact(), maxI.intValueExact()));
                     return r;
                 }
                 setIndIandJ(paramsMap, s);
@@ -212,10 +214,10 @@ public class SeqSubsequenceExpression extends BaseExpression {
                 Object hiVarValue = hiVar.get().getValue(paramsMap).get(0);
 
                 if (loVarValue != null && hiVarValue != null) {
-                    Integer loVarI = (Integer) loVarValue;
-                    Integer hiVarI = (Integer) hiVarValue;
+                    BigInteger loVarI = (BigInteger) loVarValue;
+                    BigInteger hiVarI = (BigInteger) hiVarValue;
 
-                    r.add(seqVarL.subList(loVarI, hiVarI));
+                    r.add(seqVarL.subList(loVarI.intValueExact(), hiVarI.intValueExact()));
                     return r;
                 }
             }

@@ -14,6 +14,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -63,19 +64,20 @@ public enum UnaryOperator implements Operator {
                 Type type = exp.getTypes().get(0);
                 if (type.equals(new Seq())) {
                     List<Object> valL = (List<Object>) val;
-                    return valL.size();
+                    return BigInteger.valueOf(valL.size());
 
                 } else if (type.equals(new DSet())) {
                     Set<Object> valS = (Set<Object>) val;
-                    return valS.size();
+                    return BigInteger.valueOf(valS.size());
 
                 } else if (type.equals(new Multiset())) {
-                    Map<Object, Integer> valM = (Map<Object, Integer>) val;
-                    return valM.values().stream().reduce(0, Integer::sum);
+                    Map<Object, BigInteger> valM = (Map<Object, BigInteger>) val;
+                    return valM.values().stream()
+                        .reduce(BigInteger.ZERO, BigInteger::add);
 
                 } else if (type.equals(new DMap())) {
                     Map<Object, Object> valM = (Map<Object, Object>) val;
-                    return valM.keySet().size();
+                    return BigInteger.valueOf(valM.keySet().size());
 
                 }
             }
@@ -118,7 +120,7 @@ public enum UnaryOperator implements Operator {
             Object val = exp.getValue(paramsMap).get(0);
             if (val != null) {
                 ArrayValue valL = (ArrayValue) val;
-                return valL.size();
+                return BigInteger.valueOf(valL.size());
             }
             return null;
         }
@@ -159,7 +161,7 @@ public enum UnaryOperator implements Operator {
             Object val = exp.getValue(paramsMap).get(0);
             if (val != null) {
                 String d = (String) val;
-                return (int) Math.floor(Double.parseDouble(d));
+                return BigInteger.valueOf((int) Math.floor(Double.parseDouble(d)));
             }
             return null;
         }

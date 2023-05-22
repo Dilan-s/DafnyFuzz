@@ -9,6 +9,7 @@ import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -162,12 +163,12 @@ public class MultisetLiteral extends BaseExpression {
 
             if (colValue != null) {
 
-                Map<Object, Integer> m = new HashMap<>();
+                Map<Object, BigInteger> m = new HashMap<>();
                 if (type.equals(new Seq())) {
                     List<Object> colVL = (List<Object>) colValue;
 
                     for (Object v : colVL) {
-                        m.put(v, m.getOrDefault(v, 0) + 1);
+                        m.put(v, m.getOrDefault(v, BigInteger.ZERO).add(BigInteger.ONE));
                     }
                     r.add(m);
                     return r;
@@ -175,7 +176,7 @@ public class MultisetLiteral extends BaseExpression {
                     Set<Object> colVS = (Set<Object>) colValue;
 
                     for (Object v : colVS) {
-                        m.put(v, 1);
+                        m.put(v, BigInteger.ONE);
                     }
                     r.add(m);
                     return r;
@@ -184,7 +185,7 @@ public class MultisetLiteral extends BaseExpression {
             r.add(null);
 
         } else {
-            Map<Object, Integer> m = new HashMap<>();
+            Map<Object, BigInteger> m = new HashMap<>();
 
             for (Expression e : values) {
                 List<Object> value = e.getValue(paramsMap, s);
@@ -193,7 +194,7 @@ public class MultisetLiteral extends BaseExpression {
                         r.add(null);
                         return r;
                     }
-                    m.put(v, m.getOrDefault(v, 0) + 1);
+                    m.put(v, m.getOrDefault(v, BigInteger.ZERO).add(BigInteger.ONE));
                 }
             }
             r.add(m);

@@ -15,6 +15,7 @@ import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -321,9 +322,9 @@ public enum BinaryOperator implements Operator {
             Object rhsV = rhsE.getValue(paramsMap).get(0);
 
             if (lhsV != null && rhsV != null) {
-                Integer lhsVI = (Integer) lhsV;
-                Integer rhsVI = (Integer) rhsV;
-                return lhsVI + rhsVI;
+                BigInteger lhsVI = (BigInteger) lhsV;
+                BigInteger rhsVI = (BigInteger) rhsV;
+                return lhsVI.add(rhsVI);
             }
             return null;
         }
@@ -359,9 +360,9 @@ public enum BinaryOperator implements Operator {
             Object rhsV = rhsE.getValue(paramsMap).get(0);
 
             if (lhsV != null && rhsV != null) {
-                Integer lhsVI = (Integer) lhsV;
-                Integer rhsVI = (Integer) rhsV;
-                return lhsVI - rhsVI;
+                BigInteger lhsVI = (BigInteger) lhsV;
+                BigInteger rhsVI = (BigInteger) rhsV;
+                return lhsVI.subtract(rhsVI);
             }
             return null;
         }
@@ -376,9 +377,9 @@ public enum BinaryOperator implements Operator {
             Object rhsV = rhsE.getValue(paramsMap).get(0);
 
             if (lhsV != null && rhsV != null) {
-                Integer lhsVI = (Integer) lhsV;
-                Integer rhsVI = (Integer) rhsV;
-                return lhsVI * rhsVI;
+                BigInteger lhsVI = (BigInteger) lhsV;
+                BigInteger rhsVI = (BigInteger) rhsV;
+                return lhsVI.multiply(rhsVI);
             }
             return null;
         }
@@ -407,8 +408,8 @@ public enum BinaryOperator implements Operator {
     Divide("/", List.of(Args.INT_INT), new Int()) {
         @Override
         public boolean requiresSafe(List<Object> vals) {
-            Integer denominator = (Integer) vals.get(1);
-            return denominator == 0;
+            BigInteger denominator = (BigInteger) vals.get(1);
+            return denominator.equals(BigInteger.ZERO);
         }
 
         @Override
@@ -420,16 +421,16 @@ public enum BinaryOperator implements Operator {
             Object rhsV = rhsE.getValue(paramsMap).get(0);
 
             if (lhsV != null && rhsV != null) {
-                Integer lhsVI = (Integer) lhsV;
-                Integer rhsVI = (Integer) rhsV;
+                BigInteger lhsVI = (BigInteger) lhsV;
+                BigInteger rhsVI = (BigInteger) rhsV;
 
-                int x = lhsVI;
-                int y = rhsVI;
+                BigInteger x = lhsVI;
+                BigInteger y = rhsVI;
 
-                int r = x / y;
+                BigInteger r = x.divide(y);
 
-                if (x < 0 && r * y != x) {
-                    r -= y > 0 ? 1 : -1;
+                if (x.compareTo(BigInteger.ZERO) < 0 && !r.multiply(y).equals(x)) {
+                    r = r.subtract(y.compareTo(BigInteger.ZERO) > 0 ? BigInteger.ONE : BigInteger.ONE.negate());
                 }
                 return r;
             }
@@ -439,8 +440,8 @@ public enum BinaryOperator implements Operator {
     Modulus("%", List.of(Args.INT_INT), new Int()) {
         @Override
         public boolean requiresSafe(List<Object> vals) {
-            Integer denominator = (Integer) vals.get(1);
-            return denominator == 0;
+            BigInteger denominator = (BigInteger) vals.get(1);
+            return denominator.equals(BigInteger.ZERO);
         }
 
         @Override
@@ -452,11 +453,11 @@ public enum BinaryOperator implements Operator {
             Object rhsV = rhsE.getValue(paramsMap).get(0);
 
             if (lhsV != null && rhsV != null) {
-                Integer lhsVI = (Integer) lhsV;
-                Integer rhsVI = (Integer) rhsV;
+                BigInteger lhsVI = (BigInteger) lhsV;
+                BigInteger rhsVI = (BigInteger) rhsV;
 
-                Integer r = (Integer) Divide.apply(args, paramsMap);
-                return lhsVI - r * rhsVI;
+                BigInteger r = (BigInteger) Divide.apply(args, paramsMap);
+                return lhsVI.subtract(r.multiply(rhsVI));
             }
             return null;
         }

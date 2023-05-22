@@ -12,6 +12,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -138,18 +139,18 @@ public class SeqIndexExpression extends BaseExpression {
 
         if (seqVarValue != null && indexValue != null) {
             List<Object> seqVarL = (List<Object>) seqVarValue;
-            Integer indexValueI = (Integer) indexValue;
+            BigInteger indexValueI = (BigInteger) indexValue;
 
-            if (0 <= indexValueI && indexValueI < seqVarL.size()) {
-                r.add(seqVarL.get(indexValueI));
+            if (indexValueI.compareTo(BigInteger.ZERO) >= 0 && indexValueI.compareTo(BigInteger.valueOf(seqVarL.size())) < 0) {
+                r.add(seqVarL.get(indexValueI.intValueExact()));
                 return r;
             }
             setInd(paramsMap, s);
             indexValue = indVar.getValue(paramsMap).get(0);
             if (indexValue != null) {
-                indexValueI = (Integer) indexValue;
-                if (0 <= indexValueI && indexValueI < seqVarL.size()) {
-                    r.add(seqVarL.get(indexValueI));
+                indexValueI = (BigInteger) indexValue;
+                if (indexValueI.compareTo(BigInteger.ZERO) >= 0 && indexValueI.compareTo(BigInteger.valueOf(seqVarL.size())) < 0) {
+                    r.add(seqVarL.get(indexValueI.intValueExact()));
                     return r;
                 }
             }
