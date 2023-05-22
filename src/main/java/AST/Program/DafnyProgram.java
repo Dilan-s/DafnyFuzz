@@ -49,6 +49,7 @@ public class DafnyProgram {
         main.setBody(statement);
 
         main.execute();
+        main.execute();
         return main;
     }
 
