@@ -200,4 +200,9 @@ public class DArray implements DCollection {
         }
         return String.join(" && ", res);
     }
+
+    @Override
+    public boolean isOrdered() {
+        return false;
+    }
 }

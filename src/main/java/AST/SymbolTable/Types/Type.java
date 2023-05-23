@@ -54,4 +54,8 @@ public interface Type extends Identifier {
     default Object of(Object value) {
         return value;
     }
+
+    default boolean isOrdered() {
+        return true;
+    }
 }

@@ -103,13 +103,9 @@ public class MatchStatementCase extends BaseStatement {
     }
 
     @Override
-    public String invalidValidationTests() {
-
-        String res = String.format("case %s => {\n", test == null ? "_" : test.toString());
-        res = res + StringUtils.indent(body.invalidValidationTests());
-        res = res + "\n}\n";
-
-        return res;
+    public Map<String, String> invalidValidationTests() {
+        Map<String, String> m = body.invalidValidationTests();
+        return m;
     }
 
     @Override

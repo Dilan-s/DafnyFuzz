@@ -271,4 +271,9 @@ public class DMap implements Type {
         }
         return r;
     }
+
+    @Override
+    public boolean isOrdered() {
+        return false;
+    }
 }

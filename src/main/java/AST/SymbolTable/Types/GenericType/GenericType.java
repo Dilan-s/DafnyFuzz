@@ -134,4 +134,9 @@ public class GenericType implements Type {
     public String getRepresentation() {
         return representation;
     }
+
+    @Override
+    public boolean isOrdered() {
+        return false;
+    }
 }

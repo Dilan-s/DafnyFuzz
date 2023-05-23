@@ -194,29 +194,11 @@ public class WhileStatement extends BaseStatement {
     }
 
     @Override
-    public String invalidValidationTests() {
+    public Map<String, String> invalidValidationTests() {
         if (body.getNoOfUses() > 0) {
-            String res = String.format("while %s \n", test);
-            res = res + StringUtils.indent(String.format("decreases %s - %s;", finalVar.getName(), loopVar.getName())) + "\n";
-            res = res + StringUtils.indent(String.format("invariant (%s <= %s)", loopVar.getName(), finalVar.getName()));
-
-            if (!loopInvariants.isEmpty()) {
-
-                List<String> loopInvariants = this.loopInvariants.entrySet().stream()
-                    .map(x -> String.format("((%s) ==> (%s))", x.getKey(),
-                        String.join(" || ", x.getValue())))
-                    .collect(Collectors.toList());
-
-                res = res + " && (" + String.join(" && ", loopInvariants) + ")";
-            }
-
-            res = res + ";\n{\n";
-            res = res + StringUtils.indent(body.invalidValidationTests());
-            res = res + "\n}";
-
-            return res;
+            return body.invalidValidationTests();
         }
-        return "";
+        return new HashMap<>();
     }
 
     @Override

@@ -160,4 +160,17 @@ public class OperatorExpression extends BaseExpression {
         r.add(operator.apply(args, paramsMap));
         return r;
     }
+
+    public OperatorExpression mutateForInvalidValidation() {
+        List<Type> argTypes = args.stream()
+            .map(Expression::getTypes)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        List<Operator> ops = operator.mutateForInvalidValidation(argTypes);
+
+        int opInd = GeneratorConfig.getRandom().nextInt(ops.size());
+        Operator op = ops.get(opInd);
+
+        return new OperatorExpression(symbolTable, type, op, args);
+    }
 }
