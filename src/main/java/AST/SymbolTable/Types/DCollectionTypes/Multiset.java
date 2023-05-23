@@ -83,14 +83,14 @@ public class Multiset implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         double probType = GeneratorConfig.getRandom().nextDouble();
 
-        if (probType < PROB_USE_DSET) {
+        if (!type.equals(new DArray()) && probType < PROB_USE_DSET) {
             DSet t = new DSet(this.type.concrete(symbolTable));
             Expression exp = expressionGenerator.generateExpression(t, symbolTable);
 
             MultisetLiteral expression = new MultisetLiteral(symbolTable, this, exp);
             return expression;
         }
-        if (probType < PROB_USE_SEQ) {
+        if (type.equals(new DArray()) && probType < PROB_USE_SEQ) {
             Seq t = new Seq(this.type.concrete(symbolTable));
             Expression exp = expressionGenerator.generateExpression(t, symbolTable);
 
@@ -98,10 +98,10 @@ public class Multiset implements DCollection {
             return expression;
         }
 
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET) + 1;
+        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
         if (type.equals(new DArray())) {
             while (noOfElems == 1) {
-                noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET) + 1;
+                noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
             }
         }
         List<Expression> values = new ArrayList<>();

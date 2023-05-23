@@ -74,10 +74,10 @@ public class DSet implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
         if (type.equals(new DArray())) {
             while (noOfElems == 1) {
-                noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET) + 1;
+                noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
             }
         }
         List<Expression> values = new ArrayList<>();
