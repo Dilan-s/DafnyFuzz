@@ -70,4 +70,9 @@ public class Bool implements BaseType {
 
         return String.format("(%s == %b)", variableName, v);
     }
+
+    @Override
+    public boolean isOrdered() {
+        return false;
+    }
 }

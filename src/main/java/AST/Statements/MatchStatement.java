@@ -7,9 +7,11 @@ import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Variables.Variable;
+import com.sun.jdi.event.StepEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -216,7 +218,7 @@ public class MatchStatement extends BaseStatement {
     }
 
     @Override
-    public String invalidValidationTests() {
+    public Map<String, String> invalidValidationTests() {
         List<MatchStatementCase> usedCases = new ArrayList<>();
         distinctCases.stream().filter(c -> c.getNoOfUses() > 0).forEach(usedCases::add);
         if (defaultCase.getNoOfUses() > 0) {
@@ -225,19 +227,18 @@ public class MatchStatement extends BaseStatement {
 
         if (usedCases.size() == 1) {
             Statement body = usedCases.get(0).getBody();
-            String res = body.invalidValidationTests();
-            return res;
+            return body.invalidValidationTests();
         } else if (usedCases.size() > 1) {
-
-            String res = String.format("match %s {\n", test.minimizedTestCase());
+            Map<String, String> res = new HashMap<>();
             for (MatchStatementCase c : usedCases) {
-                res = res + StringUtils.indent(c.invalidValidationTests());
+                Map<String, String> m = c.invalidValidationTests();
+                res.putAll(m);
+
             }
-            res = res + "\n}\n";
             return res;
         }
 
-        return "";
+        return new HashMap<>();
     }
 
     @Override

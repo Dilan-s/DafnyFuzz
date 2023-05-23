@@ -2,6 +2,7 @@ package AST.Statements;
 
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,8 @@ public interface Statement {
 
     String minimizedTestCase();
 
-    default String invalidValidationTests() {
-        return minimizedTestCase();
+    default Map<String, String> invalidValidationTests() {
+        return new HashMap<>();
     }
 
     default boolean minimizedReturn() {

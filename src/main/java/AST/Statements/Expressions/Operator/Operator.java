@@ -107,4 +107,14 @@ public interface Operator {
     default boolean requiresSafe(List<Object> vals) {
         return false;
     }
+
+    default List<Operator> mutateForInvalidValidation(List<Type> argTypes) {
+        List<Operator> ops = new ArrayList<>();
+        ops.add(BinaryOperator.Not_Equals);
+        if (argTypes.stream().allMatch(Type::isOrdered)) {
+            ops.add(BinaryOperator.Less_Than);
+            ops.add(BinaryOperator.Greater_Than);
+        }
+        return ops;
+    }
 }

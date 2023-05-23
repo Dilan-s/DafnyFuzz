@@ -9,6 +9,7 @@ import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -115,12 +116,12 @@ public class IfElseStatement extends BaseStatement {
     }
 
     @Override
-    public String invalidValidationTests() {
+    public Map<String, String> invalidValidationTests() {
         if (elseStat.isEmpty()) {
             if (ifStat.getNoOfUses() > 0) {
                 return ifStat.invalidValidationTests();
             }
-            return "";
+            return new HashMap<>();
         }
 
         if (ifStat.getNoOfUses() > 0 && elseStat.get().getNoOfUses() == 0) {
@@ -128,19 +129,15 @@ public class IfElseStatement extends BaseStatement {
         } else if (ifStat.getNoOfUses() == 0 && elseStat.get().getNoOfUses() > 0) {
             return elseStat.get().invalidValidationTests();
         } else {
+            Map<String, String> res = new HashMap<>();
 
-            List<String> code = new ArrayList<>();
-
-            code.add(String.format("if %s {", test));
-            code.add(StringUtils.indent(ifStat.invalidValidationTests()));
-
+            Map<String, String> ifM = ifStat.invalidValidationTests();
+            res.putAll(ifM);
             if (elseStat.isPresent()) {
-                code.add("} else {");
-                code.add(StringUtils.indent(elseStat.get().invalidValidationTests()));
+                Map<String, String> elseM = elseStat.get().invalidValidationTests();
+                res.putAll(elseM);
             }
-
-            code.add("}");
-            return StringUtils.intersperse("\n", code);
+            return res;
         }
     }
 

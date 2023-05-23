@@ -389,32 +389,22 @@ public class Method implements Identifier {
         return String.join("\n", code);
     }
 
-    public String invalidValidationTests() {
+    public Map<String, String> invalidValidationTests() {
         return invalidValidationTests(true);
     }
-    public String invalidValidationTests(boolean printAll) {
-        List<String> code = new ArrayList<>();
+    public Map<String, String> invalidValidationTests(boolean printAll) {
+        Map<String, String> res = new HashMap<>();
 
         if (printAll) {
-            for (DataType d : RandomTypeGenerator.DEFINED_DATA_TYPES) {
-                code.add(d.declaration());
-            }
-
             List<Method> allMethods = symbolTable.getAllMethods();
             for (Method m : allMethods) {
                 if (m.getNoOfUses() > 0) {
-                    if (m.getName().startsWith("safe")) {
-                        code.add(m.toCode(false));
-                    } else {
-                        code.add(m.invalidValidationTests(false));
-                    }
+                    res.putAll(m.invalidValidationTests(false));
                 }
             }
         }
 
-        code.add(declarationLine());
-        code.add(StringUtils.indent(body.invalidValidationTests()));
-        code.add("}\n");
-        return String.join("\n", code);
+        res.putAll(body.invalidValidationTests());
+        return res;
     }
 }

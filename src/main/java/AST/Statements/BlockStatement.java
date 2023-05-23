@@ -8,6 +8,7 @@ import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -139,8 +140,8 @@ public class BlockStatement extends BaseStatement {
 
 
     @Override
-    public String invalidValidationTests() {
-        List<String> code = new ArrayList<>();
+    public Map<String, String> invalidValidationTests() {
+        Map<String, String> code = new HashMap<>();
         boolean goToNext = true;
         for (int i = 0; goToNext && i < body.size(); i++) {
             Statement b = body.get(i);
@@ -148,10 +149,9 @@ public class BlockStatement extends BaseStatement {
                 List<Statement> expand = b.expand();
                 for (int j = 0; j < expand.size(); j++) {
                     Statement s = expand.get(j);
-                    String val = s.invalidValidationTests();
-                    if (!val.isEmpty()) {
-                        code.add(val);
-                    }
+
+                    Map<String, String> val = s.invalidValidationTests();
+                    code.putAll(val);
 
                     if (s.minimizedReturn()) {
                         goToNext = false;
@@ -160,7 +160,7 @@ public class BlockStatement extends BaseStatement {
                 }
             }
         }
-        return StringUtils.intersperse("\n", code);
+        return code;
     }
 
     @Override

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 public class DafnyProgram {
@@ -111,16 +113,24 @@ public class DafnyProgram {
     }
 
     public void incorrectValidationTestCase(Method main) {
-        String incorrectValidationTests = main.invalidValidationTests();
-        if (incorrectValidationTests.contains("assert")) {
-            try {
-                Path path = Paths.get("./tests-incorrect");
-                FileWriter p = new FileWriter(
-                    String.format("%s/test-incorrect.dfy", path.toAbsolutePath()));
-                p.write(incorrectValidationTests);
-                p.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+        String minimizedTestCase = main.minimizedTestCase();
+        Map<String, String> incorrectAssert = main.invalidValidationTests();
+        if (!incorrectAssert.isEmpty()) {
+            int i = 0;
+            for (Map.Entry<String, String> replacement : incorrectAssert.entrySet()) {
+                String incorrectTest = minimizedTestCase.replace(replacement.getKey(), replacement.getValue());
+                if (!minimizedTestCase.equals(incorrectTest)) {
+                    try {
+                        Path path = Paths.get("./tests-incorrect");
+                        FileWriter p = new FileWriter(
+                            String.format("%s/test-incorrect-%d.dfy", path.toAbsolutePath(), i));
+                        p.write(incorrectTest);
+                        p.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    i++;
+                }
             }
         }
     }

@@ -23,4 +23,9 @@ public interface UserDefinedType extends Type {
     default Boolean equal(Object lhsV, Object rhsV) {
         return null;
     }
+
+    @Override
+    default boolean isOrdered() {
+        return false;
+    }
 }
