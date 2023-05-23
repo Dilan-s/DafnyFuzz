@@ -9,12 +9,13 @@ javac -cp src/main/java/ -d ./out/ src/main/java/Main/VerificationProgramGenerat
 rm -rf tests-minimized || true
 rm -rf tests-incorrect || true
 rm -rf errors || true
-rm -rf errors/verificationErrors
 
 mkdir tests-minimized || true
 mkdir tests-incorrect || true
 mkdir errors || true
 mkdir errors/verificationErrors
+mkdir errors/verificationErrors/incorrect
+mkdir errors/verificationErrors/correct
 
 
 t=360
@@ -39,15 +40,14 @@ do
 	for file in tests-minimized/*
 	do
 	    echo "Expecting validation to succeed for $file"
-	
+
 	    timeout -s SIGKILL $t Dafny verify $file > tmp.txt 2>&1
 	    if [ $? -eq 4 ]
 	    then
 		echo "Verification error found in test $x - correct validation of the file $file"
-		mkdir "errors/verificationErrors/$x" || true
-		mkdir "errors/verificationErrors/$x/correct" || true
-		cp $file "errors/verificationErrors/$x/correct/test-$y.dfy"
-		cat tmp.txt > "errors/verificationErrors/$x/correct/verificationOutput-$y.txt"
+		mkdir "errors/verificationErrors/correct/$x" || true
+		cp $file "errors/verificationErrors/correct/$x/test-$y.dfy"
+		cat tmp.txt > "errors/verificationErrors/correct/$x/verificationOutput-$y.txt"
 	    fi
 	    rm -rf test.dfy || true
 	    rm -rf tmp.txt || true
@@ -69,10 +69,9 @@ do
 	    if [[ $code -ne 4 && $code -lt 5 ]]
 	    then
 		echo "Verification error found in test $x - incorrect validation of file $file"
-		mkdir "errors/verificationErrors/$x" || true
-		mkdir "errors/verificationErrors/$x/incorrect" || true
-		cp $file "errors/verificationErrors/$x/incorrect/test-$y.dfy"
-		cat tmp.txt > "errors/verificationErrors/$x/incorrect/verificationOutput-$y.txt"
+		mkdir "errors/verificationErrors/incorrect/$x" || true
+		cp $file "errors/verificationErrors/incorrect/$x/test-$y.dfy"
+		cat tmp.txt > "errors/verificationErrors/incorrect/$x/verificationOutput-$y.txt"
 	    fi
 	    rm -rf test.dfy || true
 	    rm -rf tmp.txt || true

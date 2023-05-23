@@ -156,7 +156,7 @@ public class AssertStatement extends BaseStatement {
             disJSVal.add(String.format("(%s)", String.join(" && ", clausesVal)));
         }
 
-        res.put("assert " + String.join(" || ", disJSVal), "assert " + String.join(" || ", disJSInv));
+        res.put("assert " + String.join(" && ", disJSVal), "assert " + String.join(" || ", disJSInv));
         return res;
 
     }
