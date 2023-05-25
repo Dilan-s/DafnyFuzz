@@ -34,6 +34,7 @@ public class DArrayLiteralByElements extends BaseExpression {
         this.values = values;
 
         this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
+        this.variable.setConstant();
         this.statement = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues(values));
         this.assignments = new ArrayList<>();
         generateAssignments();
