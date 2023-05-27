@@ -38,3 +38,5 @@ tmp.txt
 
 **/gen/**
 **/antlr_config/DafnyLexer.tokens
+
+StrykerTests
