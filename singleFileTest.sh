@@ -12,6 +12,7 @@ do
     esac
 done
 
+exitCode=0
 if [ "$language" = "go" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/go.txt
     if [ $? -eq 0 ];
@@ -22,6 +23,7 @@ if [ "$language" = "go" ]; then
     else
         echo "Failed to convert to Go in $t seconds for test number $testno file $fileno"
         rm -rf test test-go || true
+        exitCode=1
     fi
 elif [ "$language" = "py" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/py.txt
@@ -33,6 +35,7 @@ elif [ "$language" = "py" ]; then
     else
         echo "Failed to convert to Python in $t seconds for test number $testno file $fileno"
         rm -rf test-py || true
+        exitCode=1
     fi
 elif [ "$language" = "js" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/js.txt
@@ -44,6 +47,7 @@ elif [ "$language" = "js" ]; then
     else
         echo "Failed to convert to JavaScript in $t seconds for test number $testno file $fileno"
         rm -rf test.js || true
+        exitCode=1
     fi
 elif [ "$language" = "java" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 /unicodeChar:0 test.dfy > tmp.txt 2>&1
@@ -55,6 +59,7 @@ elif [ "$language" = "java" ]; then
     else
         echo "Failed to convert to Java in $t seconds for test number $testno file $fileno"
         rm -rf test.jar test-java || true
+        exitCode=1
     fi
 elif [ "$language" = "cs" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:cs /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>&1
@@ -66,7 +71,9 @@ elif [ "$language" = "cs" ]; then
     else
         echo "Failed to convert to CS in $t seconds for test number $testno file $fileno"
         rm -rf test.dll test.runtimeconfig.json || true
+        exitCode=1
     fi
 fi
 
 rm -rf tmp.txt || true
+exit $exitCode
