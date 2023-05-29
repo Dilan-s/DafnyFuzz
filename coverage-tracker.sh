@@ -5,6 +5,12 @@ trap 'kill -9 $$' SIGINT
 
 npm install bignumber.js
 
+rm -rf outputs || true
+rm -rf errors || true
+rm -rf tests || true
+rm -rf tests-minimized || true
+rm -rf tests-incorrect || true
+
 mkdir outputs || true
 mkdir errors || true
 mkdir tests || true
@@ -22,7 +28,7 @@ dafny_binary=$(pwd)
 cd "$directory"
 
 x=0
-while [ $x -le 10 ]; do
+while [ $x -le 0 ]; do
   cd "$directory"
 
   echo "Test number $x"
@@ -39,40 +45,46 @@ while [ $x -le 10 ]; do
   for file in tests/*.dfy
   do
     echo "Attempting to run $file"
+    cp $file test.dfy
+    cp test.dfy "$dafny_binary/test.dfy"
+
+    cd "$dafny_binary"
+    echo "Verify File"
+    coverlet . --target dotnet --targetargs "Dafny.dll verify test.dfy" -f cobertura -f json --merge-with coverage.json
 
     # GO
     cd "$dafny_binary"
     echo "GO File"
-    echo "coverlet . --target \"dotnet\" --targetargs \"Dafny.dll /compile:4 /compileTarget:go ../../../../../"$file" /out:/tmp/dv\" -f json --merge-with \"coverage.json\"" | bash
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:go test.dfy" -f cobertura -f json --merge-with coverage.json
 
     # js
     cd "$dafny_binary"
     echo "JS File"
-    echo "coverlet . --target \"dotnet\" --targetargs \"Dafny.dll /compile:4 /compileTarget:js ../../../../../"$file" /out:/tmp/dv\" -f json --merge-with \"coverage.json\"" | bash
-
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:js test.dfy" -f cobertura -f json --merge-with coverage.json
 
     # java
     cd "$dafny_binary"
     echo "JAVA File"
-    echo "coverlet . --target \"dotnet\" --targetargs \"Dafny.dll /compile:4 /compileTarget:java ../../../../../"$file" /out:/tmp/dv\" -f json --merge-with \"coverage.json\"" | bash
-
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:java test.dfy" -f cobertura -f json --merge-with coverage.json
 
     # py
     cd "$dafny_binary"
     echo "PY File"
-    echo "coverlet . --target \"dotnet\" --targetargs \"Dafny.dll /compile:4 /compileTarget:py ../../../../../"$file" /out:/tmp/dv\" -f json --merge-with \"coverage.json\"" | bash
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:py test.dfy" -f cobertura -f json --merge-with coverage.json
 
     # cs
     cd "$dafny_binary"
     echo "CS File"
-    echo "coverlet . --target \"dotnet\" --targetargs \"Dafny.dll /compile:4 /compileTarget:cs ../../../../../"$file" /out:/tmp/dv\" -f json --merge-with \"coverage.json\"" | bash
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:cs test.dfy" -f cobertura -f json --merge-with coverage.json
 
 
     cd "$directory"
+    rm -rf test.dfy "$dafny_binary/test.dfy" || true
+
   done
 
   cd "$dafny_binary"
-  cp coverage.json "$directory"
+  cp coverage.cobertura.xml "$directory/coverage/"
 
   rm -rf tests/* || true
   x=$(( $x + 1 ))

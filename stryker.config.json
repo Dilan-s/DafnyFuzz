@@ -1,0 +1,18 @@
+{
+    "stryker-config":
+    {
+        "solution": "./Stryker.sln",
+        "mutation-level": "Advanced",
+        "coverage-analysis": "off",
+        "mutate": [
+            "**/DafnyCore/Compilers/SinglePassCompiler.cs",
+            "**/DafnyCore/Compilers/ExecutableBackend.cs",
+            "**/DafnyCore/Compilers/CSharp/**/*.*",
+            "**/DafnyCore/Compilers/GoLang/**/*.*",
+            "**/DafnyCore/Compilers/Java/**/*.*",
+            "**/DafnyCore/Compilers/JavaScript/**/*.*",
+            "**/DafnyCore/Compilers/Python/**/*.*"
+        ],
+        "break-on-initial-test-failure": true
+    }
+}
