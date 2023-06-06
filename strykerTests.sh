@@ -30,8 +30,9 @@ mkdir "$testDir/StrykerTests" || true
 
 t=180
 x=0
-while [ $x -le 10 ]; do
+while [ true ]; do
     exitCode=0
+    join='>'
 
     echo "Test number $x"
     timeout -s SIGKILL $t java -cp out/ Main.ExpectedProgramGeneration $x
@@ -43,28 +44,17 @@ while [ $x -le 10 ]; do
     fi
 
     cp tests/test.dfy test.dfy
-    touch "test-$x.dfy"
-    touch "test-$x.dfy.expect"
 
     successCount=0
-    timeout --foreground -s SIGKILL $t Dafny /compile:0 test.dfy > tmp.txt
-    if [ $? -eq 0 ];
-    then
-        echo "Successfully ran command 'Dafny /compile:0 test.dfy'"
-        echo "// RUN: %dafny /compile:0 \"%s\" >> \"%t\"" >> "test-$x.dfy"
-        cat tmp.txt >> "test-$x.dfy.expect"
-        successCount=$(( successCount + 1))
-    else
-        echo "Failed to run command 'Dafny /compile:0 test.dfy'"
-    fi
 
     timeout --foreground -s SIGKILL $t Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:cs test.dfy > tmp.txt
     if [ $? -eq 0 ];
     then
         echo "Successfully ran command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:cs test.dfy'"
-        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:cs \"%s\" >> \"%t\"" >> "test-$x.dfy"
-        cat tmp.txt >> "test-$x.dfy.expect"
-        successCount=$(( successCount + 1))
+        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:cs \"%s\" > \"%t\"" > "$testDir/StrykerTests/test-$x-cs.dfy"
+        echo "// RUN: %diff \"%s.expect\" \"%t\"" >> "$testDir/StrykerTests/test-$x-cs.dfy"
+        cat test.dfy >> "$testDir/StrykerTests/test-$x-cs.dfy"
+        cat tmp.txt > "$testDir/StrykerTests/test-$x-cs.dfy.expect"
     else
         echo "Failed to run command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:cs test.dfy'"
     fi
@@ -73,9 +63,10 @@ while [ $x -le 10 ]; do
     if [ $? -eq 0 ];
     then
         echo "Successfully ran command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:js test.dfy'"
-        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:js \"%s\" >> \"%t\"" >> "test-$x.dfy"
-        cat tmp.txt >> "test-$x.dfy.expect"
-        successCount=$(( successCount + 1))
+        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:js \"%s\" > \"%t\"" > "$testDir/StrykerTests/test-$x-js.dfy"
+        echo "// RUN: %diff \"%s.expect\" \"%t\"" >> "$testDir/StrykerTests/test-$x-js.dfy"
+        cat test.dfy >> "$testDir/StrykerTests/test-$x-js.dfy"
+        cat tmp.txt > "$testDir/StrykerTests/test-$x-js.dfy.expect"
     else
         echo "Failed to run command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:js test.dfy'"
     fi
@@ -84,9 +75,10 @@ while [ $x -le 10 ]; do
     if [ $? -eq 0 ];
     then
         echo "Successfully ran command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:go test.dfy'"
-        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:go \"%s\" >> \"%t\"" >> "test-$x.dfy"
-        cat tmp.txt >> "test-$x.dfy.expect"
-        successCount=$(( successCount + 1))
+        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:go \"%s\" > \"%t\"" > "$testDir/StrykerTests/test-$x-go.dfy"
+        echo "// RUN: %diff \"%s.expect\" \"%t\"" >> "$testDir/StrykerTests/test-$x-go.dfy"
+        cat test.dfy >> "$testDir/StrykerTests/test-$x-go.dfy"
+        cat tmp.txt > "$testDir/StrykerTests/test-$x-go.dfy.expect"
     else
         echo "Failed to run command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:go test.dfy'"
     fi
@@ -95,9 +87,10 @@ while [ $x -le 10 ]; do
     if [ $? -eq 0 ];
     then
         echo "Successfully ran command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:py test.dfy'"
-        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:py \"%s\" >> \"%t\"" >> "test-$x.dfy"
-        cat tmp.txt >> "test-$x.dfy.expect"
-        successCount=$(( successCount + 1))
+        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:py \"%s\" > \"%t\"" > "$testDir/StrykerTests/test-$x-py.dfy"
+        echo "// RUN: %diff \"%s.expect\" \"%t\"" >> "$testDir/StrykerTests/test-$x-py.dfy"
+        cat test.dfy >> "$testDir/StrykerTests/test-$x-py.dfy"
+        cat tmp.txt > "$testDir/StrykerTests/test-$x-py.dfy.expect"
     else
         echo "Failed to run command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:py test.dfy'"
     fi
@@ -106,20 +99,14 @@ while [ $x -le 10 ]; do
     if [ $? -eq 0 ];
     then
         echo "Successfully ran command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:java test.dfy'"
-        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:java \"%s\" >> \"%t\"" >> "test-$x.dfy"
-        cat tmp.txt >> "test-$x.dfy.expect"
-        successCount=$(( successCount + 1))
+        echo "// RUN: %dafny /noVerify /deleteCodeAfterRun:1 /compile:4 /compileTarget:java \"%s\" > \"%t\"" > "$testDir/StrykerTests/test-$x-java.dfy"
+        echo "// RUN: %diff \"%s.expect\" \"%t\"" >> "$testDir/StrykerTests/test-$x-java.dfy"
+        cat test.dfy >> "$testDir/StrykerTests/test-$x-java.dfy"
+        cat tmp.txt > "$testDir/StrykerTests/test-$x-java.dfy.expect"
     else
         echo "Failed to run command 'Dafny /noVerify /deleteCodeAfterRun:1 /compileVerbose:0 /compile:4 /compileTarget:java test.dfy'"
     fi
-    echo "// RUN: %diff \"%s.expect\" \"%t\"" >> "test-$x.dfy"
-    cat test.dfy >> "test-$x.dfy"
-    if [ $successCount -gt 0 ];
-    then
-        mv "test-$x.dfy" "$testDir/StrykerTests/test-$x.dfy"
-        mv "test-$x.dfy.expect" "$testDir/StrykerTests/test-$x.dfy.expect"
-    fi
 
-    rm -rf tmp.txt test.dfy tests/* "test-$x.dfy" "test-$x.dfy.expect" || true
+    rm -rf tmp.txt test.dfy tests/* || true
     x=$(( x + 1 ))
 done
