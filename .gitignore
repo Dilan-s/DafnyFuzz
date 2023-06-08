@@ -40,3 +40,5 @@ tmp.txt
 **/antlr_config/DafnyLexer.tokens
 
 StrykerTests
+
+coverage

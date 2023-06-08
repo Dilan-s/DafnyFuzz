@@ -18,72 +18,73 @@ mkdir tests-minimized || true
 mkdir tests-incorrect || true
 
 
-javac -cp src/main/java/ -d ./out/ src/main/java/Main/GenerateProgram.java src/main/java/Main/CompareOutputs.java
+javac -cp src/main/java/ -d ./out/ src/main/java/Main/ExpectedProgramGeneration.java
 
 directory=$(pwd)
+rm -rf coverage || true
+mkdir coverage
 
-cd src/main/dafny_compiler/dafny/Binaries
-dafny_binary=$(pwd)
+
+cd src/main/dafny_compiler/dafny
+dafny_dir=$(pwd)
 
 cd "$directory"
 
 x=0
-while [ $x -le 0 ]; do
+while [ true ]; do
   cd "$directory"
 
   echo "Test number $x"
-  java -cp out/ Main.GenerateProgram $x
+  timeout --foreground 300 java -cp out/ Main.ExpectedProgramGeneration $x
   if [ $? -ne 0 ]
   then
     echo "Failed to create dafny file in $t seconds"
     x=$(( $x + 1 ))
     continue;
   fi
-  # css
-  #./src/main/dafny_compiler/dafny/Binaries/Dafny /noVerify /compileTarget:cs /spillTargetCode:3 test.dfy
-  
+
   for file in tests/*.dfy
   do
     echo "Attempting to run $file"
     cp $file test.dfy
-    cp test.dfy "$dafny_binary/test.dfy"
+    cp test.dfy "$dafny_dir/test.dfy"
 
-    cd "$dafny_binary"
+    cd "$dafny_dir"
     echo "Verify File"
-    coverlet . --target dotnet --targetargs "Dafny.dll verify test.dfy" -f cobertura -f json --merge-with coverage.json
+    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll verify test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # GO
-    cd "$dafny_binary"
+    cd "$dafny_dir"
     echo "GO File"
-    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:go test.dfy" -f cobertura -f json --merge-with coverage.json
+    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:go test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # js
-    cd "$dafny_binary"
+    cd "$dafny_dir"
     echo "JS File"
-    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:js test.dfy" -f cobertura -f json --merge-with coverage.json
+    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:js test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # java
-    cd "$dafny_binary"
+    cd "$dafny_dir"
     echo "JAVA File"
-    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:java test.dfy" -f cobertura -f json --merge-with coverage.json
+    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:java test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # py
-    cd "$dafny_binary"
+    cd "$dafny_dir"
     echo "PY File"
-    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:py test.dfy" -f cobertura -f json --merge-with coverage.json
+    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:py test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # cs
-    cd "$dafny_binary"
+    cd "$dafny_dir"
     echo "CS File"
-    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:cs test.dfy" -f cobertura -f json --merge-with coverage.json
+    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:cs test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
 
     cd "$directory"
-    rm -rf test.dfy "$dafny_binary/test.dfy" || true
+    rm -rf test.dfy "$dafny_dir/test.dfy" || true
 
   done
 
-  cd "$dafny_binary"
+  cd "$dafny_dir"
   cp coverage.cobertura.xml "$directory/coverage/"
 
   rm -rf tests/* || true
