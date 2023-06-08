@@ -34,10 +34,6 @@ while [ true ]; do
 
   cp "$xd_dir/test.dfy" "$dafny_dir/test.dfy"
 
-  cd "$dafny_dir"
-  echo "Verify File"
-  coverlet . --target dotnet --targetargs "Dafny.dll verify test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
-
   # GO
   cd "$dafny_dir"
   echo "GO File"
