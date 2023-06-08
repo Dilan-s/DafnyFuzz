@@ -25,7 +25,7 @@ rm -rf coverage || true
 mkdir coverage
 
 
-cd src/main/dafny_compiler/dafny
+cd src/main/dafny_compiler/dafny/Binaries
 dafny_dir=$(pwd)
 
 cd "$directory"
@@ -51,32 +51,32 @@ while [ true ]; do
 
     cd "$dafny_dir"
     echo "Verify File"
-    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll verify test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
+    coverlet . --target dotnet --targetargs "Dafny.dll verify test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # GO
     cd "$dafny_dir"
     echo "GO File"
-    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:go test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:go test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # js
     cd "$dafny_dir"
     echo "JS File"
-    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:js test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:js test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # java
     cd "$dafny_dir"
     echo "JAVA File"
-    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:java test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:java test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # py
     cd "$dafny_dir"
     echo "PY File"
-    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:py test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:py test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
     # cs
     cd "$dafny_dir"
     echo "CS File"
-    coverlet . --target dotnet --targetargs "Binaries/Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:cs test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
+    coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:cs test.dfy" -f cobertura -f json --merge-with coverage.json --include "Microsoft.Dafny.Compilers"
 
 
     cd "$directory"
