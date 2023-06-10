@@ -24,7 +24,7 @@ while [ true ]; do
 
   cd "$xd_dir"
   echo "Test number $x"
-  timeout --foreground 300 racket ../xdsmith/fuzzer.rkt --timeout 300 --dafny-syntax true --seed $x > test.dfy
+  timeout --foreground 300 racket ../xdsmith/fuzzer.rkt --timeout 300 --dafny-syntax true > test.dfy
   if [ $? -ne 0 ]
   then
     echo "Failed to create dafny file in $t seconds"

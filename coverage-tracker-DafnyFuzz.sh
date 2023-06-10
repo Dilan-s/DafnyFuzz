@@ -35,7 +35,7 @@ while [ true ]; do
   cd "$directory"
 
   echo "Test number $x"
-  timeout --foreground 300 java -cp out/ Main.ExpectedProgramGeneration $x
+  timeout --foreground 300 java -cp out/ Main.ExpectedProgramGeneration
   if [ $? -ne 0 ]
   then
     echo "Failed to create dafny file in $t seconds"
