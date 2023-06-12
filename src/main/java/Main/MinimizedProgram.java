@@ -4,7 +4,7 @@ import AST.Program.DafnyProgram;
 import AST.SymbolTable.Method;
 import java.io.File;
 
-public class VerificationProgramGeneration {
+public class MinimizedProgram {
 
     public static void main(String[] args) {
         DafnyProgram dafnyProgram;
@@ -13,11 +13,10 @@ public class VerificationProgramGeneration {
         } else {
             dafnyProgram = new DafnyProgram();
         }
+        new File("./tests").mkdirs();
         new File("./tests-minimized").mkdirs();
-        new File("./tests-incorrect").mkdirs();
         Method main = dafnyProgram.generateProgram();
+        dafnyProgram.baseTestCase(main);
         dafnyProgram.minimizedTestCase(main);
-        dafnyProgram.incorrectValidationTestCase(main);
     }
-
 }

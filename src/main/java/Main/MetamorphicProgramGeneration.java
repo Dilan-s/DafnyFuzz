@@ -2,8 +2,9 @@ package Main;
 
 import AST.Program.DafnyProgram;
 import AST.SymbolTable.Method;
+import java.io.File;
 
-public class EMIProgramGeneration {
+public class MetamorphicProgramGeneration {
 
     public static void main(String[] args) {
         DafnyProgram dafnyProgram;
@@ -12,6 +13,7 @@ public class EMIProgramGeneration {
         } else {
             dafnyProgram = new DafnyProgram();
         }
+        new File("./tests").mkdirs();
         Method main = dafnyProgram.generateProgram();
         dafnyProgram.EMIProgramGeneration(main);
     }

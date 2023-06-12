@@ -37,22 +37,22 @@ do
     y=0
     if [ "$(ls -A tests-minimized/)" ];
     then
-	for file in tests-minimized/*
-	do
-	    echo "Expecting validation to succeed for $file"
+        for file in tests-minimized/*
+        do
+            echo "Expecting validation to succeed for $file"
 
-	    timeout -s SIGKILL $t Dafny verify $file > tmp.txt 2>&1
-	    if [ $? -eq 4 ]
-	    then
-		echo "Verification error found in test $x - correct validation of the file $file"
-		mkdir "errors/verificationErrors/correct/$x" || true
-		cp $file "errors/verificationErrors/correct/$x/test-$y.dfy"
-		cat tmp.txt > "errors/verificationErrors/correct/$x/verificationOutput-$y.txt"
-	    fi
-	    rm -rf test.dfy || true
-	    rm -rf tmp.txt || true
-	    y=$(( $y + 1))
-	done
+            timeout -s SIGKILL $t Dafny verify $file > tmp.txt 2>&1
+            if [ $? -eq 4 ]
+            then
+            echo "Verification error found in test $x - correct validation of the file $file"
+            mkdir "errors/verificationErrors/correct/$x" || true
+            cp $file "errors/verificationErrors/correct/$x/test-$y.dfy"
+            cat tmp.txt > "errors/verificationErrors/correct/$x/verificationOutput-$y.txt"
+            fi
+            rm -rf test.dfy || true
+            rm -rf tmp.txt || true
+            y=$(( $y + 1))
+        done
     fi
 
     cd "$directory"

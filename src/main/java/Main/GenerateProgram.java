@@ -2,6 +2,7 @@ package Main;
 
 import AST.Program.DafnyProgram;
 import AST.SymbolTable.Method;
+import java.io.File;
 import java.util.Random;
 
 public class GenerateProgram {
@@ -13,6 +14,9 @@ public class GenerateProgram {
         } else {
             dafnyProgram = new DafnyProgram();
         }
+        new File("./tests").mkdirs();
+        new File("./tests-minimized").mkdirs();
+        new File("./tests-incorrect").mkdirs();
         Method main = dafnyProgram.generateProgram();
         dafnyProgram.expectedOutput(main);
         dafnyProgram.EMIProgramGeneration(main);

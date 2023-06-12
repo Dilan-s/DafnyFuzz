@@ -2,6 +2,7 @@ package Main;
 
 import AST.Program.DafnyProgram;
 import AST.SymbolTable.Method;
+import java.io.File;
 
 public class ExpectedProgramGeneration {
 
@@ -12,6 +13,8 @@ public class ExpectedProgramGeneration {
         } else {
             dafnyProgram = new DafnyProgram();
         }
+        new File("./tests").mkdirs();
+        new File("./outputs").mkdirs();
         Method main = dafnyProgram.generateProgram();
         dafnyProgram.expectedOutput(main);
         dafnyProgram.baseTestCase(main);
