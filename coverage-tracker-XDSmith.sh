@@ -37,27 +37,27 @@ while [ true ]; do
   # GO
   cd "$dafny_dir"
   echo "GO File"
-  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:go test.dfy" -f cobertura -f json --merge-with coverage.json
+  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /compileTarget:go test.dfy" -f cobertura -f json --merge-with coverage.json
 
   # js
   cd "$dafny_dir"
   echo "JS File"
-  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:js test.dfy" -f cobertura -f json --merge-with coverage.json
+  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /compileTarget:js test.dfy" -f cobertura -f json --merge-with coverage.json
 
   # java
   cd "$dafny_dir"
   echo "JAVA File"
-  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:java test.dfy" -f cobertura -f json --merge-with coverage.json
+  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /compileTarget:java test.dfy" -f cobertura -f json --merge-with coverage.json
 
   # py
   cd "$dafny_dir"
   echo "PY File"
-  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:py test.dfy" -f cobertura -f json --merge-with coverage.json
+  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /compileTarget:py test.dfy" -f cobertura -f json --merge-with coverage.json
 
   # cs
   cd "$dafny_dir"
   echo "CS File"
-  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /noVerify /compileTarget:cs test.dfy" -f cobertura -f json --merge-with coverage.json
+  coverlet . --target dotnet --targetargs "Dafny.dll /deleteCodeAfterRun:1 /compile:4 /compileTarget:cs test.dfy" -f cobertura -f json --merge-with coverage.json
 
 
   cd "$directory"
