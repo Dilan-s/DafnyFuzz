@@ -10,6 +10,7 @@ out/
 target/
 
 src/main/dafny_compiler/
+src/main/xdsmith/
 
 test.dfy
 test-go
@@ -40,3 +41,5 @@ tmp.txt
 **/antlr_config/DafnyLexer.tokens
 
 StrykerTests
+
+coverage
