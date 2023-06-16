@@ -63,6 +63,7 @@ while [ true ]; do
     fi
 
     rm -rf outputs/* || true
+    rm -rf "$xd_dir/test.dfy" "$directory/test.dfy"
 
     x=$(( x + 1 ))
 done
