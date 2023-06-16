@@ -22,9 +22,6 @@ directory=$(pwd)
 
 t=180
 
-#verrors=(244331	254096	257847	258535	262558	266809	267919	269773	278997	282797	284046)
-#for z in ${verrors[@]}; do
-#  x=$z
 x=0
 while [ true ]; do
     cd "$directory"
