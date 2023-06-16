@@ -26,7 +26,7 @@ t=180
 #for z in ${verrors[@]}; do
 #  x=$z
 x=0
-while [ $x -le 100 ]; do
+while [ true ]; do
     cd "$directory"
 
     echo "Test number $x"

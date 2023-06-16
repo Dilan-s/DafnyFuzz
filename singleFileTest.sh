@@ -17,9 +17,16 @@ if [ "$language" = "go" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/go.txt
     if [ $? -eq 0 ];
     then
-        ./test > "outputs/output-go-$fileno.txt" 2>>errors/compErrors/go.txt
-        rm -rf test test-go || true
         echo "Success Go"
+        ./test > "outputs/output-go-$fileno.txt" 2>>errors/compErrors/go.txt
+	if [ $? -eq 0 ];
+	then
+	    echo "GoCompSuccess"
+	else
+	    echo "GoCompFail"
+	fi
+        rm -rf test test-go || true
+
     else
         echo "Failed to convert to Go in $t seconds for test number $testno file $fileno"
         rm -rf test test-go || true
@@ -29,9 +36,16 @@ elif [ "$language" = "py" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/py.txt
     if [ $? -eq 0 ];
     then
-        python3 test-py/test.py > "outputs/output-py-$fileno.txt" 2>>errors/compErrors/py.txt
-        rm -rf test-py || true
         echo "Success Python"
+        python3 test-py/test.py > "outputs/output-py-$fileno.txt" 2>>errors/compErrors/py.txt
+	if [ $? -eq 0 ];
+	then
+	    echo "PyCompSuccess"
+	else
+	    echo "PyCompFail"
+	fi
+        rm -rf test-py || true
+
     else
         echo "Failed to convert to Python in $t seconds for test number $testno file $fileno"
         rm -rf test-py || true
@@ -41,9 +55,17 @@ elif [ "$language" = "js" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/js.txt
     if [ $? -eq 0 ];
     then
-        node test.js > "outputs/output-js-$fileno.txt" 2>>errors/compErrors/js.txt
-        rm -rf test.js || true
         echo "Success JavaScript"
+	node test.js > "outputs/output-js-$fileno.txt" 2>>errors/compErrors/js.txt
+
+	if [ $? -eq 0 ];
+	then
+	    echo "JsCompSuccess"
+	else
+	    echo "JsCompFail"
+	fi
+	rm -rf test.js || true
+        
     else
         echo "Failed to convert to JavaScript in $t seconds for test number $testno file $fileno"
         rm -rf test.js || true
@@ -53,9 +75,17 @@ elif [ "$language" = "java" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 /unicodeChar:0 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ];
     then
-        java -jar test.jar > "outputs/output-java-$fileno.txt" 2>>errors/compErrors/java.txt
-        rm -rf test.jar test-java || true
         echo "Success Java"
+        java -jar test.jar > "outputs/output-java-$fileno.txt" 2>>errors/compErrors/java.txt
+
+	if [ $? -eq 0 ];
+	then
+	    echo "JavaCompSuccess"
+	else
+	    echo "JavaCompFail"
+	fi
+	rm -rf test.jar test-java || true
+
     else
         echo "Failed to convert to Java in $t seconds for test number $testno file $fileno"
         rm -rf test.jar test-java || true
@@ -65,9 +95,17 @@ elif [ "$language" = "cs" ]; then
     timeout -s SIGKILL $t Dafny /noVerify /compileTarget:cs /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>&1
     if [ $? -eq 0 ];
     then
-        dotnet test.dll > "outputs/output-cs-$fileno.txt" 2>>errors/compErrors/cs.txt
-        rm -rf test.dll test.runtimeconfig.json || true
         echo "Success CS"
+	dotnet test.dll > "outputs/output-cs-$fileno.txt" 2>>errors/compErrors/cs.txt
+
+	if [ $? -eq 0 ];
+	then
+	    echo "CSCompSuccess"
+	else
+	    echo "CSCompFail"
+	fi
+	rm -rf test.dll test.runtimeconfig.json || true
+
     else
         echo "Failed to convert to CS in $t seconds for test number $testno file $fileno"
         rm -rf test.dll test.runtimeconfig.json || true
