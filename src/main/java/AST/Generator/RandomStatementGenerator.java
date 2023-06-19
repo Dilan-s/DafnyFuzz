@@ -51,7 +51,6 @@ public class RandomStatementGenerator {
     public static final int MAX_STATEMENT_DEPTH = 4;
     public static final double PROB_NEXT_STAT = 0.85;
     public static final double PROB_FORCE_RETURN = 0.25;
-//    public static final double PROB_REASSIGN = 0.5;
     public static final double PROB_REASSIGN = 1.0;
 
     public static int loopDepth = 0;
@@ -69,6 +68,13 @@ public class RandomStatementGenerator {
         Statement statement = null;
         while (probContinue < PROB_NEXT_STAT || requireReturn) {
             statement = generateStatement(method, symbolTable, requireReturn);
+            if (statementDepth == 0) {
+                List<Statement> expand = statement.expand();
+                for (Statement st : expand) {
+                    st.execute(new StringBuilder());
+                }
+            }
+
             body.addStatement(statement);
             if (statement.isReturn()) {
                 break;
@@ -78,7 +84,13 @@ public class RandomStatementGenerator {
 
         if (statement != null && !statement.isReturn()) {
             PrintAll printAll = new PrintAll(body.getSymbolTable());
-            body.addStatement(printAll.expand());
+            List<Statement> expand = printAll.expand();
+            if (statementDepth == 0) {
+                for (Statement st : expand) {
+                    st.execute(new StringBuilder());
+                }
+            }
+            body.addStatement(expand);
         }
 
         return body;
@@ -201,9 +213,6 @@ public class RandomStatementGenerator {
         AssignmentStatement finalAssign = new AssignmentStatement(symbolTable, List.of(finalVar), finalExp);
 
         Bool boolType = new Bool();
-//        Expression testRhs = expressionGenerator.generateExpression(boolType, symbolTable);
-//        OperatorExpression testLhs = new OperatorExpression(symbolTable, boolType, BinaryOperator.Less_Than, List.of(loopVarExp, finalExp));
-//        Expression test = new OperatorExpression(symbolTable, boolType, BinaryOperator.And, List.of(testLhs, testRhs));
 
         OperatorExpression test = new OperatorExpression(symbolTable, boolType, BinaryOperator.Less_Than, List.of(loopVarExp, finalVarExp));
 
@@ -341,10 +350,7 @@ public class RandomStatementGenerator {
     }
 
     private List<Variable> generateAssignVariables(List<Type> types, SymbolTable symbolTable) {
-
-        double probReassign = GeneratorConfig.getRandom().nextDouble();
-
-        if (probReassign < PROB_REASSIGN && types.stream().allMatch(Type::validMethodType)) {
+        if (types.stream().allMatch(Type::validMethodType)) {
             List<Variable> variables = new ArrayList<>();
             for (Type t : types) {
                 List<Variable> varsInScope = symbolTable.getAllVariables(t).stream()

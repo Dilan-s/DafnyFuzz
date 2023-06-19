@@ -117,7 +117,7 @@ public class PrintStatement extends BaseStatement {
                         this.values.set(i, op);
                         this.expanded.set(i, op.expand());
                         for (Statement st : op.expand()) {
-                            st.execute(paramMap, new StringBuilder());
+                            st.execute(paramMap, s);
                         }
 
                         this.update = true;

@@ -14,6 +14,9 @@ public interface Statement {
         return false;
     }
 
+    default ReturnStatus execute(StringBuilder s) {
+        return execute(new HashMap<>(), s);
+    }
     ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s);
 
     List<Statement> expand();

@@ -50,14 +50,6 @@ public class DafnyProgram {
         Statement statement = randomStatementGenerator.generateBody(main, main.getSymbolTable());
         main.setBody(statement);
 
-        String curr = main.toString();
-        main.execute();
-        String next = main.toString();
-        while (!next.equals(curr)) {
-            curr = next;
-            main.execute();
-            next = main.toString();
-        }
         return main;
     }
 

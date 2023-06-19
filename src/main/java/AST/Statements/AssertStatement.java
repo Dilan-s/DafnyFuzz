@@ -68,6 +68,13 @@ public class AssertStatement extends BaseStatement {
                 disjuncts.add(conjuncts);
                 disjunctsEnsures.add(f);
                 expanded.add(currExpand);
+                for (List<Statement> ss : currExpand) {
+                    for (Statement st : ss) {
+                        st.execute(paramMap, s);
+                    }
+
+                }
+
             }
         }
 

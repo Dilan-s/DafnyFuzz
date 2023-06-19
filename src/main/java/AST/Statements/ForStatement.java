@@ -186,6 +186,7 @@ public class ForStatement extends BaseStatement {
         start = start + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
         if (!loopInvariants.isEmpty()) {
             List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                .distinct()
                 .map(x -> String.format("(%s) ==> (%s)", x.getKey(),
                     String.join(" || ", x.getValue())))
                 .collect(Collectors.toList());
@@ -229,6 +230,7 @@ public class ForStatement extends BaseStatement {
             res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
             if (!loopInvariants.isEmpty()) {
                 List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                    .distinct()
                     .map(x -> String.format("((%s) ==> (%s))", x.getKey(),
                         String.join(" || ", x.getValue())))
                     .collect(Collectors.toList());
@@ -261,6 +263,7 @@ public class ForStatement extends BaseStatement {
         res = res + StringUtils.indent(direction.invariantClause(loopVar, finalVar));
         if (!loopInvariants.isEmpty()) {
             List<String> loopInvariants = this.loopInvariants.entrySet().stream()
+                .distinct()
                 .map(x -> String.format("((%s) ==> (%s))", x.getKey(),
                     String.join(" || ", x.getValue())))
                 .collect(Collectors.toList());
@@ -306,17 +309,14 @@ public class ForStatement extends BaseStatement {
         public boolean validBounds(BigInteger lower, BigInteger upper) {
             if (this == DOWNTO) {
                 return lower.compareTo(upper) >= 0;
-//                return lower >= upper;
             } else {
                 return lower.compareTo(upper) <= 0;
-//                return lower <= upper;
             }
         }
 
         public BigInteger getInitBound(BigInteger init) {
             if (this == DOWNTO) {
                 return init.subtract(BigInteger.ONE);
-//                return init - 1;
             } else {
                 return init;
             }
@@ -349,10 +349,8 @@ public class ForStatement extends BaseStatement {
         public boolean withinFinalBound(BigInteger i, BigInteger finalVarValue) {
             if (this == DOWNTO) {
                 return i.compareTo(finalVarValue) >= 0;
-//                return i >= finalVarValue;
             } else {
                 return i.compareTo(finalVarValue) < 0;
-//                return i < finalVarValue;
             }
         }
     }
