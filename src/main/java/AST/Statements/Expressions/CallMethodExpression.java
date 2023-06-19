@@ -1,6 +1,5 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
@@ -14,19 +13,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CallExpression extends BaseExpression {
+public class CallMethodExpression extends BaseExpression {
 
     private SymbolTable symbolTable;
     private Method method;
     private List<Variable> variables;
     private List<Statement> assignments;
     private List<Variable> assignedVariables;
-    private CallMethodExpression callExpr;
+    private CallMethod callExpr;
     private AssignmentStatement assignStat;
 
     private List<List<Statement>> expanded;
 
-    public CallExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
+    public CallMethodExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
         super();
         this.symbolTable = symbolTable;
         this.method = method;
@@ -68,7 +67,7 @@ public class CallExpression extends BaseExpression {
             assignedVariables.add(variable);
         }
 
-        callExpr = new CallMethodExpression(method, variables);
+        callExpr = new CallMethod(method, variables);
 
         assignStat = new AssignmentStatement(symbolTable, assignedVariables, callExpr);
     }
@@ -118,12 +117,17 @@ public class CallExpression extends BaseExpression {
             .collect(Collectors.toList());
     }
 
-    private class CallMethodExpression extends BaseExpression {
+    @Override
+    public boolean validForFunction() {
+        return true;
+    }
+
+    private class CallMethod extends BaseExpression {
 
         private Method method;
         private List<Variable> args;
 
-        public CallMethodExpression(Method method, List<Variable> args) {
+        public CallMethod(Method method, List<Variable> args) {
             super();
             this.method = method;
             this.args = args;
@@ -167,6 +171,11 @@ public class CallExpression extends BaseExpression {
                 }
             }
             return method.execute(args, s);
+        }
+
+        @Override
+        public boolean validForFunction() {
+            return true;
         }
     }
 }

@@ -50,6 +50,9 @@ public interface Type extends Identifier {
     default boolean validMethodType() {
         return true;
     }
+    default boolean validFunctionType() {
+        return validMethodType();
+    }
 
     default Object of(Object value) {
         return value;

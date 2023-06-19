@@ -1,6 +1,5 @@
 package AST.Statements.Expressions.DMap;
 
-import AST.Errors.SemanticException;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Expressions.BaseExpression;
@@ -10,7 +9,6 @@ import AST.Statements.Expressions.Operator.BinaryOperator;
 import AST.Statements.Expressions.Operator.OperatorExpression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.Type;
@@ -93,6 +91,13 @@ public class DMapSelection extends BaseExpression {
 
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
+
+    @Override
+    public boolean validForFunction() {
+        return mapAssign.validForFunction() || indexAssign.validForFunction() ||
+            ifElseExp.validForFunction();
+    }
+
 
     @Override
     public boolean requireUpdate() {

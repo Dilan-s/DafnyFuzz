@@ -44,4 +44,8 @@ public interface Statement {
     default Set<Variable> getModifies() {
         return new HashSet<>();
     }
+
+    default boolean validForFunction() {
+        return false;
+    }
 }

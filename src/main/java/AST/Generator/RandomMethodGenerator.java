@@ -11,7 +11,7 @@ public class RandomMethodGenerator {
 
     public static final double PROB_REUSE_METHOD = 0.75;
     public static final int MAX_METHOD_DEPTH = 5;
-    public static final int MAX_NO_OF_ARGS = 4;
+    public static final int MAX_NO_OF_ARGS = 5;
 
     private static int methodDepth = 0;
 
@@ -26,8 +26,8 @@ public class RandomMethodGenerator {
         methodDepth++;
         List<Method> methodWithSameType = symbolTable.getMethodWithTypes(returnTypes);
 
-        double probReuseMethod = GeneratorConfig.getRandom().nextDouble() * Math.pow(GeneratorConfig.OPTION_DECAY_FACTOR,
-            methodDepth - 1);
+        double probReuseMethod = GeneratorConfig.getRandom().nextDouble();
+
         if (!methodWithSameType.isEmpty() && probReuseMethod < PROB_REUSE_METHOD) {
             int i = GeneratorConfig.getRandom().nextInt(methodWithSameType.size());
             return methodWithSameType.get(i);
@@ -36,7 +36,7 @@ public class RandomMethodGenerator {
         String methodName = VariableNameGenerator.generateMethodName();
         Method m = new Method(returnTypes, methodName);
 
-        int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS) + 1;
+        int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
         List<Type> args = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
         for (Type t : args) {
             Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
@@ -52,4 +52,11 @@ public class RandomMethodGenerator {
         return m;
     }
 
+    public void enableMethods() {
+        methodDepth -= MAX_METHOD_DEPTH;
+    }
+
+    public void disableMethods() {
+        methodDepth += MAX_METHOD_DEPTH;
+    }
 }

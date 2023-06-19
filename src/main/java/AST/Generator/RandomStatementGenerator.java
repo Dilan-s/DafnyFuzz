@@ -5,7 +5,7 @@ import AST.Statements.AssignmentStatement;
 import AST.Statements.BlockStatement;
 import AST.Statements.BreakStatement;
 import AST.Statements.ContinueStatement;
-import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.CallMethodExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.IntLiteral;
 import AST.Statements.Expressions.Operator.BinaryOperator;
@@ -325,7 +325,7 @@ public class RandomStatementGenerator {
             List<Type> returnTypes = typeGenerator.generateMethodTypes(noOfReturns, symbolTable);
             //Create method
 
-            CallExpression expression = expressionGenerator.generateCallExpression(symbolTable, returnTypes);
+            CallMethodExpression expression = expressionGenerator.generateCallMethodExpression(symbolTable, returnTypes);
             if (expression != null) {
                 List<Variable> variables = generateAssignVariables(returnTypes, symbolTable);
 

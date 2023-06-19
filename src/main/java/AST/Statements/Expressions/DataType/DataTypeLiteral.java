@@ -11,7 +11,6 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
 import AST.SymbolTable.Types.Variables.Variable;
 import AST.SymbolTable.Types.Variables.VariableDataTypeIndex;
-import java.awt.GraphicsDevice;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -88,6 +87,11 @@ public class DataTypeLiteral extends BaseExpression {
             expanded.set(i, statement.expand());
         }
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean validForFunction() {
+        return fields.stream().anyMatch(Expression::validForFunction) || statement.validForFunction();
     }
 
     @Override

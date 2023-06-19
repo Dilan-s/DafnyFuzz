@@ -92,6 +92,11 @@ public class DArrayLiteralByElements extends BaseExpression {
         return assignments.stream().anyMatch(Statement::requireUpdate) || statement.requireUpdate();
     }
 
+    @Override
+    public boolean validForFunction() {
+        return true;
+    }
+
     private class ArrayInitValues extends BaseExpression {
 
         private final List<Expression> values;
@@ -134,6 +139,11 @@ public class DArrayLiteralByElements extends BaseExpression {
         @Override
         public boolean requireUpdate() {
             return false;
+        }
+
+        @Override
+        public boolean validForFunction() {
+            return true;
         }
     }
 }

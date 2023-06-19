@@ -40,28 +40,17 @@ public class AssignmentStatement extends BaseStatement {
         this(symbolTable, variables, List.of(value));
     }
 
+    @Override
+    public boolean validForFunction() {
+        return values.stream().anyMatch(Expression::validForFunction) || this.declared;
+    }
+
     private void declareVariables() {
         for (int i = 0, variablesSize = variables.size(); i < variablesSize; i++) {
             Variable v = variables.get(i);
             v.setDeclared();
             symbolTable.addVariable(v);
         }
-
-        /*
-        List<Object> expValues = new ArrayList<>();
-        for (Expression value : values) {
-            List<Object> expressionValue = value.getValue();
-            for (Object object : expressionValue) {
-                expValues.add(object);
-            }
-        }
-
-        for (int i = 0; i < variables.size(); i++) {
-            Object expV = expValues.get(i);
-            Variable v = variables.get(i);
-            v.setValue(expV);
-        }
-        */
     }
 
     @Override

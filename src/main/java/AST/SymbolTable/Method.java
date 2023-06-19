@@ -145,6 +145,10 @@ public class Method implements Identifier {
             for (Method m : allMethods) {
                 code.add(m.toCode(false));
             }
+            List<Function> allFunctions = symbolTable.getAllFunctions();
+            for (Function f : allFunctions) {
+                code.add(f.toCode());
+            }
         }
 
         code.add(declarationLine());
@@ -188,12 +192,32 @@ public class Method implements Identifier {
                         temp.add(curr);
                     }
                 }
-                res = new HashSet(temp);
+                res = new HashSet<>(temp);
 
                 List<String> r = new ArrayList<>(res);
                 Collections.shuffle(r, GeneratorConfig.getRandom());
                 res = new HashSet<>(r.subList(0, Math.min(5, res.size())));
             }
+
+            List<Function> allFunctions = symbolTable.getAllFunctions();
+
+            for (Function func : allFunctions) {
+                List<String> functionBodyOptions = func.toOutput();
+                temp = new ArrayList<>();
+                for (String f : res) {
+                    for (String fBody : functionBodyOptions) {
+                        String curr = f + fBody;
+                        temp.add(curr);
+                    }
+                }
+
+                res = new HashSet<>(temp);
+
+                List<String> r = new ArrayList<>(res);
+                Collections.shuffle(r, GeneratorConfig.getRandom());
+                res = new HashSet<>(r.subList(0, Math.min(5, res.size())));
+            }
+
         }
 
         temp = new ArrayList<>();
@@ -379,6 +403,12 @@ public class Method implements Identifier {
                     } else {
                         code.add(m.minimizedTestCase(false));
                     }
+                }
+            }
+            List<Function> allFunctions = symbolTable.getAllFunctions();
+            for (Function f : allFunctions) {
+                if (f.getNoOfUses() > 0) {
+                    code.add(f.toCode());
                 }
             }
         }

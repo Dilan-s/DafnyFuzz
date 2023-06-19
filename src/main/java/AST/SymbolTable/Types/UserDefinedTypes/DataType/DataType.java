@@ -170,4 +170,8 @@ public class DataType implements UserDefinedType {
         return String.format("datatype %s%s = %s", datatypeName, genericsRep, rules);
     }
 
+    @Override
+    public boolean validFunctionType() {
+        return false;
+    }
 }

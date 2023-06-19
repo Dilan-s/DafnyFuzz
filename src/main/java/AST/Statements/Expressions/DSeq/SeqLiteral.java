@@ -1,11 +1,9 @@
 package AST.Statements.Expressions.DSeq;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -126,6 +124,12 @@ public class SeqLiteral extends BaseExpression {
         }
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
+
+    @Override
+    public boolean validForFunction() {
+        return values.stream().anyMatch(Expression::validForFunction);
+    }
+
 
     @Override
     public boolean requireUpdate() {

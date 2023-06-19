@@ -94,6 +94,11 @@ public class DArrayLiteralInline extends BaseExpression {
         return variable.getValue(paramsMap);
     }
 
+    @Override
+    public boolean validForFunction() {
+        return true;
+    }
+
     private class ArrayInitValues extends BaseExpression {
 
         private final List<Expression> values;
@@ -193,6 +198,11 @@ public class DArrayLiteralInline extends BaseExpression {
         @Override
         public boolean requireUpdate() {
             return false;
+        }
+
+        @Override
+        public boolean validForFunction() {
+            return true;
         }
     }
 }

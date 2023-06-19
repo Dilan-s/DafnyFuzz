@@ -43,4 +43,8 @@ public interface Expression {
     default String minimizedTestCase() {
         return toString();
     }
+
+    default boolean validForFunction() {
+        return false;
+    }
 }

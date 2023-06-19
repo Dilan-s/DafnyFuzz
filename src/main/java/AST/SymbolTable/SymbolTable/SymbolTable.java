@@ -1,5 +1,6 @@
 package AST.SymbolTable.SymbolTable;
 
+import AST.SymbolTable.Function;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -12,6 +13,7 @@ public class SymbolTable {
 
     private final HashMap<String, Variable> variables;
     private final HashMap<String, Method> methods;
+    private final HashMap<String, Function> functions;
     private SymbolTable enclosingSymbolTable;
 
     SymbolTable(boolean global) {
@@ -26,6 +28,7 @@ public class SymbolTable {
         this.enclosingSymbolTable = enclosingSymbolTable;
         this.variables = new HashMap<>();
         this.methods = new HashMap<>();
+        this.functions = new HashMap<>();
     }
 
     public void setEnclosingSymbolTable(SymbolTable enclosingSymbolTable) {
@@ -45,6 +48,14 @@ public class SymbolTable {
 
     }
 
+    public void addFunction(Function function) {
+        if (enclosingSymbolTable == null) {
+            functions.put(function.getName(), function);
+        } else {
+            enclosingSymbolTable.addFunction(function);
+        }
+    }
+
     public Variable getVariable(Variable variable) {
         return variables.getOrDefault(variable.getName(), null);
     }
@@ -55,6 +66,14 @@ public class SymbolTable {
         return method == null && enclosingSymbolTable != null
             ? enclosingSymbolTable.getMethod(methodName)
             : method;
+    }
+
+    public List<Function> getAllFunctions() {
+        List<Function> fs = new ArrayList<>(functions.values());
+        if (enclosingSymbolTable != null) {
+            fs.addAll(enclosingSymbolTable.getAllFunctions());
+        }
+        return fs;
     }
 
     public List<Method> getAllMethods() {
@@ -73,6 +92,7 @@ public class SymbolTable {
         }
         return currST;
     }
+
     public List<Variable> getAllVariables(Type t) {
         return getAllVariables(t, true);
     }
@@ -92,8 +112,16 @@ public class SymbolTable {
         return vars;
     }
 
+    public List<Function> getFunctionWithType(Type returnType) {
+        return getAllFunctions().stream()
+            .filter(f -> f.getReturnType().equals(returnType))
+            .collect(Collectors.toList());
+    }
+
     public List<Method> getMethodWithTypes(List<Type> returnTypes) {
-        return getAllMethods().stream().filter(m -> sameReturnType(m.getReturnTypes(), returnTypes)).collect(Collectors.toList());
+        return getAllMethods().stream()
+            .filter(m -> sameReturnType(m.getReturnTypes(), returnTypes))
+            .collect(Collectors.toList());
     }
 
     private boolean sameReturnType(List<Type> methodReturnTypes, List<Type> wantedReturnTypes) {

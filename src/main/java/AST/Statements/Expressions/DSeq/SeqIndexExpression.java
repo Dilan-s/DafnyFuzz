@@ -3,7 +3,7 @@ package AST.Statements.Expressions.DSeq;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Expressions.BaseExpression;
-import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.CallMethodExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
@@ -73,7 +73,7 @@ public class SeqIndexExpression extends BaseExpression {
         VariableExpression seqVarExp = getSequenceVariableExpression();
         VariableExpression indVarExp = getIndexVariableExpression();
 
-        CallExpression exp = new CallExpression(symbolTable, symbolTable.getMethod(String.format("safe_index_%s", seqT.getName())), List.of(seqVarExp, indVarExp));
+        CallMethodExpression exp = new CallMethodExpression(symbolTable, symbolTable.getMethod(String.format("safe_index_%s", seqT.getName())), List.of(seqVarExp, indVarExp));
         asStatInd = Optional.of(new AssignmentStatement(symbolTable, List.of(indVar), exp));
         List<Statement> expand = asStatInd.get().expand();
         for (Statement stat : expand) {
@@ -81,6 +81,12 @@ public class SeqIndexExpression extends BaseExpression {
         }
         expanded.add(asStatInd.get().expand());
     }
+
+    @Override
+    public boolean validForFunction() {
+        return true;
+    }
+
 
     @Override
     public List<Type> getTypes() {

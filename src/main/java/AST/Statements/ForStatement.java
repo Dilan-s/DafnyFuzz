@@ -2,7 +2,7 @@ package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
-import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.CallMethodExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.util.ReturnStatus;
@@ -150,7 +150,7 @@ public class ForStatement extends BaseStatement {
         Expression initVarExp = new VariableExpression(symbolTable, initVar, initT);
         Expression finalVarExp = new VariableExpression(symbolTable, finalVar, finalT);
 
-        CallExpression exp = new CallExpression(symbolTable, symbolTable.getMethod("safe_min_max"), List.of(initVarExp, finalVarExp));
+        CallMethodExpression exp = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_min_max"), List.of(initVarExp, finalVarExp));
 
         statCallMinMax = Optional.of(new AssignmentStatement(symbolTable, List.of(initVar, finalVar), exp));
 

@@ -102,6 +102,11 @@ public class TupleLiteral extends BaseExpression {
     }
 
     @Override
+    public boolean validForFunction() {
+        return values.stream().anyMatch(Expression::validForFunction) || statement.validForFunction();
+    }
+
+    @Override
     public boolean requireUpdate() {
         return values.stream().anyMatch(Expression::requireUpdate) || statement.requireUpdate();
     }

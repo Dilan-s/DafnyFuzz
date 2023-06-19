@@ -1,11 +1,7 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Statement;
-import AST.SymbolTable.Identifier;
-import AST.SymbolTable.Method;
-import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -174,6 +170,11 @@ public class IfElseExpression extends BaseExpression {
 
         }
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean validForFunction() {
+        return test.validForFunction() || ifExp.validForFunction() || elseExp.validForFunction();
     }
 
     @Override

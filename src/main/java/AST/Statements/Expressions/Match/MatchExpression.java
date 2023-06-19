@@ -4,7 +4,6 @@ import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.BaseExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
-import AST.Statements.util.MatchStatementCase;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -15,7 +14,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,6 +65,12 @@ public class MatchExpression extends BaseExpression {
         }
 
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean validForFunction() {
+        return test.validForFunction() || cases.stream().anyMatch(Expression::validForFunction)
+            || defaultCase.validForFunction();
     }
 
     @Override

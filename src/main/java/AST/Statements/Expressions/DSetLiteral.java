@@ -1,9 +1,7 @@
 package AST.Statements.Expressions;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Statement;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -48,6 +46,11 @@ public class DSetLiteral extends BaseExpression {
             }
         }
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean validForFunction() {
+        return values.stream().anyMatch(Expression::validForFunction);
     }
 
     @Override

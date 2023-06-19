@@ -251,4 +251,9 @@ public class DataTypeRule implements UserDefinedType {
 
         return String.format("%s(%s)", ruleName, String.join(", ", fieldsMap));
     }
+
+    @Override
+    public boolean validFunctionType() {
+        return false;
+    }
 }

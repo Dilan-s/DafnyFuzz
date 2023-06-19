@@ -75,6 +75,12 @@ public class MatchExpressionCase extends BaseExpression {
     }
 
     @Override
+    public boolean validForFunction() {
+        return test.validForFunction() || value.validForFunction();
+    }
+
+
+    @Override
     public List<String> toOutput() {
         Set<String> res = new HashSet<>();
 

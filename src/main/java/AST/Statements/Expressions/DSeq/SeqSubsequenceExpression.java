@@ -3,7 +3,7 @@ package AST.Statements.Expressions.DSeq;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Expressions.BaseExpression;
-import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.CallMethodExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
@@ -36,7 +36,7 @@ public class SeqSubsequenceExpression extends BaseExpression {
     private Optional<AssignmentStatement> statLoHi;
     private Optional<Variable> loVar;
     private Optional<Variable> hiVar;
-    private Optional<CallExpression> callExp;
+    private Optional<CallMethodExpression> callExp;
 
     private boolean update;
 
@@ -81,7 +81,7 @@ public class SeqSubsequenceExpression extends BaseExpression {
 
         Variable loV = new Variable(VariableNameGenerator.generateVariableValueName(loT, symbolTable), loT);
         Variable hiV = new Variable(VariableNameGenerator.generateVariableValueName(hiT, symbolTable), hiT);
-        CallExpression exp = new CallExpression(symbolTable, symbolTable.getMethod("safe_subsequence"), List.of(seqVarExp, i, j));
+        CallMethodExpression exp = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_subsequence"), List.of(seqVarExp, i, j));
         this.loVar = Optional.of(loV);
         this.hiVar = Optional.of(hiV);
         this.callExp = Optional.of(exp);
@@ -95,6 +95,11 @@ public class SeqSubsequenceExpression extends BaseExpression {
         expanded.add(statSeq.expand());
         expanded.add(statLoHi.get().expand());
         update = true;
+    }
+
+    @Override
+    public boolean validForFunction() {
+        return true;
     }
 
     @Override

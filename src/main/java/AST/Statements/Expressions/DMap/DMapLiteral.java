@@ -1,11 +1,8 @@
 package AST.Statements.Expressions.DMap;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.BaseExpression;
-import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DMap.DMapEntry;
 import AST.SymbolTable.Types.Type;
@@ -94,6 +91,11 @@ public class DMapLiteral extends BaseExpression {
             }
         }
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean validForFunction() {
+        return entries.stream().anyMatch(e -> e.getKey().validForFunction() || e.getValue().validForFunction());
     }
 
     @Override

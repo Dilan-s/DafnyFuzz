@@ -16,15 +16,18 @@ public class VariableNameGenerator {
     private static Integer methodName = 0;
     private static Integer datatypeName = 0;
     private static Integer genericName = 0;
+    private static Integer functionName = 0;
 
     public static String generateReturnVariableName(String method) {
         Integer i = returnValues.getOrDefault(method, 1);
         returnValues.put(method, i + 1);
         return String.format("ret_%d", i);
     }
+
     public static String generateArgumentName(Method method) {
         return generateArgumentName(method.getName());
     }
+
     public static String generateArgumentName(String method) {
         Integer i = parameterValues.getOrDefault(method, 1);
         parameterValues.put(method, i + 1);
@@ -42,6 +45,11 @@ public class VariableNameGenerator {
     public static String generateMethodName() {
         methodName++;
         return String.format("m_method_%d", methodName);
+    }
+
+    public static String generateFunctionName() {
+        functionName++;
+        return String.format("f_function_%d", functionName);
     }
 
     public static String generateGenericName() {

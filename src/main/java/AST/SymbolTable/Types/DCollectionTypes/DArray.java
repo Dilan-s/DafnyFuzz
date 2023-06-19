@@ -205,4 +205,9 @@ public class DArray implements DCollection {
     public boolean isOrdered() {
         return false;
     }
+
+    @Override
+    public boolean validFunctionType() {
+        return false;
+    }
 }

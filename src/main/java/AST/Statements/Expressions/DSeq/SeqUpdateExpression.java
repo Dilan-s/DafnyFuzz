@@ -1,15 +1,13 @@
 package AST.Statements.Expressions.DSeq;
 
-import AST.Errors.SemanticException;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Expressions.BaseExpression;
-import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.CallMethodExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.Statement;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -35,7 +33,7 @@ public class SeqUpdateExpression extends BaseExpression {
     private Variable seqVar;
     private Variable indVar;
     private Expression exp;
-    private CallExpression callExp;
+    private CallMethodExpression callExp;
 
     private List<List<Statement>> expanded;
 
@@ -59,11 +57,16 @@ public class SeqUpdateExpression extends BaseExpression {
         seqAssign = new AssignmentStatement(symbolTable, List.of(seqVar), seq);
         VariableExpression seqVarExp = getSequenceVariableExpression();
 
-        callExp = new CallExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(seqVarExp, ind));
+        callExp = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(seqVarExp, ind));
 
         indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int(), symbolTable), new Int());
 
         indAssign = new AssignmentStatement(symbolTable, List.of(indVar), callExp);
+    }
+
+    @Override
+    public boolean validForFunction() {
+        return true;
     }
 
     @Override

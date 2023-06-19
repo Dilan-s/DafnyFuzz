@@ -2,7 +2,7 @@ package AST.Statements.Expressions.Operator;
 
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Expressions.BaseExpression;
-import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.CallMethodExpression;
 import AST.Statements.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -108,7 +108,7 @@ public class OperatorExpression extends BaseExpression {
 
     private void generateMethodCallReplacement(Map<Variable, Variable> paramsMap, StringBuilder s) {
         if (convertToCall && operator.equals(BinaryOperator.Divide)) {
-            CallExpression safe_division = new CallExpression(symbolTable, symbolTable.getMethod("safe_division"), args);
+            CallMethodExpression safe_division = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_division"), args);
             for (Statement stat : safe_division.expand()) {
                 stat.execute(paramsMap, s);
             }
@@ -118,7 +118,7 @@ public class OperatorExpression extends BaseExpression {
             update = true;
 
         } else if (convertToCall && operator.equals(BinaryOperator.Modulus)) {
-            CallExpression safe_modulus = new CallExpression(symbolTable, symbolTable.getMethod("safe_modulus"), args);
+            CallMethodExpression safe_modulus = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_modulus"), args);
             for (Statement stat : safe_modulus.expand()) {
                 stat.execute(paramsMap, s);
             }
@@ -128,6 +128,13 @@ public class OperatorExpression extends BaseExpression {
             update = true;
         }
     }
+
+    @Override
+    public boolean validForFunction() {
+        return operator.equals(BinaryOperator.Divide) || operator.equals(BinaryOperator.Modulus) ||
+            args.stream().anyMatch(Expression::validForFunction);
+    }
+
 
     @Override
     protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {

@@ -1,6 +1,7 @@
 package AST.Generator;
 
-import AST.Statements.Expressions.CallExpression;
+import AST.Statements.Expressions.CallFunctionExpression;
+import AST.Statements.Expressions.CallMethodExpression;
 import AST.Statements.Expressions.DMap.DMapSelection;
 import AST.Statements.Expressions.DMap.DMapUpdateExpression;
 import AST.Statements.Expressions.Expression;
@@ -16,9 +17,7 @@ import AST.Statements.Expressions.DSeq.SeqUpdateExpression;
 import AST.Statements.Expressions.DSeq.SeqIndexExpression;
 import AST.Statements.Expressions.DSeq.SeqSubsequenceExpression;
 import AST.Statements.Expressions.VariableExpression;
-import AST.Statements.MatchStatement;
-import AST.Statements.Statement;
-import AST.Statements.util.MatchStatementCase;
+import AST.SymbolTable.Function;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
@@ -43,7 +42,8 @@ public class RandomExpressionGenerator {
     public static double PROB_SEQ_UPDATE_EXPRESSION = 8.0;
     public static double PROB_DMAP_UPDATE_EXPRESSION = 8.0;
     public static double PROB_IF_ELSE_EXPRESSION = 8.0;
-    public static double PROB_CALL_EXPRESSION = 20.0;
+    public static double PROB_CALL_METHOD_EXPRESSION = 20.0;
+    public static double PROB_CALL_FUNCTION_EXPRESSION = 20.0;
     public static double PROB_MATCH_EXPRESSION = 5.0;
 
     private static final int MAX_MATCH_CASES_VALUES = 2;
@@ -52,8 +52,6 @@ public class RandomExpressionGenerator {
 
     private static int expressionDepth = 0;
 
-    public static boolean allowNullValues = true;
-
     public Expression generateExpression(Type type, SymbolTable symbolTable) {
         Expression ret = null;
         expressionDepth++;
@@ -61,7 +59,7 @@ public class RandomExpressionGenerator {
             double ratioSum = PROB_LITERAL_EXPRESSION + PROB_OPERATOR_EXPRESSION +
                 PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_DMAP_SELECTION_EXPRESSION +
                 PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION +
-                PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_EXPRESSION
+                PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_METHOD_EXPRESSION
                 + PROB_MATCH_EXPRESSION
                 ;
             double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * ratioSum;
@@ -110,14 +108,19 @@ public class RandomExpressionGenerator {
                 PROB_IF_ELSE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateIfElseExpression(type, symbolTable);
 
-            } else if ((probTypeOfExpression -= PROB_CALL_EXPRESSION) < 0) {
+            } else if ((probTypeOfExpression -= PROB_CALL_METHOD_EXPRESSION) < 0) {
                 //call
                 if (type.validMethodType()) {
-                    PROB_CALL_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                    ret = generateCallExpression(symbolTable, List.of(type));
+                    PROB_CALL_METHOD_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateCallMethodExpression(symbolTable, List.of(type));
                 }
-            }
-            else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
+            }  else if ((probTypeOfExpression -= PROB_CALL_FUNCTION_EXPRESSION) < 0) {
+                //call
+                if (type.validFunctionType()) {
+                    PROB_CALL_FUNCTION_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateCallFunctionExpression(type, symbolTable);
+                }
+            } else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
                 //match
                 PROB_MATCH_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateMatchExpression(symbolTable, type);
@@ -258,12 +261,6 @@ public class RandomExpressionGenerator {
     private VariableExpression generateVariableExpression(Type type, SymbolTable symbolTable) {
         List<Variable> variables = symbolTable.getAllVariables(type);
 
-        if (!allowNullValues) {
-            variables = variables.stream()
-                .filter(v -> v.getValue() != null)
-                .collect(Collectors.toList());
-        }
-
         if (!variables.isEmpty()) {
             int index = GeneratorConfig.getRandom().nextInt(variables.size());
             Variable variable = variables.get(index);
@@ -330,7 +327,31 @@ public class RandomExpressionGenerator {
         return null;
     }
 
-    public CallExpression generateCallExpression(SymbolTable symbolTable, List<Type> returnTypes) {
+    private Expression generateCallFunctionExpression(Type type, SymbolTable symbolTable) {
+        if (!type.validFunctionType()) {
+            return null;
+        }
+        RandomFunctionGenerator functionGenerator = new RandomFunctionGenerator();
+        Function f = functionGenerator.generateFunction(type, symbolTable);
+
+        if (f == null) {
+            return null;
+        }
+
+        List<Type> argTypes = f.getArgTypes();
+        List<Expression> args = new ArrayList<>();
+
+        for (Type t : argTypes) {
+            Type concrete = t.concrete(symbolTable);
+            Expression exp = generateExpression(concrete, symbolTable);
+            args.add(exp);
+        }
+        CallFunctionExpression expression = new CallFunctionExpression(symbolTable, f, args);
+
+        return expression;
+    }
+
+    public CallMethodExpression generateCallMethodExpression(SymbolTable symbolTable, List<Type> returnTypes) {
         if (!returnTypes.stream().allMatch(Type::validMethodType)) {
             return null;
         }
@@ -346,19 +367,13 @@ public class RandomExpressionGenerator {
         }
 
         List<Type> argTypes = m.getArgTypes();
-        int i = 0;
         List<Expression> args = new ArrayList<>();
-        boolean prevNull = allowNullValues;
-        allowNullValues = false;
-        while (i < argTypes.size()) {
-            Type t = argTypes.get(i);
+        for (Type t : argTypes) {
             Type concrete = t.concrete(symbolTable);
             Expression exp = generateExpression(concrete, symbolTable);
             args.add(exp);
-            i++;
         }
-        allowNullValues = prevNull;
-        CallExpression expression = new CallExpression(symbolTable, m, args);
+        CallMethodExpression expression = new CallMethodExpression(symbolTable, m, args);
 
 
         return expression;
