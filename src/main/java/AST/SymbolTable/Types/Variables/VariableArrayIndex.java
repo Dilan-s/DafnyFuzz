@@ -1,8 +1,7 @@
 package AST.SymbolTable.Types.Variables;
 
-import AST.Statements.Expressions.Array.ArrayValue;
+import AST.Expressions.Array.ArrayValue;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,5 @@
 package AST.SymbolTable.Types.DCollectionTypes;
 
-import AST.Statements.Expressions.Expression;
 import AST.SymbolTable.Types.Type;
 
 public interface DCollection extends Type {

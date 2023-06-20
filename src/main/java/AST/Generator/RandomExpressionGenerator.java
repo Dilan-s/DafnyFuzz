@@ -1,22 +1,22 @@
 package AST.Generator;
 
-import AST.Statements.Expressions.CallFunctionExpression;
-import AST.Statements.Expressions.CallMethodExpression;
-import AST.Statements.Expressions.DMap.DMapSelection;
-import AST.Statements.Expressions.DMap.DMapUpdateExpression;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.IfElseExpression;
-import AST.Statements.Expressions.IntLiteral;
-import AST.Statements.Expressions.Match.MatchExpression;
-import AST.Statements.Expressions.Match.MatchExpressionCase;
-import AST.Statements.Expressions.Operator.BinaryOperator;
-import AST.Statements.Expressions.Operator.Operator;
-import AST.Statements.Expressions.Operator.UnaryOperator;
-import AST.Statements.Expressions.Operator.OperatorExpression;
-import AST.Statements.Expressions.DSeq.SeqUpdateExpression;
-import AST.Statements.Expressions.DSeq.SeqIndexExpression;
-import AST.Statements.Expressions.DSeq.SeqSubsequenceExpression;
-import AST.Statements.Expressions.VariableExpression;
+import AST.Expressions.CallFunctionExpression;
+import AST.Expressions.CallMethodExpression;
+import AST.Expressions.DMap.DMapSelection;
+import AST.Expressions.DMap.DMapUpdateExpression;
+import AST.Expressions.Expression;
+import AST.Expressions.IfElseExpression;
+import AST.Expressions.IntLiteral;
+import AST.Expressions.Match.MatchExpression;
+import AST.Expressions.Match.MatchExpressionCase;
+import AST.Expressions.Operator.BinaryOperator;
+import AST.Expressions.Operator.Operator;
+import AST.Expressions.Operator.UnaryOperator;
+import AST.Expressions.Operator.OperatorExpression;
+import AST.Expressions.DSeq.SeqUpdateExpression;
+import AST.Expressions.DSeq.SeqIndexExpression;
+import AST.Expressions.DSeq.SeqSubsequenceExpression;
+import AST.Expressions.VariableExpression;
 import AST.SymbolTable.Function;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.DMap.DMap;
@@ -60,8 +60,8 @@ public class RandomExpressionGenerator {
                 PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_DMAP_SELECTION_EXPRESSION +
                 PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION +
                 PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_METHOD_EXPRESSION
-                + PROB_MATCH_EXPRESSION
-                ;
+                + PROB_CALL_FUNCTION_EXPRESSION + PROB_MATCH_EXPRESSION;
+
             double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * ratioSum;
             if (expressionDepth > MAX_EXPRESSION_DEPTH || (probTypeOfExpression -= PROB_LITERAL_EXPRESSION) < 0) {
                 //literal

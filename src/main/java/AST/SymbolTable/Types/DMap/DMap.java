@@ -3,11 +3,10 @@ package AST.SymbolTable.Types.DMap;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Statements.Expressions.DMap.DMapLiteral;
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.DMap.DMapLiteral;
+import AST.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
-import javax.management.ObjectName;
 
 public class DMap implements Type {
 

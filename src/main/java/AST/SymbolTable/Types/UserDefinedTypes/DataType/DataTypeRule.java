@@ -2,9 +2,9 @@ package AST.SymbolTable.Types.UserDefinedTypes.DataType;
 
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.VariableNameGenerator;
-import AST.Statements.Expressions.DataType.DataTypeLiteral;
-import AST.Statements.Expressions.DataType.DataTypeValue;
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.DataType.DataTypeLiteral;
+import AST.Expressions.DataType.DataTypeValue;
+import AST.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.GenericType.GenericType;
 import AST.SymbolTable.Types.Type;

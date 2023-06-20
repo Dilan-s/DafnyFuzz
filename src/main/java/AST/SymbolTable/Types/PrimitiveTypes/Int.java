@@ -1,12 +1,11 @@
 package AST.SymbolTable.Types.PrimitiveTypes;
 
 import AST.Generator.GeneratorConfig;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.IntLiteral;
+import AST.Expressions.Expression;
+import AST.Expressions.IntLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.math.BigInteger;
-import java.util.Objects;
 
 public class Int implements BaseType {
 

@@ -1,7 +1,7 @@
 package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.Expression;
 import AST.Statements.util.PrintAll;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;

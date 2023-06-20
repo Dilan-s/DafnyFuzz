@@ -1,6 +1,6 @@
 package AST.SymbolTable.Types.DMap;
 
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.Expression;
 
 public class DMapEntry {
 

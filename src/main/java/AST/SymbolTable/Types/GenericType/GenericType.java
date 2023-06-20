@@ -1,7 +1,7 @@
 package AST.SymbolTable.Types.GenericType;
 
 import AST.Generator.RandomTypeGenerator;
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.Objects;

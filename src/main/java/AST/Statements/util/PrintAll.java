@@ -1,21 +1,13 @@
 package AST.Statements.util;
 
-import AST.Errors.SemanticException;
 import AST.Statements.BaseStatement;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.StringLiteral;
-import AST.Statements.Expressions.VariableExpression;
 import AST.Statements.PrintStatement;
 import AST.Statements.Statement;
-import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.prefs.BackingStoreException;
-import java.util.stream.Collectors;
 
 public class PrintAll extends BaseStatement {
 

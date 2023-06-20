@@ -1,14 +1,10 @@
 package AST.SymbolTable.Types.PrimitiveTypes;
 
-import AST.Generator.GeneratorConfig;
-import AST.Statements.Expressions.BoolLiteral;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.StringLiteral;
-import AST.StringUtils;
+import AST.Expressions.Expression;
+import AST.Expressions.StringLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.Objects;
-import java.util.Random;
 
 public class DString implements BaseType {
 

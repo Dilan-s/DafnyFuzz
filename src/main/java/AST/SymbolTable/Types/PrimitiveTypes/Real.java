@@ -1,8 +1,8 @@
 package AST.SymbolTable.Types.PrimitiveTypes;
 
 import AST.Generator.GeneratorConfig;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.RealLiteral;
+import AST.Expressions.Expression;
+import AST.Expressions.RealLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.Objects;

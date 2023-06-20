@@ -4,7 +4,7 @@ echo "PID: $$"
 trap 'kill -9 $$' SIGINT
 
 
-javac -cp src/main/java/ -d ./out/ src/main/java/Main/VerificationProgramGeneration.java
+javac -cp src/main/java/ -d ./out/ src/main/java/Main/VerificationProgram.java
 
 rm -rf tests-minimized || true
 rm -rf tests-incorrect || true
@@ -25,7 +25,7 @@ do
     cd "$directory"
 
     echo "Test number $x"
-    timeout -s SIGKILL $t java -cp out/ Main.VerificationProgramGeneration $x
+    timeout -s SIGKILL $t java -cp out/ Main.VerificationProgram $x
     if [ $? -ne 0 ]
     then
 	echo "Failed to create dafny file in $t seconds"

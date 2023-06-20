@@ -65,7 +65,7 @@ public class DafnyProgram {
         }
     }
 
-    public void EMIProgramGeneration(Method main) {
+    public void MetamorphicProgramGeneration(Method main) {
         List<String> programOptions = main.toOutput();
         try {
             Path path = Paths.get("./tests");

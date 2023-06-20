@@ -10,7 +10,7 @@ do
     esac
 done
 
-javac -cp src/main/java/ -d ./out/ src/main/java/Main/ExpectedProgramGeneration.java src/main/java/Main/CompareOutputs.java
+javac -cp src/main/java/ -d ./out/ src/main/java/Main/ExpectedProgram.java src/main/java/Main/CompareOutputs.java
 
 rm -rf outputs || true
 rm -rf tests || true
@@ -30,7 +30,7 @@ while [ true ]; do
     cd "$directory"
 
     echo "Test number $x"
-    timeout -s SIGKILL $t java -cp out/ Main.ExpectedProgramGeneration $x
+    timeout -s SIGKILL $t java -cp out/ Main.ExpectedProgram $x
     if [ $? -ne 0 ]
     then
         echo "Failed to create dafny file in $t seconds"

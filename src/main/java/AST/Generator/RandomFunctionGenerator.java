@@ -1,6 +1,6 @@
 package AST.Generator;
 
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.Expression;
 import AST.SymbolTable.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;

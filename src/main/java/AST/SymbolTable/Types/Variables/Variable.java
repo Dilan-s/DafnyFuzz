@@ -1,12 +1,11 @@
 package AST.SymbolTable.Types.Variables;
 
-import AST.Statements.Expressions.Array.ArrayValue;
-import AST.Statements.Expressions.DataType.DataTypeValue;
+import AST.Expressions.Array.ArrayValue;
+import AST.Expressions.DataType.DataTypeValue;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import java.util.ArrayList;

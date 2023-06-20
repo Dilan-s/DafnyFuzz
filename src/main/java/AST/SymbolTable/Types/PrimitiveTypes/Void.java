@@ -1,6 +1,6 @@
 package AST.SymbolTable.Types.PrimitiveTypes;
 
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 

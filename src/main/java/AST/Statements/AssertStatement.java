@@ -1,10 +1,10 @@
 package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.Operator.BinaryOperator;
-import AST.Statements.Expressions.Operator.OperatorExpression;
-import AST.Statements.Expressions.VariableExpression;
+import AST.Expressions.Expression;
+import AST.Expressions.Operator.BinaryOperator;
+import AST.Expressions.Operator.OperatorExpression;
+import AST.Expressions.VariableExpression;
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class AssertStatement extends BaseStatement {

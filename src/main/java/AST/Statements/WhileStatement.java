@@ -1,11 +1,10 @@
 package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.xml.transform.ErrorListener;
 
 public class WhileStatement extends BaseStatement {
 

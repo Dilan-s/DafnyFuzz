@@ -3,9 +3,8 @@ package AST.SymbolTable.Types.DCollectionTypes;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Statements.Expressions.DSeq.SeqLiteral;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.MultisetLiteral;
+import AST.Expressions.Expression;
+import AST.Expressions.MultisetLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.math.BigInteger;
@@ -13,10 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Multiset implements DCollection {
 

@@ -2,7 +2,7 @@ package AST.SymbolTable;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
-import AST.Statements.Expressions.Expression;
+import AST.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;

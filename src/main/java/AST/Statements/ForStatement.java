@@ -2,9 +2,9 @@ package AST.Statements;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
-import AST.Statements.Expressions.CallMethodExpression;
-import AST.Statements.Expressions.Expression;
-import AST.Statements.Expressions.VariableExpression;
+import AST.Expressions.CallMethodExpression;
+import AST.Expressions.Expression;
+import AST.Expressions.VariableExpression;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
