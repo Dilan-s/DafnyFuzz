@@ -76,7 +76,7 @@ public class MatchExpressionCase extends BaseExpression {
 
     @Override
     public boolean validForFunction() {
-        return test.validForFunction() || value.validForFunction();
+        return (test != null && test.validForFunction()) || value.validForFunction();
     }
 
 
