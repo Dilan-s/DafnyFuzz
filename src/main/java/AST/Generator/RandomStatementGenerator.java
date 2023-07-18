@@ -19,6 +19,7 @@ import AST.Statements.Statement;
 import AST.Statements.WhileStatement;
 import AST.Statements.util.MatchStatementCase;
 import AST.Statements.util.PrintAll;
+import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -53,6 +54,7 @@ public class RandomStatementGenerator {
     public static final double PROB_FORCE_RETURN = 0.25;
     public static final double PROB_REASSIGN = 1.0;
 
+    public static boolean execute = true;
     public static int loopDepth = 0;
     private static int statementDepth = 0;
 
@@ -66,12 +68,16 @@ public class RandomStatementGenerator {
 
         double probContinue = GeneratorConfig.getRandom().nextDouble();
         Statement statement = null;
+        ReturnStatus returnStatus = ReturnStatus.UNKNOWN;
         while (probContinue < PROB_NEXT_STAT || requireReturn) {
             statement = generateStatement(method, symbolTable, requireReturn);
-            if (statementDepth == 0) {
+            if (statementDepth == 0 && execute) {
                 List<Statement> expand = statement.expand();
                 for (Statement st : expand) {
-                    st.execute(new StringBuilder());
+                    returnStatus = st.execute(new StringBuilder());
+                    if (returnStatus == ReturnStatus.RETURN) {
+                        execute = false;
+                    }
                 }
             }
 
@@ -85,7 +91,7 @@ public class RandomStatementGenerator {
         if (statement != null && !statement.isReturn()) {
             PrintAll printAll = new PrintAll(body.getSymbolTable());
             List<Statement> expand = printAll.expand();
-            if (statementDepth == 0) {
+            if (statementDepth == 0 && (execute || returnStatus == ReturnStatus.RETURN)) {
                 for (Statement st : expand) {
                     st.execute(new StringBuilder());
                 }

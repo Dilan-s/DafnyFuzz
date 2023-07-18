@@ -28,9 +28,9 @@ do
     timeout -s SIGKILL $t java -cp out/ Main.VerificationProgram $x
     if [ $? -ne 0 ]
     then
-	echo "Failed to create dafny file in $t seconds"
-	x=$(( $x + 1 ))
-	continue;
+        echo "Failed to create dafny file in $t seconds"
+        x=$(( $x + 1 ))
+        continue;
     fi
 
     cd "$directory"
@@ -41,6 +41,12 @@ do
         do
             echo "Expecting validation to succeed for $file"
 
+            Dafny /compile:0 /noVerify $file > tmp.txt 2>&1
+            if [ $? -ne 0 ]
+            then
+                echo "Invalid Dafny code in $file"
+                continue;
+            fi
             timeout -s SIGKILL $t Dafny verify $file > tmp.txt 2>&1
             if [ $? -eq 4 ]
             then
@@ -62,9 +68,15 @@ do
 	for file in tests-incorrect/*
 	do
 	    echo "Expecting validation to fail for $file"
-	    cp "$file" test.dfy
-	
-	    timeout -s SIGKILL $t Dafny verify test.dfy > tmp.txt 2>&1
+
+        Dafny /compile:0 /noVerify $file > tmp.txt 2>&1
+        if [ $? -ne 0 ]
+        then
+            echo "Invalid Dafny code in $file"
+            continue;
+        fi
+	    timeout -s SIGKILL $t Dafny verify $file > tmp.txt 2>&1
+
 	    code=$?
 	    if [[ $code -ne 4 && $code -lt 5 ]]
 	    then

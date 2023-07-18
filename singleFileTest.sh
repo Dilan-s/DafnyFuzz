@@ -72,7 +72,7 @@ elif [ "$language" = "js" ]; then
         exitCode=1
     fi
 elif [ "$language" = "java" ]; then
-    timeout -s SIGKILL $t Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 /unicodeChar:0 test.dfy > tmp.txt 2>&1
+    timeout -s SIGKILL $t Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 /unicodeChar:0 test.dfy > tmp.txt 2>errors/compErrors/java.txt
     if [ $? -eq 0 ];
     then
         echo "Success Java"

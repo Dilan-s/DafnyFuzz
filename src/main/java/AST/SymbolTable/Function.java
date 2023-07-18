@@ -130,7 +130,7 @@ public class Function implements Identifier {
         for (String s : body.toOutput()) {
             for (String f : res) {
                 String curr = f;
-                curr = curr + StringUtils.indent(s) + "\n";
+                curr = curr + StringUtils.indent(s) + "\n}\n\n";
                 temp.add(curr);
             }
         }
