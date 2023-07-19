@@ -208,7 +208,9 @@ public class MatchExpression extends BaseExpression {
                 cases.add(c);
             }
         }
-        cases.add(defaultCase);
+        if (defaultCase.getNoOfUses() > 0) {
+            cases.add(defaultCase);
+        }
 
         if (cases.size() == 1) {
             MatchExpressionCase matchExpressionCase = cases.get(0);

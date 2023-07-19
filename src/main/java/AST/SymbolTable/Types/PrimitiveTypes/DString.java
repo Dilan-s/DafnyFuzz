@@ -2,18 +2,22 @@ package AST.SymbolTable.Types.PrimitiveTypes;
 
 import AST.Expressions.Expression;
 import AST.Expressions.StringLiteral;
+import AST.Generator.GeneratorConfig;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.Objects;
+import org.apache.commons.lang3.RandomStringUtils;
 
 public class DString implements BaseType {
+
+    private static final int MAX_STRING_SIZE = 20;
 
     public DString() {
     }
 
     @Override
     public String getName() {
-        return "bool";
+        return "string";
     }
 
     @Override
@@ -32,13 +36,25 @@ public class DString implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
-        return new StringLiteral(this, symbolTable, "");
+        int size = GeneratorConfig.getRandom().nextInt(MAX_STRING_SIZE);
+        String s = RandomStringUtils.random(size, 0, 0, true, true, null, GeneratorConfig.getRandom());
+        return new StringLiteral(this, symbolTable, s);
     }
 
     @Override
     public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
         String v = value.toString();
         return new StringLiteral(this, symbolTable, v);
+    }
+
+    @Override
+    public boolean validMethodType() {
+        return true;
+    }
+
+    @Override
+    public boolean validFunctionType() {
+        return true;
     }
 
     @Override

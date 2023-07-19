@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PrintStatement extends BaseStatement {
@@ -78,14 +79,17 @@ public class PrintStatement extends BaseStatement {
     protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         if (values.isEmpty()) {
             values = new ArrayList<>();
-            variables.stream().filter(symbolTable::variableInScope).forEach(v -> {
-                StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
-                VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
-                values.add(stringLiteral);
-                expanded.add(expanded.size() - 1, stringLiteral.expand());
-                values.add(expression);
-                expanded.add(expanded.size() - 1, expression.expand());
-            });
+            variables.stream()
+                .filter(symbolTable::variableInScope)
+                .filter(v -> v.getValue(paramMap).stream().allMatch(Objects::nonNull))
+                .forEach(v -> {
+                    StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
+                    VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
+                    values.add(stringLiteral);
+                    expanded.add(expanded.size() - 1, stringLiteral.expand());
+                    values.add(expression);
+                    expanded.add(expanded.size() - 1, expression.expand());
+                });
         }
 
         List<String> joiner = new ArrayList<>();

@@ -1,12 +1,16 @@
 package AST.SymbolTable.Types.DCollectionTypes;
 
+import AST.Expressions.DSeq.SeqFuncLiteral;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
+import AST.Generator.RandomFunctionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Expressions.Expression;
 import AST.Expressions.DSeq.SeqLiteral;
+import AST.SymbolTable.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
+import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +20,7 @@ import java.util.stream.Collectors;
 public class Seq implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 5;
+    public static final double PROB_USE_FUNC = 0.3;
     private Type type;
     public static int printDepth = 0;
 
@@ -74,6 +79,7 @@ public class Seq implements DCollection {
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+        RandomFunctionGenerator functionGenerator = new RandomFunctionGenerator();
 
         int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
         if (type.equals(new DArray())) {
@@ -81,6 +87,14 @@ public class Seq implements DCollection {
                 length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
             }
         }
+
+        double probType = GeneratorConfig.getRandom().nextDouble();
+        if (probType < PROB_USE_FUNC) {
+            Function f = functionGenerator.generateFunction(type, symbolTable, List.of(new Int()));
+            SeqFuncLiteral expression = new SeqFuncLiteral(symbolTable, this, length, f);
+            return expression;
+        }
+
         List<Expression> values = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             Type concrete = type.concrete(symbolTable);

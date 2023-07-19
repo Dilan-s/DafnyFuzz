@@ -22,10 +22,7 @@ public class RandomFunctionGenerator {
         }
 
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
-        RandomMethodGenerator methodGenerator = new RandomMethodGenerator();
 
-        functionDepth++;
         List<Function> functionWithSameType = symbolTable.getFunctionWithType(returnType);
 
         double probReuseFunction = GeneratorConfig.getRandom().nextDouble();
@@ -35,19 +32,28 @@ public class RandomFunctionGenerator {
             return functionWithSameType.get(i);
         }
 
+        int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
+        List<Type> argsT = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
+
+        return generateFunction(returnType, symbolTable, argsT);
+    }
+
+    public Function generateFunction(Type returnType, SymbolTable symbolTable, List<Type> argsT) {
+
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+        RandomMethodGenerator methodGenerator = new RandomMethodGenerator();
+
+        functionDepth++;
         String functionName = VariableNameGenerator.generateFunctionName();
 
-        int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
-        SymbolTable st = new SymbolTable();
-        List<Type> argsT = typeGenerator.generateMethodTypes(noOfArgs, st);
         List<Variable> args = argsT.stream()
             .map(t -> new Variable(VariableNameGenerator.generateArgumentName(functionName), t))
             .collect(Collectors.toList());
+
+        SymbolTable st;
         Expression body;
         do {
             st = new SymbolTable();
-
-
             for (Variable arg : args) {
                 arg.setConstant();
                 for (Variable tableArg : arg.getSymbolTableArgs()) {

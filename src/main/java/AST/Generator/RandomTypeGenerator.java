@@ -6,6 +6,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.BaseType;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
@@ -29,6 +30,7 @@ public class RandomTypeGenerator {
     public static double PROB_BOOL = 40.0;
     public static double PROB_CHAR = 40.0;
     public static double PROB_REAL = 10.0;
+    public static double PROB_DSTRING = 10.0;
     public static double PROB_DMAP = 10.0;
     public static double PROB_DARRAY = 10.0;
     public static double PROB_DSET = 10.0;
@@ -53,8 +55,9 @@ public class RandomTypeGenerator {
                 t = PRIMITIVE_TYPES.get(index);
 
             } else {
-                double ratioSum = PROB_INT + PROB_BOOL + PROB_CHAR + PROB_REAL + PROB_DMAP +
-                    PROB_DARRAY + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE + PROB_DATATYPE;
+                double ratioSum = PROB_INT + PROB_BOOL + PROB_CHAR + PROB_REAL + PROB_DSTRING +
+                    PROB_DMAP + PROB_DARRAY + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE +
+                    PROB_DATATYPE;
                 double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
                 if (swarm) {
@@ -91,6 +94,14 @@ public class RandomTypeGenerator {
                     t = new Real();
                     if (swarm) {
                         PROB_REAL *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
+                    }
+
+                } else if ((probType -= PROB_DSTRING) < 0) {
+                    // string
+                    PROB_DSTRING *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new DString();
+                    if (swarm) {
+                        PROB_DSTRING *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
                     }
 
                 } else if ((probType -= PROB_DMAP) < 0) {
