@@ -6,6 +6,7 @@ import AST.Expressions.Expression;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
@@ -39,6 +40,7 @@ public interface Operator {
         Type tuple = new Tuple().concrete(symbolTable);
         Type datatype = new DataType();
         datatype.concrete(symbolTable);
+        Type map = new DMap().concrete(symbolTable);
 
         List<Type> ret = new ArrayList<>();
         for (Type type: types) {
@@ -50,6 +52,8 @@ public interface Operator {
                 ret.add(tuple.concrete(symbolTable));
             } else if (type.equals(new DataType())) {
                 ret.add(datatype.concrete(symbolTable));
+            } else if (type.equals(new DMap())) {
+                ret.add(map.concrete(symbolTable));
             } else {
                 ret.add(type.concrete(symbolTable));
             }
@@ -73,5 +77,12 @@ public interface Operator {
             ops.add(BinaryOperator.Greater_Than);
         }
         return ops;
+    }
+
+    default int restrictions() {
+        return 0;
+    }
+
+    default void restore(int v) {
     }
 }

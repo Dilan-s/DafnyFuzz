@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class DSet implements DCollection {
 
     public static final int MAX_SIZE_OF_SET = 5;
+    public static int MIN_SIZE_OF_SET = 0;
     private Type type;
 
     public DSet(Type type) {
@@ -74,10 +75,10 @@ public class DSet implements DCollection {
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
+        int noOfElems = MIN_SIZE_OF_SET + GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
         if (type.equals(new DArray())) {
             while (noOfElems == 1) {
-                noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
+                noOfElems = MIN_SIZE_OF_SET + GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
             }
         }
         List<Expression> values = new ArrayList<>();

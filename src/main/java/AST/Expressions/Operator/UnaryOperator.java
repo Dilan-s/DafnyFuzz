@@ -83,6 +83,22 @@ public enum UnaryOperator implements Operator {
             }
             return null;
         }
+
+        @Override
+        public int restrictions() {
+            int prev = Seq.MIN_SIZE_OF_SEQ;
+            Seq.MIN_SIZE_OF_SEQ = 1;
+            DSet.MIN_SIZE_OF_SET = 1;
+            Multiset.MIN_SIZE_OF_MULTISET = 1;
+            return prev;
+        }
+
+        @Override
+        public void restore(int v) {
+            Seq.MIN_SIZE_OF_SEQ = v;
+            DSet.MIN_SIZE_OF_SET = v;
+            Multiset.MIN_SIZE_OF_MULTISET = v;
+        }
     },
     ArrayLength("Length", List.of(Args.DARRAY), new Int()) {
         @Override

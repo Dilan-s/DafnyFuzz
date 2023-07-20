@@ -25,6 +25,7 @@ public class SeqFuncLiteral extends BaseExpression {
         this.type = type;
         this.length = length;
         this.f = f;
+        f.incrementUse();
     }
 
     @Override
@@ -46,7 +47,6 @@ public class SeqFuncLiteral extends BaseExpression {
     protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
         List<Object> l = new ArrayList<>();
-        f.incrementUse();
         for (int i = 0; i < length; i++) {
             Variable arg = new Variable("TEMP", new Int());
             arg.setValue(symbolTable, paramMap, i);

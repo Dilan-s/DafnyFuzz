@@ -17,6 +17,7 @@ import java.util.Objects;
 public class Multiset implements DCollection {
 
     public static final int MAX_SIZE_OF_MULTISET = 5;
+    public static int MIN_SIZE_OF_MULTISET = 0;
     public static final double PROB_USE_DSET = 0.3;
     public static final double PROB_USE_SEQ = PROB_USE_DSET + 0.3;
     private Type type;
@@ -94,7 +95,7 @@ public class Multiset implements DCollection {
             return expression;
         }
 
-        int noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
+        int noOfElems = MIN_SIZE_OF_MULTISET + GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
         if (type.equals(new DArray())) {
             while (noOfElems == 1) {
                 noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);

@@ -280,6 +280,7 @@ public class RandomExpressionGenerator {
         List<Type> types = typeArgs.get(randType);
 
         types = operator.concreteType(types, symbolTable, type);
+        int prev = operator.restrictions();
 
         List<Expression> args = new ArrayList<>();
         for (Type t : types) {
@@ -288,6 +289,7 @@ public class RandomExpressionGenerator {
         }
 
         OperatorExpression expression = new OperatorExpression(symbolTable, type, operator, args);
+        operator.restore(prev);
 
         return expression;
     }

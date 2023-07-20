@@ -19,8 +19,9 @@ import java.util.stream.Collectors;
 
 public class Seq implements DCollection {
 
-    public static final int MAX_SIZE_OF_SET = 5;
-    public static final double PROB_USE_FUNC = 0.3;
+    public static final int MAX_SIZE_OF_SEQ = 5;
+    public static int MIN_SIZE_OF_SEQ = 0;
+    public static final double PROB_USE_FUNC = 0.1;
     private Type type;
     public static int printDepth = 0;
 
@@ -81,10 +82,10 @@ public class Seq implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         RandomFunctionGenerator functionGenerator = new RandomFunctionGenerator();
 
-        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
+        int length = MIN_SIZE_OF_SEQ + GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SEQ);
         if (type.equals(new DArray())) {
             while (length == 1) {
-                length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SET);
+                length = MIN_SIZE_OF_SEQ + GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_SEQ);
             }
         }
 
