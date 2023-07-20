@@ -65,7 +65,6 @@ public class RandomExpressionGenerator {
             double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * ratioSum;
             if (expressionDepth > MAX_EXPRESSION_DEPTH || (probTypeOfExpression -= PROB_LITERAL_EXPRESSION) < 0) {
                 //literal
-                PROB_LITERAL_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                 ret = generateLiteral(type, symbolTable);
 
             } else if ((probTypeOfExpression -= PROB_VARIABLE_EXPRESSION) < 0) {

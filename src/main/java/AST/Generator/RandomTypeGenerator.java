@@ -158,8 +158,7 @@ public class RandomTypeGenerator {
                         int ind = GeneratorConfig.getRandom().nextInt(DEFINED_DATA_TYPES.size());
                         t = DEFINED_DATA_TYPES.get(ind);
                     } else {
-                        String datatypeName = VariableNameGenerator.generateDatatypeName();
-                        DataType dataType = new DataType(datatypeName);
+                        DataType dataType = new DataType();
                         t = dataType;
                         DEFINED_DATA_TYPES.add(dataType);
                     }

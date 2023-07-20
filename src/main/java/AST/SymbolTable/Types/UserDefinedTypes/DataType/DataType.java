@@ -66,6 +66,10 @@ public class DataType implements UserDefinedType {
     @Override
     public Type concrete(SymbolTable symbolTable) {
         if (rules == null) {
+            if (datatypeName == null) {
+                datatypeName = VariableNameGenerator.generateDatatypeName();
+            }
+
             RandomTypeGenerator randomTypeGenerator = new RandomTypeGenerator();
             this.rules = new ArrayList<>();
 
@@ -100,6 +104,10 @@ public class DataType implements UserDefinedType {
                 ruleName = VariableNameGenerator.generateDatatypeRuleName(datatypeName);
                 DataTypeRule rule = new DataTypeRule(this, ruleName, types, generics);
                 rules.add(rule);
+            }
+
+            if (!RandomTypeGenerator.DEFINED_DATA_TYPES.contains(this)) {
+                RandomTypeGenerator.DEFINED_DATA_TYPES.add(this);
             }
         }
         List<DataTypeRule> rs = new ArrayList<>();

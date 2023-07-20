@@ -5,6 +5,7 @@ import AST.Expressions.StringLiteral;
 import AST.Generator.GeneratorConfig;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.math.BigInteger;
 import java.util.Objects;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -62,16 +63,19 @@ public class DString implements BaseType {
         return false;
     }
 
+
     @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
-        return false;
+        String lhs = (String) lhsV;
+        String rhs = (String) rhsV;
+        return lhs.compareTo(rhs) < 0;
     }
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        String lhsVS = lhsV.toString();
-        String rhsVS = rhsV.toString();
-        return Objects.equals(lhsVS, rhsVS);
+        String lhs = (String) lhsV;
+        String rhs = (String) rhsV;
+        return lhs.compareTo(rhs) == 0;
     }
 
     @Override
