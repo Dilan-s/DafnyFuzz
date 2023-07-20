@@ -3,8 +3,6 @@
 echo "PID: $$"
 trap 'kill -9 $$' SIGINT
 
-mvn install
-
 while getopts l: flag
 do
     case "${flag}" in

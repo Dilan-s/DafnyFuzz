@@ -3,11 +3,9 @@ package AST.SymbolTable.Types.PrimitiveTypes;
 import AST.Expressions.Expression;
 import AST.Expressions.StringLiteral;
 import AST.Generator.GeneratorConfig;
+import AST.Statements.util.RandomStringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import java.math.BigInteger;
-import java.util.Objects;
-import org.apache.commons.lang3.RandomStringUtils;
 
 public class DString implements BaseType {
 
@@ -38,7 +36,7 @@ public class DString implements BaseType {
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
         int size = GeneratorConfig.getRandom().nextInt(MAX_STRING_SIZE);
-        String s = RandomStringUtils.random(size, 0, 0, true, true, null, GeneratorConfig.getRandom());
+        String s = RandomStringUtils.generateRandomString(size);
         return new StringLiteral(this, symbolTable, s);
     }
 
@@ -80,7 +78,7 @@ public class DString implements BaseType {
 
     @Override
     public String formatPrint(Object object) {
-        return object.toString();
+        return "\"" + object + "\"";
     }
 
     @Override
