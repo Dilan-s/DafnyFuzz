@@ -83,6 +83,20 @@ public class Function implements Identifier {
         return name;
     }
 
+    public String minimizedTestCase() {
+        List<String> code = new ArrayList<>();
+
+        code.add(declarationLine());
+
+        for (Statement statement : body.expand()) {
+            code.add(StringUtils.indent(statement.minimizedTestCase()));
+        }
+
+        code.add(StringUtils.indent(body.minimizedTestCase()));
+        code.add("}\n");
+        return String.join("\n", code);
+    }
+
     public String toCode() {
         List<String> code = new ArrayList<>();
 

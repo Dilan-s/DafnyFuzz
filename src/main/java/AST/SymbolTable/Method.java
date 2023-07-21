@@ -408,7 +408,7 @@ public class Method implements Identifier {
             List<Function> allFunctions = symbolTable.getAllFunctions();
             for (Function f : allFunctions) {
                 if (f.getNoOfUses() > 0) {
-                    code.add(f.toCode());
+                    code.add(f.minimizedTestCase());
                 }
             }
         }
