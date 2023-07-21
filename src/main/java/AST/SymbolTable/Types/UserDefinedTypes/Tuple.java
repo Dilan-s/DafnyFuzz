@@ -180,7 +180,20 @@ public class Tuple implements UserDefinedType {
             return true;
         }
 
-        return tupleOther.typeList.equals(typeList);
+        if (tupleOther.typeList.size() != typeList.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < typeList.size(); i++) {
+            Type type = typeList.get(i);
+            Type otype = tupleOther.typeList.get(i);
+
+            if (type != null && otype != null && !type.equals(otype)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public int getNoOfType() {

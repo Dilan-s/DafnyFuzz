@@ -13,6 +13,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -295,6 +297,69 @@ public enum UnaryOperator implements Operator {
             Set<String> res = new HashSet<>();
             for (String arg : args.get(0).toOutput()) {
                 res.add(String.format("(%s).Values", arg));
+            }
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
+        }
+    },
+    ItemsMap("Items", List.of(Args.DMAP), new DSet(new Tuple(Args.PAIR_NULL))) {
+        @Override
+        public String formExpression(List<Expression> args) {
+            return String.format("(%s).Items", args.get(0).toString());
+        }
+
+        @Override
+        public String formMinimizedExpression(List<Expression> args) {
+            return String.format("(%s).Items", args.get(0).minimizedTestCase());
+        }
+
+        @Override
+        public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
+            DSet set = (DSet) expected;
+            Type innerType = set.getInnerType();
+            Tuple innerTuple = (Tuple) innerType;
+            Type keyT = innerTuple.getType(0);
+            Type valueT = innerTuple.getType(1);
+
+            List<Type> ret = new ArrayList<>();
+            ret.add(new DMap(keyT, valueT).concrete(symbolTable));
+            return ret;
+        }
+
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression exp = args.get(0);
+            Object val = exp.getValue(paramsMap).get(0);
+            if (val != null) {
+                Map<Object, Object> m = (Map<Object, Object>) val;
+                Set<Object> r = new HashSet<>();
+                for (Entry<Object, Object> entry : m.entrySet()) {
+                    List<Object> l = new ArrayList<>();
+                    l.add(entry.getKey());
+                    l.add(entry.getValue());
+                    r.add(l);
+                }
+                return r;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean returnType(Type type) {
+            for (Type t : getType()) {
+                if (t.equals(type)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            Set<String> res = new HashSet<>();
+            for (String arg : args.get(0).toOutput()) {
+                res.add(String.format("(%s).Items", arg));
             }
             List<String> r = new ArrayList<>(res);
             Collections.shuffle(r, GeneratorConfig.getRandom());

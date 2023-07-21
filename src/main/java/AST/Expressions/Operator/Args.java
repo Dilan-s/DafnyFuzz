@@ -13,6 +13,7 @@ import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Args {
@@ -36,4 +37,11 @@ public class Args {
     public static final List<Type> REAL = List.of(new Real());
     public static final List<Type> TUPLE_TUPLE = List.of(new Tuple(), new Tuple());
     public static final List<Type> DATATYPE_DATATYPE = List.of(new DataType(), new DataType());
+    public static List<Type> PAIR_NULL;
+    static {
+        PAIR_NULL = new ArrayList<>();
+        PAIR_NULL.add(null);
+        PAIR_NULL.add(null);
+    }
+
 }
