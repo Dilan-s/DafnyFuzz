@@ -57,7 +57,8 @@ public class SymbolTable {
     }
 
     public Variable getVariable(Variable variable) {
-        return variables.getOrDefault(variable.getName(), null);
+        return variables.getOrDefault(variable.getName(),
+            enclosingSymbolTable == null ? null : enclosingSymbolTable.getVariable(variable));
     }
 
     public Method getMethod(String methodName) {

@@ -80,13 +80,15 @@ public class Variable implements Identifier {
         }
         Object o = getValue(paramMap).get(0);
         if (o != null) {
+            List<Boolean> dec = new ArrayList<>();
+            List<Boolean> con = new ArrayList<>();
             List<Variable> remove = new ArrayList<>();
             List<Variable> replace = new ArrayList<>();
             if (type.equals(new DArray())) {
                 DArray dArray = (DArray) this.type;
                 ArrayValue prevV = (ArrayValue) o;
                 for (int i = 0; i < prevV.size(); i++) {
-                    VariableArrayIndex variableArrayIndex = new VariableArrayIndex(this, dArray.getInnerType(), i);
+                    Variable variableArrayIndex = new VariableArrayIndex(this, dArray.getInnerType(), i);
                     remove.add(variableArrayIndex);
                 }
                 ArrayValue newV = (ArrayValue) value;
@@ -103,7 +105,10 @@ public class Variable implements Identifier {
                 List<String> fieldNames = dataTypeRule.getFieldNames();
 
                 for (int i = 0; i < fieldTypes.size(); i++) {
-                    VariableDataTypeIndex variableDataTypeIndex = new VariableDataTypeIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
+                    Variable variableDataTypeIndex = new VariableDataTypeIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
+                    variableDataTypeIndex = symbolTable.getVariable(variableDataTypeIndex);
+                    dec.add(variableDataTypeIndex == null || variableDataTypeIndex.isDeclared());
+                    con.add(variableDataTypeIndex == null || variableDataTypeIndex.isConstant());
                     remove.add(variableDataTypeIndex);
                 }
 
@@ -114,6 +119,12 @@ public class Variable implements Identifier {
 
                 for (int i = 0; i < fieldTypes.size(); i++) {
                     VariableDataTypeIndex variableDataTypeIndex = new VariableDataTypeIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
+                    if (dec.get(i)) {
+                        variableDataTypeIndex.setDeclared();
+                    }
+                    if (con.get(i)) {
+                        variableDataTypeIndex.setConstant();
+                    }
                     replace.add(variableDataTypeIndex);
                 }
 

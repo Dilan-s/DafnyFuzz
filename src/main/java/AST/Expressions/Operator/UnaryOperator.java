@@ -366,6 +366,36 @@ public enum UnaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
+    Is("is", List.of(Args.INT, Args.CHAR, Args.BOOL, Args.REAL, Args.DSTRING, Args.SEQ, Args.DSET, Args.MULTISET, Args.DMAP, Args.DARRAY, Args.TUPLE, Args.DATATYPE), new Bool()) {
+        @Override
+        public String formExpression(List<Expression> args) {
+            String variableType = args.get(0).getTypes().get(0).getVariableType();
+            return String.format("(%s) is %s", args.get(0).toString(), variableType);
+        }
+
+        @Override
+        public String formMinimizedExpression(List<Expression> args) {
+            String variableType = args.get(0).getTypes().get(0).getVariableType();
+            return String.format("(%s) is %s", args.get(0).minimizedTestCase(), variableType);
+        }
+
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            return true;
+        }
+
+        @Override
+        public List<String> formOutput(List<Expression> args) {
+            String variableType = args.get(0).getTypes().get(0).getVariableType();
+            Set<String> res = new HashSet<>();
+            for (String arg : args.get(0).toOutput()) {
+                res.add(String.format("(%s) is %s", arg, variableType));
+            }
+            List<String> r = new ArrayList<>(res);
+            Collections.shuffle(r, GeneratorConfig.getRandom());
+            return r.subList(0, Math.min(5, res.size()));
+        }
+    }
     ;
 
     private final String operator;

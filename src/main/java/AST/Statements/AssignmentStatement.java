@@ -46,10 +46,13 @@ public class AssignmentStatement extends BaseStatement {
     }
 
     private void declareVariables() {
-        for (int i = 0, variablesSize = variables.size(); i < variablesSize; i++) {
-            Variable v = variables.get(i);
-            v.setDeclared();
-            symbolTable.addVariable(v);
+        for (int i = 0; i < variables.size(); i++) {
+            Variable vs = variables.get(i);
+            for (Variable v : vs.getSymbolTableArgs()) {
+                v.setDeclared();
+                symbolTable.addVariable(v);
+            }
+
         }
     }
 
