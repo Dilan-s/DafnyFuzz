@@ -23,25 +23,4 @@ public class GenerateProgram {
         dafnyProgram.minimizedTestCase(main);
         dafnyProgram.incorrectValidationTestCase(main);
     }
-
-    /*public static void main(String[] args) {
-        DafnyProgram dafnyProgram;
-
-        for (long i = 0; ;i++) {
-            if (args.length == 1) {
-                dafnyProgram = new DafnyProgram(i);
-            } else {
-                dafnyProgram = new DafnyProgram();
-            }
-            new File("./tests").mkdirs();
-            new File("./tests-minimized").mkdirs();
-            new File("./tests-incorrect").mkdirs();
-            Method main = dafnyProgram.generateProgram();
-            dafnyProgram.expectedOutput(main);
-            dafnyProgram.MetamorphicProgramGeneration(main);
-            dafnyProgram.baseTestCase(main);
-            dafnyProgram.minimizedTestCase(main);
-            dafnyProgram.incorrectValidationTestCase(main);
-        }
-    }*/
 }
