@@ -107,75 +107,21 @@ while [ true ]; do
 
       # GO
       cd "$directory"
-      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:go /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/go.txt
-      if [ $? -eq 0 ]
-      then
-        echo "Created GO files"
-        ./test > "outputs/output-go-$y.txt" 2>>errors/compErrors/go.txt
-        rm -rf test || true
-        rm -rf test-go || true
-      else
-        rm -rf test || true
-        rm -rf test-go || true
-        echo "Failed to convert to GO in $t seconds"
-      fi
+      ./singleFileTest.sh -l go -n $x -f $y -t $t
 
       # js
-      cd "$directory"
-      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:js /compile:2 /compileVerbose:0 test.dfy > tmp.txt 2>>errors/compErrors/js.txt
-      if [ $? -eq 0 ]
-      then
-        echo "Created JS files"
-        node test.js > "outputs/output-js-$y.txt" 2>>errors/compErrors/js.txt
-        rm -rf test.js || true
-      else
-        rm -rf test.js || true
-        echo "Failed to convert to JS in $t seconds"
-      fi
+      ./singleFileTest.sh -l js -n $x -f $y -t $t
 
       # java
-      cd "$directory"
-      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:java /compile:2 /compileVerbose:0 /unicodeChar:0 test.dfy  > tmp.txt 2>>errors/compErrors/java.txt
-      if [ $? -eq 0 ]
-      then
-        echo "Created Java files"
-        java -jar test.jar > "outputs/output-java-$y.txt" 2>>errors/compErrors/java.txt
-        rm -rf test.jar || true
-        rm -rf test-java || true
-      else
-        rm -rf test.jar || true
-        rm -rf test-java || true
-        echo "Failed to convert to Java in $t seconds"
-      fi
+      ./singleFileTest.sh -l java -n $x -f $y -t $t
 
       # py
-      cd "$directory"
-      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:py /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>>errors/compErrors/py.txt
-      if [ $? -eq 0 ]
-      then
-        echo "Created Python files"
-        python3 test-py/test.py > "outputs/output-py-$y.txt" 2>>errors/compErrors/py.txt
-        rm -rf test-py || true
-      else
-        rm -rf test-py || true
-        echo "Failed to convert to Python in $t seconds"
-      fi
+      ./singleFileTest.sh -l py -n $x -f $y -t $t
 
       # cs
-      cd "$directory"
-      timeout -s SIGKILL $t Dafny /noVerify /compileTarget:cs /compile:2 /compileVerbose:0 test.dfy > tmp.txt  2>>errors/compErrors/cs.txt
-      if [ $? -eq 0 ]
-      then
-        echo "Created CS files"
-        dotnet test.dll > "outputs/output-cs-$y.txt" 2>>errors/compErrors/cs.txt
-        rm -rf test.dll test.runtimeconfig.json || true
-      else
-        rm -rf test.dll test.runtimeconfig.json || true
-        echo "Failed to convert to CS in $t seconds"
-      fi
+      ./singleFileTest.sh -l cs -n $x -f $y -t $t
 
       rm -rf test.dfy || true
-      rm -rf tmp.txt || true
       y=$(( $y + 1))
     done
   fi

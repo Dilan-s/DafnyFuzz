@@ -10,8 +10,14 @@ import AST.SymbolTable.Types.Type;
 public class DString implements BaseType {
 
     private static final int MAX_STRING_SIZE = 20;
+    private boolean isPrintable;
+
+    public DString(boolean isPrintable) {
+        this.isPrintable = isPrintable;
+    }
 
     public DString() {
+        this(false);
     }
 
     @Override
@@ -89,5 +95,10 @@ public class DString implements BaseType {
         String v = object.toString();
 
         return String.format("(%s == \"%s\")", variableName, v);
+    }
+
+    @Override
+    public boolean isPrintable() {
+        return isPrintable;
     }
 }

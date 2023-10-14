@@ -168,13 +168,13 @@ public class Function implements Identifier {
         String res = String.format("function %s(%s): (%s: %s)\n", getName(), arguments, returnArg.getName(), returnType.getVariableType());
 
         if (!requires.isEmpty()) {
-            res = res + StringUtils.indent("requires " + StringUtils.intersperse(" || ", requires)) + ";\n";
+            res = res + StringUtils.indent("requires " + StringUtils.intersperse(" || ", requires)) + "\n";
         }
         if (!ensures.isEmpty()) {
-            res = res + StringUtils.indent("ensures " + StringUtils.intersperse(" && ", ensures)) + ";\n";
+            res = res + StringUtils.indent("ensures " + StringUtils.intersperse(" && ", ensures)) + "\n";
         }
         if (!reads.isEmpty()) {
-            res = res + StringUtils.indent("reads " + StringUtils.intersperse(", ", reads)) + ";\n";
+            res = res + StringUtils.indent("reads " + StringUtils.intersperse(", ", reads)) + "\n";
         }
 
         res = res + "{";

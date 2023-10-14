@@ -253,13 +253,13 @@ public class Method implements Identifier {
         String res = String.format("method %s(%s) returns (%s)\n", getName(), arguments, types);
 
         if (!requires.isEmpty()) {
-            res = res + StringUtils.indent("requires " + StringUtils.intersperse(" || ", requires)) + ";\n";
+            res = res + StringUtils.indent("requires " + StringUtils.intersperse(" || ", requires)) + "\n";
         }
         if (!ensures.isEmpty()) {
-            res = res + StringUtils.indent("ensures " + StringUtils.intersperse(" && ", ensures)) + ";\n";
+            res = res + StringUtils.indent("ensures " + StringUtils.intersperse(" && ", ensures)) + "\n";
         }
         if (!modifies.isEmpty()) {
-            res = res + StringUtils.indent("modifies " + StringUtils.intersperse(", ", modifies)) + ";\n";
+            res = res + StringUtils.indent("modifies " + StringUtils.intersperse(", ", modifies)) + "\n";
         }
 
         res = res + "{";

@@ -83,7 +83,7 @@ public class PrintStatement extends BaseStatement {
                 .filter(symbolTable::variableInScope)
                 .filter(v -> v.getValue(paramMap).stream().allMatch(Objects::nonNull))
                 .forEach(v -> {
-                    StringLiteral stringLiteral = new StringLiteral(new DString(), symbolTable, v.getName());
+                    StringLiteral stringLiteral = new StringLiteral(new DString(true), symbolTable, v.getName());
                     VariableExpression expression = new VariableExpression(symbolTable, v, v.getType());
                     values.add(stringLiteral);
                     expanded.add(expanded.size() - 1, stringLiteral.expand());
