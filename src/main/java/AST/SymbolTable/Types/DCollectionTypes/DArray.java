@@ -1,14 +1,18 @@
 package AST.SymbolTable.Types.DCollectionTypes;
 
+import AST.Expressions.Array.DArrayLiteralByComprehension;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
+import AST.Generator.RandomFunctionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Expressions.Array.ArrayValue;
 import AST.Expressions.Array.DArrayLiteralByElements;
 import AST.Expressions.Array.DArrayLiteralInline;
 import AST.Expressions.Expression;
 import AST.Expressions.VariableExpression;
+import AST.SymbolTable.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
@@ -18,7 +22,9 @@ import java.util.Objects;
 public class DArray implements DCollection {
 
     public static final int MAX_SIZE_OF_ARRAY = 3;
-    public static final double PROB_EXPAND = 0.9;
+    public static final double PROB_EXPAND = 9;
+    private static final double PROB_INLINE = 1;
+    private static final double PROB_COMPREHENSION = 1;
     public static final int MIN_SIZE_OF_ARRAY = 3;
     private Type type;
 
@@ -79,23 +85,36 @@ public class DArray implements DCollection {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
 
         int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + MIN_SIZE_OF_ARRAY;
+        double ratioSum = (PROB_EXPAND + PROB_INLINE + PROB_COMPREHENSION);
+        double probInitType = ratioSum * GeneratorConfig.getRandom().nextDouble();
 
-        List<Expression> values = new ArrayList<>();
-        for (int i = 0; i < length; i++) {
-            Type t = type.concrete(symbolTable);
-            Expression exp = expressionGenerator.generateExpression(t, symbolTable);
+        Type innerT = type.concrete(symbolTable);
+        if ((probInitType -= PROB_INLINE) < 0) {
+            List<Expression> values = new ArrayList<>();
+            for (int i = 0; i < length; i++) {
+                Expression exp = expressionGenerator.generateExpression(innerT, symbolTable);
 
-            values.add(exp);
-        }
-
-        double probInlineInit = GeneratorConfig.getRandom().nextDouble();
-        if (probInlineInit < PROB_EXPAND) {
+                values.add(exp);
+            }
             DArrayLiteralInline expression = new DArrayLiteralInline(symbolTable, this, values);
             return expression;
-        } else {
+        } else if ((probInitType -= PROB_EXPAND) < 0) {
+            List<Expression> values = new ArrayList<>();
+            for (int i = 0; i < length; i++) {
+                Expression exp = expressionGenerator.generateExpression(innerT, symbolTable);
+
+                values.add(exp);
+            }
             DArrayLiteralByElements expression = new DArrayLiteralByElements(symbolTable, this, values);
             return expression;
+        } else if ((probInitType -= PROB_COMPREHENSION) < 0) {
+            RandomFunctionGenerator randomFunctionGenerator = new RandomFunctionGenerator();
+            Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable, List.of(new Int()));
+
+            DArrayLiteralByComprehension expression = new DArrayLiteralByComprehension(symbolTable, this, length, func);
+            return expression;
         }
+        return null;
     }
 
     @Override

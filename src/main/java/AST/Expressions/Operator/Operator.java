@@ -6,6 +6,9 @@ import AST.Expressions.Expression;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DCollectionTypes.DSet;
+import AST.SymbolTable.Types.DCollectionTypes.Multiset;
+import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
@@ -80,9 +83,16 @@ public interface Operator {
     }
 
     default int restrictions() {
-        return 0;
+        int prev = Seq.MIN_SIZE_OF_SEQ;
+        Seq.MIN_SIZE_OF_SEQ = 1;
+        DSet.MIN_SIZE_OF_SET = 1;
+        Multiset.MIN_SIZE_OF_MULTISET = 1;
+        return prev;
     }
 
     default void restore(int v) {
+        Seq.MIN_SIZE_OF_SEQ = v;
+        DSet.MIN_SIZE_OF_SET = v;
+        Multiset.MIN_SIZE_OF_MULTISET = v;
     }
 }

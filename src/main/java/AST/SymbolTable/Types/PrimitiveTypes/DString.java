@@ -78,7 +78,7 @@ public class DString implements BaseType {
 
     @Override
     public String formatPrint(Object object) {
-        return "\"" + object + "\"";
+        return "" + object + "";
     }
 
     @Override

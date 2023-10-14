@@ -1,14 +1,13 @@
 package AST.Expressions.DSeq;
 
 import AST.Expressions.BaseExpression;
-import AST.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,14 +17,15 @@ public class SeqFuncLiteral extends BaseExpression {
     private final SymbolTable symbolTable;
     private final Type type;
     private final int length;
-    private final Function f;
+    private final Function func;
 
-    public SeqFuncLiteral(SymbolTable symbolTable, Type type, int length, Function f) {
+    public SeqFuncLiteral(SymbolTable symbolTable, Type type, int length, Function func) {
+        super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.length = length;
-        this.f = f;
-        f.incrementUse();
+        this.func = func;
+        func.incrementUse();
     }
 
     @Override
@@ -35,23 +35,23 @@ public class SeqFuncLiteral extends BaseExpression {
 
     @Override
     public String toString() {
-        return String.format("seq(%d, i => %s(i))", length, f.getName());
+        return String.format("seq(%d, i => %s(i))", length, func.getName());
     }
 
     @Override
     public List<String> toOutput() {
-        return List.of(String.format("seq(%d, i => %s(i))", length, f.getName()), String.format("seq(%d, %s)", length, f.getName()));
+        return List.of(String.format("seq(%d, i => %s(i))", length, func.getName()), String.format("seq(%d, %s)", length, func.getName()));
     }
 
     @Override
-    protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
         List<Object> r = new ArrayList<>();
         List<Object> l = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             Variable arg = new Variable("TEMP", new Int());
-            arg.setValue(symbolTable, paramMap, i);
+            arg.setValue(symbolTable, paramsMap, BigInteger.valueOf(i));
 
-            List<Object> value = f.execute(List.of(arg), s);
+            List<Object> value = func.execute(List.of(arg), s);
             for (Object v : value) {
                 if (v == null) {
                     r.add(null);

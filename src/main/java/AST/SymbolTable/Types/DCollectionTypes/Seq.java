@@ -220,15 +220,15 @@ public class Seq implements DCollection {
         printDepth ++;
         String res;
         List<Object> value = (List<Object>) object;
-        if (type.equals(new Char()) && printDepth < 2) {
-            res = value.stream()
-                .map(v -> ((Char) type).formatPrintWithNoQuotes(v))
-                .collect(Collectors.joining(""));
-        } else {
+//        if (type.equals(new Char()) && printDepth < 2) {
+//            res = value.stream()
+//                .map(v -> ((Char) type).formatPrintWithNoQuotes(v))
+//                .collect(Collectors.joining(""));
+//        } else {
             res =
                 "[" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", "))
                     + "]";
-        }
+//        }
         printDepth--;
         return res;
     }
