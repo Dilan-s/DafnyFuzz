@@ -234,7 +234,7 @@ public class RandomTypeGenerator {
         while (t == null) {
             t = generateTypes(1, symbolTable).get(0);
 
-            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap()) || t.equals(new DataType()) || t.equals(new DataTypeRule())) {
+            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap()) || t.equals(new DataType()) || t.equals(new DataTypeRule()) || t.equals(new DString())) {
                 t = null;
             }
         }
