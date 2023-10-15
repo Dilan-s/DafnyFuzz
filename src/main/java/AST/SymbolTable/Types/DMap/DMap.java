@@ -7,6 +7,7 @@ import AST.Expressions.DMap.DMapLiteral;
 import AST.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -171,6 +172,12 @@ public class DMap implements Type {
             }
         }
         return true;
+    }
+
+    @Override
+    public BigInteger cardinality(Object value) {
+        Map<Object, Object> valM = (Map<Object, Object>) value;
+        return BigInteger.valueOf(valM.keySet().size());
     }
 
     @Override

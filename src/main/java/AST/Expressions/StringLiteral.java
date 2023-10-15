@@ -7,6 +7,7 @@ import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StringLiteral extends BaseExpression {
 
@@ -32,7 +33,17 @@ public class StringLiteral extends BaseExpression {
     }
 
     @Override
-    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
+    public List<String> toOutput() {
+        return List.of(toString(),
+            String.format("[%s]",
+                value.chars()
+                    .mapToObj(x -> String.format("'%s'", (char) x)).collect(
+                        Collectors.joining(", "))));
+    }
+
+    @Override
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+        boolean unused) {
         List<Object> r = new ArrayList<>();
         r.add(value);
         return r;

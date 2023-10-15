@@ -1,19 +1,19 @@
 package AST.Expressions.Operator;
 
 import AST.Errors.SemanticException;
+import AST.Expressions.Expression;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomTypeGenerator;
-import AST.Expressions.Expression;
-import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Method;
-import AST.SymbolTable.Types.DMap.DMap;
-import AST.SymbolTable.Types.PrimitiveTypes.Bool;
+import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
-import AST.SymbolTable.Types.PrimitiveTypes.DString;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
-import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DMap.DMap;
+import AST.SymbolTable.Types.PrimitiveTypes.Bool;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
+import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.math.BigInteger;
@@ -173,7 +173,10 @@ public enum BinaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
-    Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.REAL_REAL, Args.DSTRING_DSTRING, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DMAP_DMAP, Args.TUPLE_TUPLE, Args.DATATYPE_DATATYPE, Args.DSTRING_DSTRING), new Bool()) {
+    Equals("==",
+        List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.REAL_REAL, Args.DSTRING_DSTRING,
+            Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DMAP_DMAP, Args.TUPLE_TUPLE,
+            Args.DATATYPE_DATATYPE, Args.DSTRING_DSTRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -209,7 +212,10 @@ public enum BinaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
-    Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.REAL_REAL, Args.DSTRING_DSTRING, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DMAP_DMAP, Args.TUPLE_TUPLE, Args.DATATYPE_DATATYPE, Args.DSTRING_DSTRING), new Bool()) {
+    Not_Equals("!=",
+        List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.REAL_REAL, Args.DSTRING_DSTRING,
+            Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DMAP_DMAP, Args.TUPLE_TUPLE,
+            Args.DATATYPE_DATATYPE, Args.DSTRING_DSTRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -245,7 +251,8 @@ public enum BinaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
-    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DSTRING_DSTRING), new Bool()) {
+    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET,
+        Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DSTRING_DSTRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -254,7 +261,6 @@ public enum BinaryOperator implements Operator {
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
-
 
             if (lhsV != null && rhsV != null) {
                 return type.lessThan(lhsV, rhsV);
@@ -262,7 +268,8 @@ public enum BinaryOperator implements Operator {
             return null;
         }
     },
-    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DSTRING_DSTRING), new Bool()) {
+    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET,
+        Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DSTRING_DSTRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -271,7 +278,6 @@ public enum BinaryOperator implements Operator {
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
-
 
             if (lhsV != null && rhsV != null) {
                 return type.lessThanOrEqual(lhsV, rhsV);
@@ -279,7 +285,8 @@ public enum BinaryOperator implements Operator {
             return null;
         }
     },
-    Greater_Than(">", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()) {
+    Greater_Than(">", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET,
+        Args.MULTISET_MULTISET), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -288,7 +295,6 @@ public enum BinaryOperator implements Operator {
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
-
 
             if (lhsV != null && rhsV != null) {
                 return type.greaterThan(lhsV, rhsV);
@@ -296,7 +302,9 @@ public enum BinaryOperator implements Operator {
             return null;
         }
     },
-    Greater_Than_Or_Equal(">=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET), new Bool()) {
+    Greater_Than_Or_Equal(">=",
+        List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET,
+            Args.MULTISET_MULTISET), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -305,7 +313,6 @@ public enum BinaryOperator implements Operator {
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
-
 
             if (lhsV != null && rhsV != null) {
                 return type.greaterThanOrEqual(lhsV, rhsV);
@@ -431,7 +438,8 @@ public enum BinaryOperator implements Operator {
                 BigInteger r = x.divide(y);
 
                 if (x.compareTo(BigInteger.ZERO) < 0 && !r.multiply(y).equals(x)) {
-                    r = r.subtract(y.compareTo(BigInteger.ZERO) > 0 ? BigInteger.ONE : BigInteger.ONE.negate());
+                    r = r.subtract(y.compareTo(BigInteger.ZERO) > 0 ? BigInteger.ONE
+                        : BigInteger.ONE.negate());
                 }
                 return r;
             }
@@ -473,7 +481,6 @@ public enum BinaryOperator implements Operator {
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
 
-
             if (lhsV != null && rhsV != null) {
                 return type.disjoint(lhsV, rhsV);
             }
@@ -501,7 +508,8 @@ public enum BinaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
-    Union("+", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), List.of(new DSet(), new Seq(), new Multiset())) {
+    Union("+", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ),
+        List.of(new DSet(), new Seq(), new Multiset())) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -510,7 +518,6 @@ public enum BinaryOperator implements Operator {
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
-
 
             if (lhsV != null && rhsV != null) {
                 return type.union(lhsV, rhsV);
@@ -537,7 +544,6 @@ public enum BinaryOperator implements Operator {
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
-
 
             if (lhsV != null && rhsV != null) {
                 return type.add(lhsV, rhsV);
@@ -580,7 +586,8 @@ public enum BinaryOperator implements Operator {
             return ret;
         }
     },
-    Difference("-", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
+    Difference("-", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET),
+        List.of(new DSet(), new Multiset())) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -589,7 +596,6 @@ public enum BinaryOperator implements Operator {
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
-
 
             if (lhsV != null && rhsV != null) {
                 return type.difference(lhsV, rhsV);
@@ -607,7 +613,8 @@ public enum BinaryOperator implements Operator {
             return ret;
         }
     },
-    Intersection("*", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET), List.of(new DSet(), new Multiset())) {
+    Intersection("*", List.of(Args.DSET_DSET, Args.MULTISET_MULTISET),
+        List.of(new DSet(), new Multiset())) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -616,7 +623,6 @@ public enum BinaryOperator implements Operator {
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
-
 
             if (lhsV != null && rhsV != null) {
                 return type.intersection(lhsV, rhsV);
@@ -731,6 +737,7 @@ public enum BinaryOperator implements Operator {
             }
             return null;
         }
+
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
@@ -746,15 +753,16 @@ public enum BinaryOperator implements Operator {
     Concatenate("+", List.of(Args.DSTRING_DSTRING), new DString()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
-            Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
+            Type t = rhsE.getTypes().get(0);
+            Expression lhsE = args.get(0);
 
-            String lhsV = (String) lhsE.getValue(paramsMap).get(0);
-            String rhsV = (String) rhsE.getValue(paramsMap).get(0);
-            return lhsV + rhsV;
+            Object lhsV = lhsE.getValue(paramsMap).get(0);
+            Object rhsV = rhsE.getValue(paramsMap).get(0);
+
+            return t.concatenate(lhsV, rhsV);
         }
-    }
-    ;
+    };
 
     private final String operator;
     private final List<List<Type>> typeArgs;

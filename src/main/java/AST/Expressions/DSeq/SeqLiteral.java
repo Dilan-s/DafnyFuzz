@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 public class SeqLiteral extends BaseExpression {
 
-    private final Type type;
     private final List<Expression> values;
+    private Type type;
     private SymbolTable symbolTable;
 
     private List<List<Statement>> expanded;
@@ -37,6 +37,11 @@ public class SeqLiteral extends BaseExpression {
     @Override
     public List<Type> getTypes() {
         return List.of(type);
+    }
+
+    @Override
+    public void setType(List<Type> types) {
+        type = types.get(0);
     }
 
     @Override

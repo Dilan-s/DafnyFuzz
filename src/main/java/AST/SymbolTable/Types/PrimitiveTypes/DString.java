@@ -5,11 +5,16 @@ import AST.Expressions.StringLiteral;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.util.RandomStringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.Type;
+import java.math.BigInteger;
+import java.util.List;
 
 public class DString implements BaseType {
 
     private static final int MAX_STRING_SIZE = 20;
+    private static final double PROB_USE_SEQ_CHAR = 0.2;
+    private static final Type SEQ_CHAR = new Seq(new Char());
     private boolean isPrintable;
 
     public DString(boolean isPrintable) {
@@ -41,6 +46,13 @@ public class DString implements BaseType {
 
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
+        double probUseSeq = GeneratorConfig.getRandom().nextDouble();
+        if (probUseSeq < PROB_USE_SEQ_CHAR) {
+            Expression expression = SEQ_CHAR.generateLiteral(symbolTable);
+            expression.setType(List.of(new DString()));
+            return expression;
+        }
+
         int size = GeneratorConfig.getRandom().nextInt(MAX_STRING_SIZE);
         String s = RandomStringUtils.generateRandomString(size);
         return new StringLiteral(this, symbolTable, s);
@@ -70,16 +82,46 @@ public class DString implements BaseType {
 
     @Override
     public Boolean lessThan(Object lhsV, Object rhsV) {
-        String lhs = (String) lhsV;
-        String rhs = (String) rhsV;
+        String lhs = valueToString(lhsV);
+        String rhs = valueToString(rhsV);
         return rhs.startsWith(lhs);
     }
 
     @Override
     public Boolean equal(Object lhsV, Object rhsV) {
-        String lhs = (String) lhsV;
-        String rhs = (String) rhsV;
+        String lhs = valueToString(lhsV);
+        String rhs = valueToString(rhsV);
         return lhs.compareTo(rhs) == 0;
+    }
+
+    @Override
+    public BigInteger cardinality(Object value) {
+        String valS = valueToString(value);
+        return BigInteger.valueOf(valS.length());
+    }
+
+    @Override
+    public String concatenate(Object lhsV, Object rhsV) {
+
+        String lhsVS = valueToString(lhsV);
+        String rhsVS = valueToString(rhsV);
+
+        return lhsVS + rhsVS;
+    }
+
+    private String valueToString(Object value) {
+        String vs;
+        if (value instanceof List) {
+            String v = "";
+            List<Character> chrs = (List<Character>) value;
+            for (Character c : chrs) {
+                v += c;
+            }
+            vs = v;
+        } else {
+            vs = (String) value;
+        }
+        return vs;
     }
 
     @Override

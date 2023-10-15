@@ -15,9 +15,9 @@ import java.util.Map;
 public class SeqFuncLiteral extends BaseExpression {
 
     private final SymbolTable symbolTable;
-    private final Type type;
     private final int length;
     private final Function func;
+    private Type type;
 
     public SeqFuncLiteral(SymbolTable symbolTable, Type type, int length, Function func) {
         super();
@@ -31,6 +31,11 @@ public class SeqFuncLiteral extends BaseExpression {
     @Override
     public List<Type> getTypes() {
         return List.of(type);
+    }
+
+    @Override
+    public void setType(List<Type> types) {
+        type = types.get(0);
     }
 
     @Override

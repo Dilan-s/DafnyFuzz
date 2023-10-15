@@ -10,8 +10,10 @@ import AST.Expressions.DSeq.SeqLiteral;
 import AST.SymbolTable.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +24,7 @@ public class Seq implements DCollection {
     public static final int MAX_SIZE_OF_SEQ = 5;
     public static int MIN_SIZE_OF_SEQ = 0;
     public static final double PROB_USE_FUNC = 0.1;
+    private static final double PROB_USE_STRING = 0.2;
     private Type type;
     public static int printDepth = 0;
 
@@ -129,12 +132,12 @@ public class Seq implements DCollection {
 
     @Override
     public Type concrete(SymbolTable symbolTable) {
-        if (type == null) {
+        Type t = type;
+        if (t == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
-            return new Seq(t);
+            t = typeGenerator.generateTypes(1, symbolTable).get(0);
         }
-        return new Seq(type.concrete(symbolTable));
+        return new Seq(t.concrete(symbolTable));
     }
 
     @Override
@@ -193,6 +196,16 @@ public class Seq implements DCollection {
             }
         }
         return true;
+    }
+
+    @Override
+    public BigInteger cardinality(Object value) {
+        if (value instanceof String) {
+            String valS = (String) value;
+            return BigInteger.valueOf(valS.length());
+        }
+        List<Object> valL = (List<Object>) value;
+        return BigInteger.valueOf(valL.size());
     }
 
     @Override
