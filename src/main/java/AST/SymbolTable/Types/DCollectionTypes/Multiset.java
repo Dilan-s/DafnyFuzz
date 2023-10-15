@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class Multiset implements DCollection {
 
@@ -290,6 +291,13 @@ public class Multiset implements DCollection {
             }
         }
         return lhsVM.keySet().containsAll(rhsVM.keySet());
+    }
+
+    @Override
+    public BigInteger cardinality(Object value) {
+        Map<Object, BigInteger> valM = (Map<Object, BigInteger>) value;
+        return valM.values().stream()
+            .reduce(BigInteger.ZERO, BigInteger::add);
     }
 
     @Override

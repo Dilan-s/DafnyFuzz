@@ -3,6 +3,7 @@ package AST.SymbolTable.Types;
 import AST.Expressions.Expression;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import java.math.BigInteger;
 
 public interface Type extends Identifier {
 
@@ -65,7 +66,10 @@ public interface Type extends Identifier {
      * @param rhsV
      * @return Boolean
      */
-    Boolean lessThan(Object lhsV, Object rhsV);
+    default Boolean lessThan(Object lhsV, Object rhsV) {
+        System.err.printf("Could not use less than with class %s", this.getVariableType());
+        return null;
+    }
 
     /**
      * Whether two values of this type satisfy lhsV == rhsV
@@ -73,7 +77,10 @@ public interface Type extends Identifier {
      * @param rhsV
      * @return Boolean
      */
-    Boolean equal(Object lhsV, Object rhsV);
+    default Boolean equal(Object lhsV, Object rhsV) {
+        System.err.printf("Could not use equal with class %s", this.getVariableType());
+        return null;
+    }
 
     /**
      * Whether two values of this type satisfy lhsV <= rhsV
@@ -103,6 +110,27 @@ public interface Type extends Identifier {
      */
     default Boolean greaterThanOrEqual(Object lhsV, Object rhsV) {
         return greaterThan(lhsV, rhsV) || equal(lhsV, rhsV);
+    }
+
+    /**
+     * The size of the value
+     * @param value
+     * @return BigInterger
+     */
+    default BigInteger cardinality(Object value) {
+        System.err.printf("Could not use cardinality with class %s", this.getVariableType());
+        return null;
+    }
+
+    /**
+     * Concatenated the values together.
+     * @param lhsV
+     * @param rhsV
+     * @return
+     */
+    default String concatenate(Object lhsV, Object rhsV) {
+        System.err.printf("Could not use concatenate with class %s", this.getVariableType());
+        return null;
     }
 
     /**

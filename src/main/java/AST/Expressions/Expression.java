@@ -1,6 +1,7 @@
 package AST.Expressions;
 
 import AST.Statements.Statement;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.HashMap;
@@ -97,5 +98,9 @@ public interface Expression {
      */
     default boolean validForFunction() {
         return false;
+    }
+
+    default void setType(List<Type> types) {
+
     }
 }

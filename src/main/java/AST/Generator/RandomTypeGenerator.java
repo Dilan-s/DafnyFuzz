@@ -29,8 +29,8 @@ public class RandomTypeGenerator {
     public static double PROB_INT = 40.0;
     public static double PROB_BOOL = 40.0;
     public static double PROB_CHAR = 40.0;
+    public static double PROB_DSTRING = 20.0;
     public static double PROB_REAL = 10.0;
-    public static double PROB_DSTRING = 10.0;
     public static double PROB_DMAP = 10.0;
     public static double PROB_DARRAY = 10.0;
     public static double PROB_DSET = 10.0;

@@ -7,6 +7,7 @@ import AST.Expressions.DSetLiteral;
 import AST.Expressions.Expression;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -201,6 +202,12 @@ public class DSet implements DCollection {
         Set<Object> lhsVS = (Set<Object>) lhsV;
 
         return rhsVS.equals(lhsVS);
+    }
+
+    @Override
+    public BigInteger cardinality(Object value) {
+        Set<Object> valS = (Set<Object>) value;
+        return BigInteger.valueOf(valS.size());
     }
 
     @Override

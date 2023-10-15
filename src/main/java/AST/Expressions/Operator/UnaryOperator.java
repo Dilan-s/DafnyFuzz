@@ -10,7 +10,6 @@ import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
-import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -62,29 +61,11 @@ public enum UnaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression exp = args.get(0);
             List<Object> expValue = exp.getValue(paramsMap);
-            Object val = expValue.get(0);
-            if (val != null) {
+            Object value = expValue.get(0);
+            if (value != null) {
                 Type type = exp.getTypes().get(0);
-                if (type.equals(new Seq())) {
-                    List<Object> valL = (List<Object>) val;
-                    return BigInteger.valueOf(valL.size());
 
-                } else if (type.equals(new DSet())) {
-                    Set<Object> valS = (Set<Object>) val;
-                    return BigInteger.valueOf(valS.size());
-
-                } else if (type.equals(new Multiset())) {
-                    Map<Object, BigInteger> valM = (Map<Object, BigInteger>) val;
-                    return valM.values().stream()
-                        .reduce(BigInteger.ZERO, BigInteger::add);
-
-                } else if (type.equals(new DMap())) {
-                    Map<Object, Object> valM = (Map<Object, Object>) val;
-                    return BigInteger.valueOf(valM.keySet().size());
-                } else if (type.equals(new DString())) {
-                    String valS = (String) val;
-                    return BigInteger.valueOf(valS.length());
-                }
+                return type.cardinality(value);
             }
             return null;
         }
