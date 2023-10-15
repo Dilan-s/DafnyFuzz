@@ -244,7 +244,7 @@ public enum BinaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
-    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
+    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.STRING_STRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -261,7 +261,7 @@ public enum BinaryOperator implements Operator {
             return null;
         }
     },
-    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ), new Bool()) {
+    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.STRING_STRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);

@@ -72,7 +72,7 @@ public class DString implements BaseType {
     public Boolean lessThan(Object lhsV, Object rhsV) {
         String lhs = (String) lhsV;
         String rhs = (String) rhsV;
-        return lhs.compareTo(rhs) < 0;
+        return rhs.startsWith(lhs);
     }
 
     @Override
