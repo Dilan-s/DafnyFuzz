@@ -10,6 +10,7 @@ import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -26,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum UnaryOperator implements Operator {
-    Cardinality("|%s|", List.of(Args.SEQ, Args.DSET, Args.MULTISET, Args.DMAP), new Int()) {
+    Cardinality("|%s|", List.of(Args.SEQ, Args.DSET, Args.MULTISET, Args.DMAP, Args.DSTRING), new Int()) {
         @Override
         public String formExpression(List<Expression> args) {
             return String.format("|%s|", args.get(0).toString());
@@ -80,7 +81,9 @@ public enum UnaryOperator implements Operator {
                 } else if (type.equals(new DMap())) {
                     Map<Object, Object> valM = (Map<Object, Object>) val;
                     return BigInteger.valueOf(valM.keySet().size());
-
+                } else if (type.equals(new DString())) {
+                    String valS = (String) val;
+                    return BigInteger.valueOf(valS.length());
                 }
             }
             return null;

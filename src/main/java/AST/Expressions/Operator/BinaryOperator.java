@@ -9,6 +9,7 @@ import AST.SymbolTable.Method;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;
+import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
@@ -172,7 +173,7 @@ public enum BinaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
-    Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.REAL_REAL, Args.DSTRING_DSTRING, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DMAP_DMAP, Args.TUPLE_TUPLE, Args.DATATYPE_DATATYPE), new Bool()) {
+    Equals("==", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.REAL_REAL, Args.DSTRING_DSTRING, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DMAP_DMAP, Args.TUPLE_TUPLE, Args.DATATYPE_DATATYPE, Args.DSTRING_DSTRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -208,7 +209,7 @@ public enum BinaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
-    Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.REAL_REAL, Args.DSTRING_DSTRING, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DMAP_DMAP, Args.TUPLE_TUPLE, Args.DATATYPE_DATATYPE), new Bool()) {
+    Not_Equals("!=", List.of(Args.INT_INT, Args.BOOL_BOOL, Args.CHAR_CHAR, Args.REAL_REAL, Args.DSTRING_DSTRING, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DMAP_DMAP, Args.TUPLE_TUPLE, Args.DATATYPE_DATATYPE, Args.DSTRING_DSTRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -244,7 +245,7 @@ public enum BinaryOperator implements Operator {
             return r.subList(0, Math.min(5, res.size()));
         }
     },
-    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.STRING_STRING), new Bool()) {
+    Less_Than("<", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DSTRING_DSTRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -261,7 +262,7 @@ public enum BinaryOperator implements Operator {
             return null;
         }
     },
-    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.STRING_STRING), new Bool()) {
+    Less_Than_Or_Equal("<=", List.of(Args.INT_INT, Args.REAL_REAL, Args.CHAR_CHAR, Args.DSET_DSET, Args.MULTISET_MULTISET, Args.SEQ_SEQ, Args.DSTRING_DSTRING), new Bool()) {
         @Override
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
@@ -742,7 +743,17 @@ public enum BinaryOperator implements Operator {
             return ret;
         }
     },
+    Concatenate("+", List.of(Args.DSTRING_DSTRING), new DString()) {
+        @Override
+        public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+            Expression lhsE = args.get(0);
+            Expression rhsE = args.get(1);
 
+            String lhsV = (String) lhsE.getValue(paramsMap).get(0);
+            String rhsV = (String) rhsE.getValue(paramsMap).get(0);
+            return lhsV + rhsV;
+        }
+    }
     ;
 
     private final String operator;

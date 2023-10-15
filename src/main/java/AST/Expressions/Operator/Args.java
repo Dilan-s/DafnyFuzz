@@ -29,7 +29,6 @@ public class Args {
     public static final List<Type> DMAP_DMAP = List.of(new DMap(), new DMap());
     public static final List<Type> TUPLE_TUPLE = List.of(new Tuple(), new Tuple());
     public static final List<Type> DATATYPE_DATATYPE = List.of(new DataType(), new DataType());
-    public static final List<Type> STRING_STRING = List.of(new DString(), new DString());
 
     public static final List<Type> DMAP_DSET = List.of(new DMap(), new DSet());
 

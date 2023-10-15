@@ -64,7 +64,7 @@ public class DString implements BaseType {
 
     @Override
     public boolean operatorExists() {
-        return false;
+        return true;
     }
 
 
