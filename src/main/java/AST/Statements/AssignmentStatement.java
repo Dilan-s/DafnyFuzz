@@ -4,6 +4,7 @@ import AST.Generator.GeneratorConfig;
 import AST.Expressions.Expression;
 import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,8 +159,10 @@ public class AssignmentStatement extends BaseStatement {
 
         for (Expression value : values) {
             List<Object> expressionValue = value.getValue(paramMap, s);
-            for (Object object : expressionValue) {
-                expValues.add(object);
+            List<Type> types = value.getTypes();
+
+            for (int i = 0; i < expressionValue.size(); i++) {
+                expValues.add(types.get(i).of(expressionValue.get(i)));
             }
         }
 

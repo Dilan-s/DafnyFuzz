@@ -143,4 +143,17 @@ public class DString implements BaseType {
     public boolean isPrintable() {
         return isPrintable;
     }
+
+    @Override
+    public Object of(Object value) {
+        if (value instanceof List) {
+            String v = "";
+            List<Character> chrs = (List<Character>) value;
+            for (Character c : chrs) {
+                v += c;
+            }
+            return v;
+        }
+        return BaseType.super.of(value);
+    }
 }
