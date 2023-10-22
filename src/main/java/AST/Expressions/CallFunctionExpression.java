@@ -23,16 +23,26 @@ public class CallFunctionExpression extends BaseExpression {
     private List<Variable> variables;
     private List<List<Statement>> expanded;
 
-    public CallFunctionExpression(SymbolTable symbolTable, Function function, List<Expression> args) {
+    private CallFunctionExpression(SymbolTable symbolTable, Function function) {
         super();
         this.symbolTable = symbolTable;
         this.function = function;
-        this.args = args;
 
         this.assignments = new ArrayList<>();
         this.variables = new ArrayList<>();
 
         this.expanded = new ArrayList<>();
+    }
+
+    public CallFunctionExpression(SymbolTable symbolTable, Function function, VariableExpression var) {
+        this(symbolTable, function);
+        this.args = List.of(var);
+        variables.add(var.getVariable());
+    }
+
+    public CallFunctionExpression(SymbolTable symbolTable, Function function, List<Expression> args) {
+        this(symbolTable, function);
+        this.args = args;
 
         args.forEach(e -> {
             Type type = e.getTypes().get(0);

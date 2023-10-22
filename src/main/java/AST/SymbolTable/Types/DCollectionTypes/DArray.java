@@ -1,6 +1,7 @@
 package AST.SymbolTable.Types.DCollectionTypes;
 
 import AST.Expressions.Array.DArrayLiteralByComprehension;
+import AST.Expressions.Array.DArrayLiteralByForAll;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomFunctionGenerator;
@@ -25,6 +26,7 @@ public class DArray implements DCollection {
     public static final double PROB_EXPAND = 9;
     private static final double PROB_INLINE = 1;
     private static final double PROB_COMPREHENSION = 1;
+    private static final double PROB_FORALL = 1;
     public static final int MIN_SIZE_OF_ARRAY = 3;
     private Type type;
 
@@ -83,12 +85,14 @@ public class DArray implements DCollection {
     @Override
     public Expression generateLiteral(SymbolTable symbolTable) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
-
-        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + MIN_SIZE_OF_ARRAY;
-        double ratioSum = (PROB_EXPAND + PROB_INLINE + PROB_COMPREHENSION);
-        double probInitType = ratioSum * GeneratorConfig.getRandom().nextDouble();
+        RandomFunctionGenerator randomFunctionGenerator = new RandomFunctionGenerator();
 
         Type innerT = type.concrete(symbolTable);
+
+        int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + MIN_SIZE_OF_ARRAY;
+        double ratioSum = (PROB_EXPAND + PROB_INLINE + PROB_COMPREHENSION + (innerT.validFunctionType() ? PROB_FORALL : 0));
+        double probInitType = ratioSum * GeneratorConfig.getRandom().nextDouble();
+
         if ((probInitType -= PROB_INLINE) < 0) {
             List<Expression> values = new ArrayList<>();
             for (int i = 0; i < length; i++) {
@@ -108,10 +112,14 @@ public class DArray implements DCollection {
             DArrayLiteralByElements expression = new DArrayLiteralByElements(symbolTable, this, values);
             return expression;
         } else if ((probInitType -= PROB_COMPREHENSION) < 0) {
-            RandomFunctionGenerator randomFunctionGenerator = new RandomFunctionGenerator();
             Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable, List.of(new Int()));
 
             DArrayLiteralByComprehension expression = new DArrayLiteralByComprehension(symbolTable, this, length, func);
+            return expression;
+        } else if ((probInitType -= PROB_FORALL) < 0) {
+            Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable, List.of(new Int()));
+
+            DArrayLiteralByForAll expression = new DArrayLiteralByForAll(symbolTable, this, length, func);
             return expression;
         }
         return null;
