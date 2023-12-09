@@ -476,7 +476,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DCollection type = (DCollection) lhsE.getTypes().get(0);
+            DCollection type = lhsE.getTypes().get(0).asDCollection();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -514,7 +514,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DCollection type = (DCollection) lhsE.getTypes().get(0);
+            DCollection type = lhsE.getTypes().get(0).asDCollection();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -540,7 +540,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DMap type = (DMap) lhsE.getTypes().get(0);
+            DMap type = lhsE.getTypes().get(0).asDMap();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -566,7 +566,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DMap type = (DMap) lhsE.getTypes().get(0);
+            DMap type = lhsE.getTypes().get(0).asDMap();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -580,7 +580,7 @@ public enum BinaryOperator implements Operator {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
             List<Type> ret = new ArrayList<>();
-            DMap map = (DMap) expected.concrete(symbolTable);
+            DMap map = expected.concrete(symbolTable).asDMap();
             ret.add(map);
             ret.add(new DSet(map.getKeyType()));
             return ret;
@@ -592,7 +592,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DCollection type = (DCollection) lhsE.getTypes().get(0);
+            DCollection type = lhsE.getTypes().get(0).asDCollection();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -619,7 +619,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DCollection type = (DCollection) lhsE.getTypes().get(0);
+            DCollection type = lhsE.getTypes().get(0).asDCollection();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -647,7 +647,7 @@ public enum BinaryOperator implements Operator {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
-            DMap map = (DMap) types.get(0);
+            DMap map = types.get(0).asDMap();
             ret.add(map.setKeyType(t).concrete(symbolTable));
             return ret;
         }
@@ -656,7 +656,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DMap map = (DMap) rhsE.getTypes().get(0);
+            DMap map = rhsE.getTypes().get(0).asDMap();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -674,7 +674,7 @@ public enum BinaryOperator implements Operator {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
-            DMap map = (DMap) types.get(0);
+            DMap map = types.get(0).asDMap();
             ret.add(map.setKeyType(t).concrete(symbolTable));
             return ret;
         }
@@ -683,7 +683,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DMap map = (DMap) rhsE.getTypes().get(0);
+            DMap map = rhsE.getTypes().get(0).asDMap();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -699,7 +699,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DCollection type = (DCollection) rhsE.getTypes().get(0);
+            DCollection type = rhsE.getTypes().get(0).asDCollection();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -717,7 +717,7 @@ public enum BinaryOperator implements Operator {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
-            DCollection collection = (DCollection) types.get(0);
+            DCollection collection = types.get(0).asDCollection();
             ret.add(collection.setInnerType(t));
             return ret;
         }
@@ -727,7 +727,7 @@ public enum BinaryOperator implements Operator {
         public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
             Expression lhsE = args.get(0);
             Expression rhsE = args.get(1);
-            DCollection type = (DCollection) rhsE.getTypes().get(0);
+            DCollection type = rhsE.getTypes().get(0).asDCollection();
 
             Object lhsV = lhsE.getValue(paramsMap).get(0);
             Object rhsV = rhsE.getValue(paramsMap).get(0);
@@ -745,7 +745,7 @@ public enum BinaryOperator implements Operator {
             Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
-            DCollection collection = (DCollection) types.get(0);
+            DCollection collection = types.get(0).asDCollection();
             ret.add(collection.setInnerType(t));
             return ret;
         }

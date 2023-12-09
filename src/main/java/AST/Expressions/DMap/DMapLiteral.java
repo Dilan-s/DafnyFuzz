@@ -1,9 +1,10 @@
 package AST.Expressions.DMap;
 
-import AST.Generator.GeneratorConfig;
 import AST.Expressions.BaseExpression;
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
+import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.DMap.DMapEntry;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -46,7 +47,9 @@ public class DMapLiteral extends BaseExpression {
     }
 
     @Override
-    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+        boolean unused) {
+        DMap mapT = type.asDMap();
         List<Object> r = new ArrayList<>();
         Map<Object, Object> m = new HashMap<>();
 
@@ -54,8 +57,13 @@ public class DMapLiteral extends BaseExpression {
 
         for (int i = 0; i < entries.size(); i++) {
             DMapEntry entry = entries.get(i);
-            List<Object> keyValues = entry.getKey().getValue(paramsMap, s);
-            List<Object> valueValues = entry.getValue().getValue(paramsMap, s);
+            List<Object> keyValues = entry.getKey().getValue(paramsMap, s).stream()
+                .map(v -> mapT.getKeyType().of(v))
+                .collect(Collectors.toList());
+            List<Object> valueValues = entry.getValue().getValue(paramsMap, s).stream()
+                .map(v -> mapT.getValueType().of(v))
+                .collect(Collectors.toList());
+            ;
 
             for (int j = 0; j < Math.min(keyValues.size(), valueValues.size()); j++) {
                 Object key = keyValues.get(j);
@@ -95,12 +103,14 @@ public class DMapLiteral extends BaseExpression {
 
     @Override
     public boolean validForFunction() {
-        return entries.stream().anyMatch(e -> e.getKey().validForFunction() || e.getValue().validForFunction());
+        return entries.stream()
+            .anyMatch(e -> e.getKey().validForFunction() || e.getValue().validForFunction());
     }
 
     @Override
     public boolean requireUpdate() {
-        return entries.stream().anyMatch(e -> e.getKey().requireUpdate() || e.getValue().requireUpdate());
+        return entries.stream()
+            .anyMatch(e -> e.getKey().requireUpdate() || e.getValue().requireUpdate());
     }
 
     @Override

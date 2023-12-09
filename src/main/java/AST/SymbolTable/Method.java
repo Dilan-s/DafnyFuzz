@@ -10,6 +10,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
+import AST.SymbolTable.Types.UserDefinedTypes.TypeAlias;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,6 +142,9 @@ public class Method implements Identifier {
             for (DataType d : RandomTypeGenerator.DEFINED_DATA_TYPES) {
                 code.add(d.declaration());
             }
+            for (TypeAlias t : RandomTypeGenerator.DEFINED_TYPE_ALIAS) {
+                code.add(t.declaration());
+            }
             List<Method> allMethods = symbolTable.getAllMethods();
             for (Method m : allMethods) {
                 code.add(m.toCode(false));
@@ -177,6 +181,19 @@ public class Method implements Identifier {
                 temp.add(f + dataTypes);
             }
             if (dataTypes.isEmpty()) {
+                temp.addAll(res);
+            }
+            res = new HashSet<>(temp);
+
+            String typeAliases = "";
+            for (TypeAlias t : RandomTypeGenerator.DEFINED_TYPE_ALIAS) {
+                typeAliases = typeAliases + t.declaration() + "\n";
+            }
+            temp = new ArrayList<>();
+            for (String f : res) {
+                temp.add(f + typeAliases);
+            }
+            if (typeAliases.isEmpty()) {
                 temp.addAll(res);
             }
             res = new HashSet<>(temp);
@@ -393,6 +410,9 @@ public class Method implements Identifier {
         if (printAll) {
             for (DataType d : RandomTypeGenerator.DEFINED_DATA_TYPES) {
                 code.add(d.declaration());
+            }
+            for (TypeAlias t : RandomTypeGenerator.DEFINED_TYPE_ALIAS) {
+                code.add(t.declaration());
             }
 
             List<Method> allMethods = symbolTable.getAllMethods();

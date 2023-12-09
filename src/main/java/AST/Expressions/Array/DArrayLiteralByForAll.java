@@ -39,7 +39,7 @@ public class DArrayLiteralByForAll extends BaseExpression {
         this.func = func;
         func.incrementUse();
 
-        DCollection t = (DCollection) type;
+        DCollection t = type.asDCollection();
         Type innerType = t.getInnerType();
         this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
         this.variable.setConstant();
@@ -53,7 +53,7 @@ public class DArrayLiteralByForAll extends BaseExpression {
     }
 
     private void generateAssignments() {
-        DCollection t = (DCollection) this.type;
+        DCollection t = this.type.asDCollection();
         Type valType = t.getInnerType();
 
         for (int i = 0; i < length; i++) {
@@ -132,7 +132,7 @@ public class DArrayLiteralByForAll extends BaseExpression {
 
         @Override
         public String toString() {
-            DCollection t = (DCollection) type;
+            DCollection t = type.asDCollection();
             return String.format("new %s[%d]", t.getInnerType().getVariableType(),
                 length, func.getName());
         }

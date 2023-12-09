@@ -73,7 +73,7 @@ public class DArray implements DCollection {
             return false;
         }
 
-        DArray dArray = (DArray) other;
+        DArray dArray = other.asDArray();
 
         if (type == null || dArray.type == null) {
             return true;
@@ -112,15 +112,23 @@ public class DArray implements DCollection {
             DArrayLiteralByElements expression = new DArrayLiteralByElements(symbolTable, this, values);
             return expression;
         } else if ((probInitType -= PROB_COMPREHENSION) < 0) {
-            Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable, List.of(new Int()));
+            if (this.validFunctionType()) {
+                Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable,
+                    List.of(new Int()));
 
-            DArrayLiteralByComprehension expression = new DArrayLiteralByComprehension(symbolTable, this, length, func);
-            return expression;
+                DArrayLiteralByComprehension expression = new DArrayLiteralByComprehension(
+                    symbolTable, this, length, func);
+                return expression;
+            }
         } else if ((probInitType -= PROB_FORALL) < 0) {
-            Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable, List.of(new Int()));
+            if (this.validFunctionType()) {
+                Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable,
+                    List.of(new Int()));
 
-            DArrayLiteralByForAll expression = new DArrayLiteralByForAll(symbolTable, this, length, func);
-            return expression;
+                DArrayLiteralByForAll expression = new DArrayLiteralByForAll(symbolTable, this,
+                    length, func);
+                return expression;
+            }
         }
         return null;
     }

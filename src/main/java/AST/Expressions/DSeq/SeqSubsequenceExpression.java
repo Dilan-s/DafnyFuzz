@@ -63,7 +63,7 @@ public class SeqSubsequenceExpression extends BaseExpression {
     }
 
     private void setSeqAssign(Expression seq) {
-        DCollection seqType = (DCollection) seq.getTypes().get(0);
+        DCollection seqType = seq.getTypes().get(0).asDCollection();
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqType, symbolTable), seqType);
 
         statSeq = new AssignmentStatement(symbolTable, List.of(seqVar), seq);

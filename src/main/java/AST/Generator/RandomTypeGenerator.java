@@ -16,6 +16,7 @@ import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
+import AST.SymbolTable.Types.UserDefinedTypes.TypeAlias;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,8 @@ public class RandomTypeGenerator {
     public static final int MAX_TYPE_DEPTH = 2;
     public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Real(), new Char());
     public static final List<DataType> DEFINED_DATA_TYPES = new ArrayList<>();
-    private static final double PROB_REUSE_DATATYPE = 0.75;
+    public static final List<TypeAlias> DEFINED_TYPE_ALIAS = new ArrayList<>();
+    private static final double PROB_REUSE = 0.75;
 
     public static double PROB_INT = 40.0;
     public static double PROB_BOOL = 40.0;
@@ -38,6 +40,7 @@ public class RandomTypeGenerator {
     public static double PROB_MULTISET = 10.0;
     public static double PROB_TUPLE = 20.0;
     public static double PROB_DATATYPE = 20.0;
+    public static double PROB_TYPE_ALIAS = 20.0;
 
     public static double PROB_SWARM = 0.05;
     private static int typeDepth = 0;
@@ -57,8 +60,9 @@ public class RandomTypeGenerator {
             } else {
                 double ratioSum = PROB_INT + PROB_BOOL + PROB_CHAR + PROB_REAL + PROB_DSTRING +
                     PROB_DMAP + PROB_DARRAY + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE +
-                    PROB_DATATYPE;
+                    PROB_DATATYPE + PROB_TYPE_ALIAS;
                 double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
+//                double probType = ratioSum;
 
                 if (swarm) {
                     reset();
@@ -154,13 +158,24 @@ public class RandomTypeGenerator {
                 } else if ((probType -= PROB_DATATYPE) < 0) {
                     PROB_DATATYPE *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     double prob_reuse = GeneratorConfig.getRandom().nextDouble();
-                    if (!DEFINED_DATA_TYPES.isEmpty() && prob_reuse < PROB_REUSE_DATATYPE) {
+                    if (!DEFINED_DATA_TYPES.isEmpty() && prob_reuse < PROB_REUSE) {
                         int ind = GeneratorConfig.getRandom().nextInt(DEFINED_DATA_TYPES.size());
                         t = DEFINED_DATA_TYPES.get(ind);
                     } else {
                         DataType dataType = new DataType();
                         t = dataType;
                         DEFINED_DATA_TYPES.add(dataType);
+                    }
+                } else if ((probType -= PROB_TYPE_ALIAS) < 0) {
+                    PROB_TYPE_ALIAS *= 0.001;
+                    double prob_reuse = GeneratorConfig.getRandom().nextDouble();
+                    if (!DEFINED_TYPE_ALIAS.isEmpty() && prob_reuse < PROB_REUSE) {
+                        int ind = GeneratorConfig.getRandom().nextInt(DEFINED_TYPE_ALIAS.size());
+                        t = DEFINED_TYPE_ALIAS.get(ind);
+                    } else {
+                        TypeAlias typeAlias = new TypeAlias();
+                        t = typeAlias;
+                        DEFINED_TYPE_ALIAS.add(typeAlias);
                     }
                 }
             }
@@ -172,14 +187,17 @@ public class RandomTypeGenerator {
     private void reset() {
         PROB_INT = 40.0;
         PROB_BOOL = 40.0;
+        PROB_CHAR = 40.0;
+        PROB_DSTRING = 20.0;
         PROB_REAL = 10.0;
-        PROB_DMAP = 15.0;
+        PROB_DMAP = 10.0;
         PROB_DARRAY = 10.0;
-        PROB_DSET = 15.0;
-        PROB_SEQ = 15.0;
-        PROB_MULTISET = 15.0;
-        PROB_TUPLE = 25.0;
-        PROB_DATATYPE = 25.0;
+        PROB_DSET = 10.0;
+        PROB_SEQ = 10.0;
+        PROB_MULTISET = 10.0;
+        PROB_TUPLE = 20.0;
+        PROB_DATATYPE = 20.0;
+        PROB_TYPE_ALIAS = 20.0;
     }
 
     public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
@@ -199,7 +217,7 @@ public class RandomTypeGenerator {
         List<Type> types = new ArrayList<>();
         int i = 0;
         while (i < noOfTypes) {
-            Type t = generateType();
+            Type t = generateTypes(1, symbolTable).get(0);
             if (!t.equals(new DMap())) {
                 Type concrete = t.concrete(symbolTable);
                 types.add(concrete);

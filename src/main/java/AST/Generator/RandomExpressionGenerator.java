@@ -159,7 +159,7 @@ public class RandomExpressionGenerator {
     }
 
     private Expression generateDMapUpdateExpression(Type type, SymbolTable symbolTable) {
-        DMap mapT = (DMap) type.concrete(symbolTable);
+        DMap mapT = type.concrete(symbolTable).asDMap();
 
         Expression map = generateExpression(type, symbolTable);
         Expression key = generateExpression(mapT.getKeyType(), symbolTable);
@@ -171,7 +171,7 @@ public class RandomExpressionGenerator {
     }
 
     private Expression generateSeqUpdateExpression(Type type, SymbolTable symbolTable) {
-        Seq seqT = (Seq) type.concrete(symbolTable);
+        Seq seqT = type.concrete(symbolTable).asSeq();
         Expression seq = generateExpression(seqT, symbolTable);
 
         Int indT = new Int();
@@ -194,7 +194,7 @@ public class RandomExpressionGenerator {
     }
 
     private Expression generateSeqSubsequenceExpression(Type type, SymbolTable symbolTable) {
-        Seq seqT = (Seq) type.concrete(symbolTable);
+        Seq seqT = type.concrete(symbolTable).asSeq();
         Expression seq = generateExpression(seqT, symbolTable);
 
         Int indIT = new Int();
@@ -221,7 +221,7 @@ public class RandomExpressionGenerator {
     }
 
     private Expression generateDMapSelectionExpression(Type type, SymbolTable symbolTable) {
-        DMap mapT = (DMap) new DMap().setValueType(type).concrete(symbolTable);
+        DMap mapT = new DMap().setValueType(type).concrete(symbolTable).asDMap();
         Expression map = generateExpression(mapT, symbolTable);
 
         Type keyT = mapT.getKeyType();

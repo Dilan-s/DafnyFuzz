@@ -85,7 +85,7 @@ public class Variable implements Identifier {
             List<Variable> remove = new ArrayList<>();
             List<Variable> replace = new ArrayList<>();
             if (type.equals(new DArray())) {
-                DArray dArray = (DArray) this.type;
+                DArray dArray = this.type.asDArray();
                 ArrayValue prevV = (ArrayValue) o;
                 for (int i = 0; i < prevV.size(); i++) {
                     Variable variableArrayIndex = new VariableArrayIndex(this, dArray.getInnerType(), i);
@@ -100,7 +100,7 @@ public class Variable implements Identifier {
                 DataTypeValue newV = (DataTypeValue) value;
                 DataTypeValue prevV = (DataTypeValue) o;
 
-                DataTypeRule dataTypeRule = (DataTypeRule) prevV.getType();
+                DataTypeRule dataTypeRule = prevV.getType().asDataTypeRule();
                 List<Type> fieldTypes = dataTypeRule.getFieldTypes();
                 List<String> fieldNames = dataTypeRule.getFieldNames();
 
@@ -112,7 +112,7 @@ public class Variable implements Identifier {
                     remove.add(variableDataTypeIndex);
                 }
 
-                dataTypeRule = (DataTypeRule) newV.getType();
+                dataTypeRule = newV.getType().asDataTypeRule();
                 this.type = dataTypeRule;
                 fieldTypes = dataTypeRule.getFieldTypes();
                 fieldNames = dataTypeRule.getFieldNames();
@@ -142,17 +142,17 @@ public class Variable implements Identifier {
     public List<Variable> getSymbolTableArgs() {
         List<Variable> vars = new ArrayList<>();
         if (type.equals(new DArray())) {
-            DArray dArray = (DArray) this.type;
+            DArray dArray = this.type.asDArray();
             for (int i = 0; i < DArray.MIN_SIZE_OF_ARRAY; i++) {
                 vars.addAll(new VariableArrayIndex(this, dArray.getInnerType(), i).getSymbolTableArgs());
             }
         } else if (type.equals(new Tuple())) {
-            Tuple tuple = (Tuple) this.type;
+            Tuple tuple = this.type.asTuple();
             for (int i = 0; i < tuple.getNoOfType(); i++) {
                 vars.addAll(new VariableTupleIndex(this, tuple.getType(i), i).getSymbolTableArgs());
             }
         } else if (type.equals(new DataTypeRule())) {
-            DataTypeRule dataTypeRule = (DataTypeRule) this.type;
+            DataTypeRule dataTypeRule = this.type.asDataTypeRule();
             List<Type> fieldTypes = dataTypeRule.getFieldTypes();
             List<String> fieldNames = dataTypeRule.getFieldNames();
             for (int i = 0; i < fieldTypes.size(); i++) {

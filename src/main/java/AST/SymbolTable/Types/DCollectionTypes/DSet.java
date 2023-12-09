@@ -63,7 +63,7 @@ public class DSet implements DCollection {
             return false;
         }
 
-        DSet dsetOther = (DSet) other;
+        DSet dsetOther = other.asDSet();
 
         if (type == null || dsetOther.type == null) {
             return true;
@@ -218,7 +218,7 @@ public class DSet implements DCollection {
 
         String res;
         Set<Object> value = (Set<Object>) object;
-        res = "{" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", ")) + "}";
+        res = "{" + value.stream().map(v -> type.formatEnsures(v)).collect(Collectors.joining(", ")) + "}";
         return variableName + " == " + res;
     }
 
@@ -232,5 +232,10 @@ public class DSet implements DCollection {
         }
 
         return r;
+    }
+
+    @Override
+    public boolean validFunctionType() {
+        return type.validFunctionType();
     }
 }

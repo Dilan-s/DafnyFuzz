@@ -48,7 +48,7 @@ public class DataTypeLiteral extends BaseExpression {
     }
 
     private void generateAssignments() {
-        DataTypeRule t = (DataTypeRule) type;
+        DataTypeRule t = type.asDataTypeRule();
         List<Type> fieldTypes = t.getFieldTypes();
         List<String> fieldNames = t.getFieldNames();
         for (int i = 0; i < fieldTypes.size(); i++) {

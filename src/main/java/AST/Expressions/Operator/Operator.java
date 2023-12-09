@@ -42,13 +42,13 @@ public interface Operator {
         Type collectionInnerType = typeGenerator.generateTypes(1, symbolTable).get(0);
         Type tuple = new Tuple().concrete(symbolTable);
         Type datatype = new DataType();
-        datatype.concrete(symbolTable);
+        datatype = datatype.concrete(symbolTable);
         Type map = new DMap().concrete(symbolTable);
 
         List<Type> ret = new ArrayList<>();
         for (Type type: types) {
             if (type.isCollection()) {
-                DCollection collection = (DCollection) type;
+                DCollection collection = type.asDCollection();
                 ret.add(collection.setInnerType(collectionInnerType.concrete(symbolTable))
                     .concrete(symbolTable));
             } else if (type.equals(new Tuple())) {

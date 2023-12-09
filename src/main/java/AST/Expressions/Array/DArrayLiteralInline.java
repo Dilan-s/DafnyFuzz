@@ -49,7 +49,7 @@ public class DArrayLiteralInline extends BaseExpression {
     }
 
     private void generateAssignments() {
-        DCollection t = (DCollection) this.type;
+        DCollection t = this.type.asDCollection();
         Type valType = t.getInnerType();
 
         for (int i = 0; i < values.size(); i++) {
@@ -136,7 +136,7 @@ public class DArrayLiteralInline extends BaseExpression {
             String value = values.stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", "));
-            DCollection t = (DCollection) type;
+            DCollection t = type.asDCollection();
             return String.format("new %s[%d] [%s]", t.getInnerType().getVariableType(), values.size(), value);
         }
 
@@ -145,7 +145,7 @@ public class DArrayLiteralInline extends BaseExpression {
             String value = values.stream()
                 .map(Expression::minimizedTestCase)
                 .collect(Collectors.joining(", "));
-            DCollection t = (DCollection) type;
+            DCollection t = type.asDCollection();
             return String.format("new %s[%d] [%s]", t.getInnerType().getVariableType(), values.size(), value);
         }
 
@@ -154,7 +154,7 @@ public class DArrayLiteralInline extends BaseExpression {
             Set<String> res = new HashSet<>();
             List<String> temp = new ArrayList<>();
 
-            DCollection t = (DCollection) type;
+            DCollection t = type.asDCollection();
             res.add(String.format("new %s[%d] [", t.getInnerType().getVariableType(), values.size()));
 
             boolean first = true;

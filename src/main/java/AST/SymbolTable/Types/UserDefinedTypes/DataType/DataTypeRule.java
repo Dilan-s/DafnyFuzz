@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DataTypeRule implements UserDefinedType {
 
@@ -126,7 +127,7 @@ public class DataTypeRule implements UserDefinedType {
                 Type concrete;
                 if (!genericMap.containsKey(f) && generics.contains(f)) {
                     concrete = f.concrete(symbolTable);
-                    genericMap.put((GenericType) f, concrete);
+                    genericMap.put(f.asGenericType(), concrete);
                 } else if (genericMap.containsKey(f)) {
                     concrete = genericMap.get(f);
                 } else {
@@ -161,7 +162,7 @@ public class DataTypeRule implements UserDefinedType {
             return false;
         }
 
-        DataTypeRule dataTypeRuleOther = (DataTypeRule) other;
+        DataTypeRule dataTypeRuleOther = other.asDataTypeRule();
 
         if (parentType == null || ruleName == null || dataTypeRuleOther.parentType == null || dataTypeRuleOther.ruleName == null || fields == null || dataTypeRuleOther.fields == null) {
             return true;
@@ -202,6 +203,18 @@ public class DataTypeRule implements UserDefinedType {
                 res = res + fields.get(i).formatPrint(val.get(i));
             }
             res = res + ")";
+        }
+        return res;
+    }
+
+    @Override
+    public String formatEnsures(Object object) {
+        DataTypeValue val = (DataTypeValue) object;
+        String res = parentType.getName() + "." + ruleName;
+        if (!fields.isEmpty()) {
+            return res + "(" + IntStream.range(0, fields.size())
+                .mapToObj(i -> fields.get(i).formatEnsures(val.get(i)))
+                .collect(Collectors.joining(", ")) + ")";
         }
         return res;
     }

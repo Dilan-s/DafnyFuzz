@@ -54,7 +54,7 @@ public class GenericType implements Type {
     public Type concrete(SymbolTable symbolTable) {
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
         Type type = typeGenerator.generateTypes(1, symbolTable).get(0);
-        return type;
+        return type.concrete(symbolTable);
     }
 
     @Override
@@ -114,11 +114,16 @@ public class GenericType implements Type {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof Type)) {
+            return false;
+        }
+
+        Type other = (Type) obj;
         if (!(obj instanceof GenericType)) {
             return false;
         }
-        GenericType other = (GenericType) obj;
-        return other.representation.equals(representation) && (other.type == null || type == null || other.type.equals(type));
+        GenericType genericType = other.asGenericType();
+        return genericType.representation.equals(representation) && (genericType.type == null || type == null || genericType.type.equals(type));
     }
 
     @Override

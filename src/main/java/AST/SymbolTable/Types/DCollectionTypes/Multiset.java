@@ -66,7 +66,7 @@ public class Multiset implements DCollection {
             return false;
         }
 
-        Multiset dsetOther = (Multiset) other;
+        Multiset dsetOther = other.asMultiset();
 
         if (type == null || dsetOther.type == null) {
             return true;
@@ -318,7 +318,7 @@ public class Multiset implements DCollection {
                     res = res + ", ";
                 }
                 first = false;
-                res = res + type.formatPrint(entry.getKey());
+                res = res + type.formatEnsures(entry.getKey());
             }
         }
 
@@ -336,5 +336,10 @@ public class Multiset implements DCollection {
         }
 
         return r;
+    }
+
+    @Override
+    public boolean validFunctionType() {
+        return type.validFunctionType();
     }
 }

@@ -133,7 +133,7 @@ public class DataType implements UserDefinedType {
             return false;
         }
 
-        DataType dataTypeOther = (DataType) other;
+        DataType dataTypeOther = other.asDataType();
 
         if (datatypeName == null || dataTypeOther.datatypeName == null) {
             return true;

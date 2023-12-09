@@ -1,16 +1,14 @@
 package AST.SymbolTable.Types.DCollectionTypes;
 
 import AST.Expressions.DSeq.SeqFuncLiteral;
+import AST.Expressions.DSeq.SeqLiteral;
+import AST.Expressions.Expression;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomFunctionGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Expressions.Expression;
-import AST.Expressions.DSeq.SeqLiteral;
 import AST.SymbolTable.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.PrimitiveTypes.Char;
-import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;
 import java.math.BigInteger;
@@ -71,7 +69,7 @@ public class Seq implements DCollection {
             return false;
         }
 
-        Seq dsetOther = (Seq) other;
+        Seq dsetOther = other.asSeq();
 
         if (type == null || dsetOther.type == null) {
             return true;
@@ -104,7 +102,7 @@ public class Seq implements DCollection {
             Type concrete = type.concrete(symbolTable);
             values.add(expressionGenerator.generateExpression(concrete, symbolTable));
         }
-        SeqLiteral expression = new SeqLiteral(symbolTable,this, values);
+        SeqLiteral expression = new SeqLiteral(symbolTable, this, values);
         return expression;
     }
 
@@ -230,18 +228,11 @@ public class Seq implements DCollection {
 
     @Override
     public String formatPrint(Object object) {
-        printDepth ++;
-        String res;
+        printDepth++;
         List<Object> value = (List<Object>) object;
-//        if (type.equals(new Char()) && printDepth < 2) {
-//            res = value.stream()
-//                .map(v -> ((Char) type).formatPrintWithNoQuotes(v))
-//                .collect(Collectors.joining(""));
-//        } else {
-            res =
-                "[" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", "))
-                    + "]";
-//        }
+        String res =
+            "[" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", "))
+                + "]";
         printDepth--;
         return res;
     }
@@ -276,5 +267,10 @@ public class Seq implements DCollection {
         }
 
         return r;
+    }
+
+    @Override
+    public boolean validFunctionType() {
+        return type.validFunctionType();
     }
 }

@@ -15,6 +15,7 @@ public class VariableNameGenerator {
     private static final Map<String, Integer> datatypeFieldValues = new HashMap<>();
     private static Integer methodName = 0;
     private static Integer datatypeName = 0;
+    private static Integer typeAliasName = 0;
     private static Integer genericName = 0;
     private static Integer functionName = 0;
 
@@ -74,5 +75,10 @@ public class VariableNameGenerator {
         datatypeFieldValues.put(datatypeRuleName, i + 1);
         String format = String.format("%s_%d", datatypeRuleName, i);
         return format;
+    }
+
+    public static String generateTypeAliasName() {
+        typeAliasName++;
+        return String.format("TYPE_%d", typeAliasName);
     }
 }

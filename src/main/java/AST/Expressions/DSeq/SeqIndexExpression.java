@@ -50,7 +50,7 @@ public class SeqIndexExpression extends BaseExpression {
     }
 
     private void setSeqAssignAndIndAssign(Expression seq, Expression index) {
-        DCollection seqT = (DCollection) seq.getTypes().get(0);
+        DCollection seqT = seq.getTypes().get(0).asDCollection();
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqT, symbolTable), seqT);
         asStatSeq = new AssignmentStatement(symbolTable, List.of(seqVar), seq);
 
@@ -69,7 +69,7 @@ public class SeqIndexExpression extends BaseExpression {
 
     public void setInd(Map<Variable, Variable> paramsMap, StringBuilder s) {
         update = true;
-        DCollection seqT = (DCollection) seqVar.getType();
+        DCollection seqT = seqVar.getType().asDCollection();
         VariableExpression seqVarExp = getSequenceVariableExpression();
         VariableExpression indVarExp = getIndexVariableExpression();
 

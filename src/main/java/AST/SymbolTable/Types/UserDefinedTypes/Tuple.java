@@ -174,7 +174,7 @@ public class Tuple implements UserDefinedType {
             return false;
         }
 
-        Tuple tupleOther = (Tuple) other;
+        Tuple tupleOther = other.asTuple();
 
         if (typeList == null || tupleOther.typeList == null) {
             return true;
@@ -198,5 +198,10 @@ public class Tuple implements UserDefinedType {
 
     public int getNoOfType() {
         return typeList.size();
+    }
+
+    @Override
+    public boolean validFunctionType() {
+        return typeList.stream().allMatch(Type::validFunctionType);
     }
 }

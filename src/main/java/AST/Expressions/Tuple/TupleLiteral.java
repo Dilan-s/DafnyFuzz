@@ -46,7 +46,7 @@ public class TupleLiteral extends BaseExpression {
     }
 
     private void generateAssignments() {
-        Tuple t = (Tuple) this.type;
+        Tuple t = this.type.asTuple();
 
         for (int i = 0; i < values.size(); i++) {
             Type valType = t.getType(i);

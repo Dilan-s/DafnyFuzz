@@ -130,13 +130,18 @@ public class DString implements BaseType {
     }
 
     @Override
+    public String formatEnsures(Object object) {
+        return "\"" + object + "\"";
+    }
+
+    @Override
     public String formatEnsures(String variableName, Object object) {
         if (object == null) {
             return null;
         }
-        String v = object.toString();
+        String v = formatEnsures(object);
 
-        return String.format("(%s == \"%s\")", variableName, v);
+        return String.format("(%s == %s)", variableName, v);
     }
 
     @Override

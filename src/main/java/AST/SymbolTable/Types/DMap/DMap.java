@@ -41,9 +41,8 @@ public class DMap implements Type {
         List<String> res = new ArrayList<>();
         List<String> mapContents = new ArrayList<>();
 
-        int i = 0;
         for (Entry<Object, Object> x : m.entrySet()) {
-            String s = String.format("%s := %s", keyType.formatPrint(x.getKey()), valueType.formatPrint(x.getValue()));
+            String s = String.format("%s := %s", keyType.formatEnsures(x.getKey()), valueType.formatEnsures(x.getValue()));
             mapContents.add(s);
         }
         res.add(String.format("(%s == map[%s])", variableName,
@@ -212,7 +211,7 @@ public class DMap implements Type {
             return false;
         }
 
-        DMap dsetOther = (DMap) other;
+        DMap dsetOther = other.asDMap();
 
         if (keyType == null || dsetOther.keyType == null || valueType == null || dsetOther.valueType == null) {
             return true;
@@ -278,5 +277,10 @@ public class DMap implements Type {
     @Override
     public boolean isOrdered() {
         return false;
+    }
+
+    @Override
+    public boolean validFunctionType() {
+        return keyType.validFunctionType() && valueType.validFunctionType();
     }
 }

@@ -46,7 +46,7 @@ public class DArrayLiteralByComprehension extends BaseExpression {
     }
 
     private void generateAssignments() {
-        DCollection t = (DCollection) this.type;
+        DCollection t = this.type.asDCollection();
         Type valType = t.getInnerType();
 
         for (int i = 0; i < length; i++) {
@@ -131,7 +131,7 @@ public class DArrayLiteralByComprehension extends BaseExpression {
 
         @Override
         public String toString() {
-            DCollection t = (DCollection) type;
+            DCollection t = type.asDCollection();
             return String.format("new %s[%d](i => %s(i))", t.getInnerType().getVariableType(),
                 length, func.getName());
         }

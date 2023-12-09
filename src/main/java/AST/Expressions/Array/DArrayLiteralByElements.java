@@ -45,7 +45,7 @@ public class DArrayLiteralByElements extends BaseExpression {
     }
 
     private void generateAssignments() {
-        DCollection collection = (DCollection) this.type;
+        DCollection collection = this.type.asDCollection();
 
         for (int i = 0; i < values.size(); i++) {
             VariableArrayIndex v = new VariableArrayIndex(variable, collection.getInnerType(), i);
@@ -127,7 +127,7 @@ public class DArrayLiteralByElements extends BaseExpression {
 
         @Override
         public String toString() {
-            DCollection t = (DCollection) type;
+            DCollection t = type.asDCollection();
             return String.format("new %s[%d]", t.getInnerType().getVariableType(), values.size());
         }
 

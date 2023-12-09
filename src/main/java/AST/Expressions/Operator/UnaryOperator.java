@@ -214,7 +214,7 @@ public enum UnaryOperator implements Operator {
 
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
-            DSet set = (DSet) expected;
+            DSet set = expected.asDSet();
             Type innerType = set.getInnerType();
 
             List<Type> ret = new ArrayList<>();
@@ -257,7 +257,7 @@ public enum UnaryOperator implements Operator {
 
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
-            DSet set = (DSet) expected;
+            DSet set = expected.asDSet();
             Type innerType = set.getInnerType();
 
             List<Type> ret = new ArrayList<>();
@@ -300,9 +300,9 @@ public enum UnaryOperator implements Operator {
 
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
-            DSet set = (DSet) expected;
+            DSet set = expected.asDSet();
             Type innerType = set.getInnerType();
-            Tuple innerTuple = (Tuple) innerType;
+            Tuple innerTuple = innerType.asTuple();
             Type keyT = innerTuple.getType(0);
             Type valueT = innerTuple.getType(1);
 
