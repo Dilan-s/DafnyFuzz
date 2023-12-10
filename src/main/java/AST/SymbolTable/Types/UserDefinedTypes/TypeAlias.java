@@ -45,7 +45,7 @@ public class TypeAlias implements Type {
             }
 
             RandomTypeGenerator randomTypeGenerator = new RandomTypeGenerator();
-            this.type = randomTypeGenerator.generateTypes(1, symbolTable).get(0)
+            this.type = randomTypeGenerator.generateTypeAliasType(symbolTable)
                 .concrete(symbolTable);
         }
 
@@ -178,87 +178,92 @@ public class TypeAlias implements Type {
 
     @Override
     public UserDefinedType asUserDefinedType() {
-        return (UserDefinedType) this.type;
+        return this.type.asUserDefinedType();
     }
 
     @Override
     public Tuple asTuple() {
-        return (Tuple) this.type;
+        return this.type.asTuple();
     }
 
     @Override
     public DataType asDataType() {
-        return (DataType) this.type;
+        return this.type.asDataType();
     }
 
     @Override
     public DataTypeRule asDataTypeRule() {
-        return (DataTypeRule) this.type;
+        return this.type.asDataTypeRule();
     }
 
     @Override
     public BaseType asBaseType() {
-        return (BaseType) this.type;
+        return this.type.asBaseType();
     }
 
     @Override
     public Real asReal() {
-        return (Real) this.type;
+        return this.type.asReal();
     }
 
     @Override
     public Int asInt() {
-        return (Int) this.type;
+        return this.type.asInt();
     }
 
     @Override
     public DString asDString() {
-        return (DString) this.type;
+        return this.type.asDString();
     }
 
     @Override
     public Char asChar() {
-        return (Char) this.type;
+        return this.type.asChar();
     }
 
     @Override
     public Bool asBool() {
-        return (Bool) this.type;
+        return this.type.asBool();
     }
 
     @Override
     public GenericType asGenericType() {
-        return (GenericType) this.type;
+        return this.type.asGenericType();
     }
 
     @Override
     public DMap asDMap() {
-        return (DMap) this.type;
+        return this.type.asDMap();
     }
 
     @Override
     public DCollection asDCollection() {
-        return (DCollection) this.type;
+        return this.type.asDCollection();
     }
 
     @Override
     public DArray asDArray() {
-        return (DArray) this.type;
+        return this.type.asDArray();
     }
 
     @Override
     public DSet asDSet() {
-        return (DSet) this.type;
+        return this.type.asDSet();
     }
 
     @Override
     public Multiset asMultiset() {
-        return (Multiset) this.type;
+        return this.type.asMultiset();
     }
 
     @Override
     public Seq asSeq() {
-        return (Seq) this.type;
+        return this.type.asSeq();
+    }
+
+    @Override
+    public DClass asDClass() {
+        return this.type.asDClass();
     }
 
     @Override

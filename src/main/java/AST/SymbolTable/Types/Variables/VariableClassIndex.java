@@ -1,5 +1,6 @@
 package AST.SymbolTable.Types.Variables;
 
+import AST.Expressions.DClass.DClassValue;
 import AST.Expressions.DataType.DataTypeValue;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -8,23 +9,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class VariableDataTypeIndex extends Variable {
+public class VariableClassIndex extends Variable {
 
     private final String name;
     private final int index;
     private final Variable variable;
 
-    public VariableDataTypeIndex(Variable variable, Type type, String name, int index) {
+    public VariableClassIndex(Variable variable, Type type, String name, int index) {
         super(variable.getName(), type);
         this.variable = variable;
         this.name = name;
         this.index = index;
     }
-
     @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap) {
         List<Object> l = new ArrayList<>();
-        DataTypeValue value = (DataTypeValue) variable.getValue(paramsMap).get(0);
+        DClassValue value = (DClassValue) variable.getValue(paramsMap).get(0);
         if (value != null) {
             Object o = value.get(index);
             Object v = type.of(o);
@@ -37,7 +37,7 @@ public class VariableDataTypeIndex extends Variable {
 
     @Override
     public void setValue(SymbolTable symbolTable, Map<Variable, Variable> paramMap, Object value) {
-        DataTypeValue v = (DataTypeValue) variable.getValue(paramMap).get(0);
+        DClassValue v = (DClassValue) variable.getValue(paramMap).get(0);
         v.set(index, value);
     }
 
@@ -71,10 +71,10 @@ public class VariableDataTypeIndex extends Variable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof VariableDataTypeIndex)) {
+        if (!(obj instanceof VariableClassIndex)) {
             return false;
         }
-        VariableDataTypeIndex other = (VariableDataTypeIndex) obj;
+        VariableClassIndex other = (VariableClassIndex) obj;
         return other.variable.equals(variable) && other.index == index && other.name.equals(name);
     }
 }

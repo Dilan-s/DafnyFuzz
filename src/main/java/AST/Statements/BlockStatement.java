@@ -190,7 +190,7 @@ public class BlockStatement extends BaseStatement {
                     temp.addAll(res);
                 }
                 first = false;
-                res = new HashSet(temp);
+                res = new HashSet<>(temp);
 
                 List<String> r = new ArrayList<>(res);
                 Collections.shuffle(r, GeneratorConfig.getRandom());

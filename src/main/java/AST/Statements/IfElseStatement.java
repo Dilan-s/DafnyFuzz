@@ -159,13 +159,13 @@ public class IfElseStatement extends BaseStatement {
         if (testOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         temp = new ArrayList<>();
         for (String f : res) {
             temp.add(f + " {\n");
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> ifOptions = ifStat.toOutput();
         temp = new ArrayList<>();
@@ -179,7 +179,7 @@ public class IfElseStatement extends BaseStatement {
         if (ifOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         if (elseStat.isPresent()) {
 
@@ -187,7 +187,7 @@ public class IfElseStatement extends BaseStatement {
             for (String f : res) {
                 temp.add(f + "\n} else {\n");
             }
-            res = new HashSet(temp);
+            res = new HashSet<>(temp);
 
             List<String> elseOptions = elseStat.get().toOutput();
             temp = new ArrayList<>();
@@ -201,14 +201,14 @@ public class IfElseStatement extends BaseStatement {
             if (elseOptions.isEmpty()) {
                 temp.addAll(res);
             }
-            res = new HashSet(temp);
+            res = new HashSet<>(temp);
         }
 
         temp = new ArrayList<>();
         for (String f : res) {
             temp.add(f + "\n}");
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());

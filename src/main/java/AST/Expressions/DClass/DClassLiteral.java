@@ -1,16 +1,16 @@
-package AST.Expressions.Array;
+package AST.Expressions.DClass;
 
+import AST.Expressions.BaseExpression;
+import AST.Expressions.Expression;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
-import AST.Expressions.BaseExpression;
-import AST.Expressions.Expression;
 import AST.Statements.Statement;
-import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.Variables.Variable;
-import AST.SymbolTable.Types.Variables.VariableArrayIndex;
+import AST.SymbolTable.Types.Variables.VariableClassIndex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DArrayLiteralInline extends BaseExpression {
+public class DClassLiteral extends BaseExpression {
 
     private final Type type;
     private SymbolTable symbolTable;
@@ -31,15 +31,16 @@ public class DArrayLiteralInline extends BaseExpression {
 
     private List<List<Statement>> expanded;
 
-    public DArrayLiteralInline(SymbolTable symbolTable, Type type, List<Expression> values) {
+    public DClassLiteral(SymbolTable symbolTable, Type type, List<Expression> values) {
         super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.values = values;
 
-        this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-        this.variable.setConstant();
-        this.statement = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues(values));
+        this.variable = new Variable(
+            VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
+        this.statement = new AssignmentStatement(symbolTable, List.of(variable),
+            new DClassInit(values));
 
         this.expanded = new ArrayList<>();
         values.forEach(v -> expanded.add(v.expand()));
@@ -49,11 +50,12 @@ public class DArrayLiteralInline extends BaseExpression {
     }
 
     private void generateAssignments() {
-        DCollection t = this.type.asDCollection();
-        Type valType = t.getInnerType();
+        DClass t = this.type.asDClass();
+        List<Type> fieldTypes = t.getFieldTypes();
+        List<String> fieldNames = t.getFieldNames();
 
-        for (int i = 0; i < values.size(); i++) {
-            VariableArrayIndex v = new VariableArrayIndex(variable, valType, i);
+        for (int i = 0; i < fieldTypes.size(); i++) {
+            VariableClassIndex v = new VariableClassIndex(variable, fieldTypes.get(i), fieldNames.get(i), i);
             v.setDeclared();
             symbolTable.addVariable(v);
         }
@@ -90,20 +92,16 @@ public class DArrayLiteralInline extends BaseExpression {
     }
 
     @Override
-    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
+    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+        boolean unused) {
         return variable.getValue(paramsMap);
     }
 
-    @Override
-    public boolean validForFunction() {
-        return true;
-    }
-
-    private class ArrayInitValues extends BaseExpression {
+    private class DClassInit extends BaseExpression {
 
         private final List<Expression> values;
 
-        public ArrayInitValues(List<Expression> values) {
+        public DClassInit(List<Expression> values) {
             super();
             this.values = values;
         }
@@ -112,8 +110,9 @@ public class DArrayLiteralInline extends BaseExpression {
         public List<Type> getTypes() {
             return List.of(type);
         }
-        @Override
-        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
+
+        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+            boolean unused) {
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();
@@ -127,7 +126,7 @@ public class DArrayLiteralInline extends BaseExpression {
                     l.add(v);
                 }
             }
-            r.add(new ArrayValue(variable, l));
+            r.add(new DClassValue(variable, l));
             return r;
         }
 
@@ -136,8 +135,8 @@ public class DArrayLiteralInline extends BaseExpression {
             String value = values.stream()
                 .map(Expression::toString)
                 .collect(Collectors.joining(", "));
-            DCollection t = type.asDCollection();
-            return String.format("new %s[%d] [%s]", t.getInnerType().getVariableType(), values.size(), value);
+            DClass t = type.asDClass();
+            return String.format("new %s(%s)", t.getName(), value);
         }
 
         @Override
@@ -145,17 +144,16 @@ public class DArrayLiteralInline extends BaseExpression {
             String value = values.stream()
                 .map(Expression::minimizedTestCase)
                 .collect(Collectors.joining(", "));
-            DCollection t = type.asDCollection();
-            return String.format("new %s[%d] [%s]", t.getInnerType().getVariableType(), values.size(), value);
+            DClass t = type.asDClass();
+            return String.format("new %s(%s)", t.getName(), value);
         }
-
         @Override
         public List<String> toOutput() {
             Set<String> res = new HashSet<>();
             List<String> temp = new ArrayList<>();
 
-            DCollection t = type.asDCollection();
-            res.add(String.format("new %s[%d] [", t.getInnerType().getVariableType(), values.size()));
+            DClass t = type.asDClass();
+            res.add(String.format("new %s(", t.getName()));
 
             boolean first = true;
             for (Expression exp : values) {
@@ -181,7 +179,7 @@ public class DArrayLiteralInline extends BaseExpression {
 
             temp = new ArrayList<>();
             for (String f : res) {
-                temp.add(f + "]");
+                temp.add(f + ")");
             }
             res = new HashSet<>(temp);
 
@@ -198,11 +196,6 @@ public class DArrayLiteralInline extends BaseExpression {
         @Override
         public boolean requireUpdate() {
             return false;
-        }
-
-        @Override
-        public boolean validForFunction() {
-            return true;
         }
     }
 }

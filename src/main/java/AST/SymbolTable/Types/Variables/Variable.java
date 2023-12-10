@@ -1,11 +1,13 @@
 package AST.SymbolTable.Types.Variables;
 
 import AST.Expressions.Array.ArrayValue;
+import AST.Expressions.DClass.DClassValue;
 import AST.Expressions.DataType.DataTypeValue;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import java.util.ArrayList;
@@ -88,13 +90,30 @@ public class Variable implements Identifier {
                 DArray dArray = this.type.asDArray();
                 ArrayValue prevV = (ArrayValue) o;
                 for (int i = 0; i < prevV.size(); i++) {
-                    Variable variableArrayIndex = new VariableArrayIndex(this, dArray.getInnerType(), i);
+                    Variable variableArrayIndex = new VariableArrayIndex(this,
+                        dArray.getInnerType(), i);
                     remove.add(variableArrayIndex);
                 }
                 ArrayValue newV = (ArrayValue) value;
                 for (int i = 0; i < newV.size(); i++) {
-                    VariableArrayIndex variableArrayIndex = new VariableArrayIndex(this, dArray.getInnerType(), i);
+                    VariableArrayIndex variableArrayIndex = new VariableArrayIndex(this,
+                        dArray.getInnerType(), i);
                     replace.add(variableArrayIndex);
+                }
+            } else if (type.equals(new DClass())) {
+                DClass dClass = this.type.asDClass();
+                DClassValue prevV = (DClassValue) o;
+
+                List<Type> fieldTypes = dClass.getFieldTypes();
+                List<String> fieldNames = dClass.getFieldNames();
+                for (int i = 0; i < prevV.size(); i++) {
+                    Variable variableClassIndex = new VariableClassIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
+                    remove.add(variableClassIndex);
+                }
+                DClassValue newV = (DClassValue) value;
+                for (int i = 0; i < newV.size(); i++) {
+                    Variable variableClassIndex = new VariableClassIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
+                    replace.add(variableClassIndex);
                 }
             } else if (type.equals(new DataTypeRule())) {
                 DataTypeValue newV = (DataTypeValue) value;

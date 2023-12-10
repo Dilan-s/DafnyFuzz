@@ -1,5 +1,6 @@
 package AST.SymbolTable;
 
+import AST.Expressions.DClass.DClassValue;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomTypeGenerator;
 import AST.Generator.VariableNameGenerator;
@@ -9,6 +10,7 @@ import AST.StringUtils;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.TypeAlias;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -145,6 +147,11 @@ public class Method implements Identifier {
             for (TypeAlias t : RandomTypeGenerator.DEFINED_TYPE_ALIAS) {
                 code.add(t.declaration());
             }
+
+            for (DClass t : RandomTypeGenerator.DEFINED_DCLASS) {
+                code.add(t.declaration());
+            }
+
             List<Method> allMethods = symbolTable.getAllMethods();
             for (Method m : allMethods) {
                 code.add(m.toCode(false));
@@ -192,6 +199,19 @@ public class Method implements Identifier {
             temp = new ArrayList<>();
             for (String f : res) {
                 temp.add(f + typeAliases);
+            }
+            if (typeAliases.isEmpty()) {
+                temp.addAll(res);
+            }
+            res = new HashSet<>(temp);
+
+            String dclasses = "";
+            for (DClass t : RandomTypeGenerator.DEFINED_DCLASS) {
+                dclasses = dclasses + t.declaration() + "\n";
+            }
+            temp = new ArrayList<>();
+            for (String f : res) {
+                temp.add(f + dclasses);
             }
             if (typeAliases.isEmpty()) {
                 temp.addAll(res);
@@ -247,7 +267,7 @@ public class Method implements Identifier {
                 temp.add(curr);
             }
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());
@@ -412,6 +432,9 @@ public class Method implements Identifier {
                 code.add(d.declaration());
             }
             for (TypeAlias t : RandomTypeGenerator.DEFINED_TYPE_ALIAS) {
+                code.add(t.declaration());
+            }
+            for (DClass t : RandomTypeGenerator.DEFINED_DCLASS) {
                 code.add(t.declaration());
             }
 

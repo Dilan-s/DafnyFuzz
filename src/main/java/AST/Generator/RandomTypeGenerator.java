@@ -13,6 +13,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
@@ -26,6 +27,7 @@ public class RandomTypeGenerator {
     public static final List<BaseType> PRIMITIVE_TYPES = List.of(new Int(), new Bool(), new Real(), new Char());
     public static final List<DataType> DEFINED_DATA_TYPES = new ArrayList<>();
     public static final List<TypeAlias> DEFINED_TYPE_ALIAS = new ArrayList<>();
+    public static final List<DClass> DEFINED_DCLASS = new ArrayList<>();
     private static final double PROB_REUSE = 0.75;
 
     public static double PROB_INT = 40.0;
@@ -41,6 +43,7 @@ public class RandomTypeGenerator {
     public static double PROB_TUPLE = 20.0;
     public static double PROB_DATATYPE = 20.0;
     public static double PROB_TYPE_ALIAS = 20.0;
+    public static double PROB_DCLASS = 20.0;
 
     public static double PROB_SWARM = 0.05;
     private static int typeDepth = 0;
@@ -60,9 +63,8 @@ public class RandomTypeGenerator {
             } else {
                 double ratioSum = PROB_INT + PROB_BOOL + PROB_CHAR + PROB_REAL + PROB_DSTRING +
                     PROB_DMAP + PROB_DARRAY + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE +
-                    PROB_DATATYPE + PROB_TYPE_ALIAS;
+                    PROB_DATATYPE + PROB_TYPE_ALIAS + PROB_DCLASS;
                 double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
-//                double probType = ratioSum;
 
                 if (swarm) {
                     reset();
@@ -167,7 +169,7 @@ public class RandomTypeGenerator {
                         DEFINED_DATA_TYPES.add(dataType);
                     }
                 } else if ((probType -= PROB_TYPE_ALIAS) < 0) {
-                    PROB_TYPE_ALIAS *= 0.001;
+                    PROB_TYPE_ALIAS *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     double prob_reuse = GeneratorConfig.getRandom().nextDouble();
                     if (!DEFINED_TYPE_ALIAS.isEmpty() && prob_reuse < PROB_REUSE) {
                         int ind = GeneratorConfig.getRandom().nextInt(DEFINED_TYPE_ALIAS.size());
@@ -177,6 +179,18 @@ public class RandomTypeGenerator {
                         t = typeAlias;
                         DEFINED_TYPE_ALIAS.add(typeAlias);
                     }
+                } else if ((probType -= PROB_DCLASS) < 0) {
+                    PROB_DCLASS *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    double prob_reuse = GeneratorConfig.getRandom().nextDouble();
+                    if (!DEFINED_DCLASS.isEmpty() && prob_reuse < PROB_REUSE) {
+                        int ind = GeneratorConfig.getRandom().nextInt(DEFINED_DCLASS.size());
+                        t = DEFINED_DCLASS.get(ind);
+                    } else {
+                        DClass dClass = new DClass();
+                        t = dClass;
+                        DEFINED_DCLASS.add(dClass);
+                    }
+
                 }
             }
         }
@@ -198,6 +212,7 @@ public class RandomTypeGenerator {
         PROB_TUPLE = 20.0;
         PROB_DATATYPE = 20.0;
         PROB_TYPE_ALIAS = 20.0;
+        PROB_DCLASS = 20.0;
     }
 
     public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
@@ -252,7 +267,20 @@ public class RandomTypeGenerator {
         while (t == null) {
             t = generateTypes(1, symbolTable).get(0);
 
-            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap()) || t.equals(new DataType()) || t.equals(new DataTypeRule()) || t.equals(new DString())) {
+            if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap()) || t.equals(new DataType()) || t.equals(new DataTypeRule()) || t.equals(new DString()) || t.equals(new DClass())) {
+                t = null;
+            }
+        }
+
+        return t;
+    }
+
+    public Type generateTypeAliasType(SymbolTable symbolTable) {
+        Type t = null;
+        while (t == null) {
+            t = generateTypes(1, symbolTable).get(0);
+
+            if (t.equals(new TypeAlias())) {
                 t = null;
             }
         }

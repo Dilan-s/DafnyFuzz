@@ -16,6 +16,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
@@ -291,4 +292,6 @@ public interface Type extends Identifier {
     default Seq asSeq() {
         return (Seq) this;
     }
+
+    default DClass asDClass() { return (DClass) this; };
 }

@@ -81,13 +81,13 @@ public class IfElseExpression extends BaseExpression {
         if (testOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         temp = new ArrayList<>();
         for (String f : res) {
             temp.add(f + ") then (");
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> ifOptions = ifExp.toOutput();
         temp = new ArrayList<>();
@@ -100,13 +100,13 @@ public class IfElseExpression extends BaseExpression {
         if (ifOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         temp = new ArrayList<>();
         for (String f : res) {
             temp.add(f + ") else (");
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> elseOptions = elseExp.toOutput();
         temp = new ArrayList<>();
@@ -119,13 +119,13 @@ public class IfElseExpression extends BaseExpression {
         if (elseOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         temp = new ArrayList<>();
         for (String f : res) {
             temp.add(f + "))");
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());

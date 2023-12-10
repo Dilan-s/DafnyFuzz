@@ -156,7 +156,7 @@ public class MatchStatement extends BaseStatement {
                     temp.addAll(res);
                 }
 
-                res = new HashSet(temp);
+                res = new HashSet<>(temp);
 
                 List<String> r = new ArrayList<>(res);
                 Collections.shuffle(r, GeneratorConfig.getRandom());
@@ -177,14 +177,14 @@ public class MatchStatement extends BaseStatement {
             temp.addAll(res);
         }
 
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         temp = new ArrayList<>();
         for (String f : res) {
             temp.add(f + "}\n");
         }
 
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());

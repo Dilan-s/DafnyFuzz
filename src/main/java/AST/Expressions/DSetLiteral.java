@@ -100,14 +100,14 @@ public class DSetLiteral extends BaseExpression {
             first = false;
             Collections.shuffle(temp, GeneratorConfig.getRandom());
             temp = temp.subList(0, Math.min(5, temp.size()));
-            res = new HashSet(temp);
+            res = new HashSet<>(temp);
         }
 
         temp = new ArrayList<>();
         for (String f : res) {
             temp.add(f + "}");
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());

@@ -110,7 +110,7 @@ public class DMapUpdateExpression extends BaseExpression {
         if (mapOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         temp = new ArrayList<>();
         List<String> keyOptions = key.toOutput();
@@ -123,7 +123,7 @@ public class DMapUpdateExpression extends BaseExpression {
         if (keyOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         temp = new ArrayList<>();
         List<String> valueOptions = value.toOutput();
@@ -136,7 +136,7 @@ public class DMapUpdateExpression extends BaseExpression {
         if (valueOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
 
         List<String> r = new ArrayList<>(res);

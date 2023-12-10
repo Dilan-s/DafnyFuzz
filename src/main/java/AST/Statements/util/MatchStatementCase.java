@@ -131,7 +131,7 @@ public class MatchStatementCase extends BaseStatement {
             temp.addAll(res);
         }
 
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());
@@ -142,7 +142,7 @@ public class MatchStatementCase extends BaseStatement {
             temp.add(f + "\n}");
         }
 
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());

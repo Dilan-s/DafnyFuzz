@@ -16,7 +16,7 @@ public class Tuple implements UserDefinedType {
 
     public static final int MAX_SIZE_OF_TUPLE = 2;
     public static final int MIN_SIZE_OF_TUPLE = 2;
-    List<Type> typeList;
+    private List<Type> typeList;
 
     public Tuple() {
         this.typeList = null;
@@ -75,8 +75,8 @@ public class Tuple implements UserDefinedType {
         if (typeList == null) {
             int noTypes = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_TUPLE) + MIN_SIZE_OF_TUPLE;
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            List<Type> types = typeGenerator.generateTypes(noTypes, symbolTable);
-            return new Tuple(types);
+            typeList = typeGenerator.generateTypes(noTypes, symbolTable);
+            return new Tuple(typeList);
         }
         return new Tuple(typeList.stream()
             .map(t -> t.concrete(symbolTable))

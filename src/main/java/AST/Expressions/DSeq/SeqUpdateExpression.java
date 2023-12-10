@@ -121,13 +121,13 @@ public class SeqUpdateExpression extends BaseExpression {
         if (expOptions.isEmpty()) {
             temp.addAll(res);
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         temp = new ArrayList<>();
         for (String f : res) {
             temp.add(f + "]");
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());

@@ -165,7 +165,7 @@ public class DMapLiteral extends BaseExpression {
         for (String f : res) {
             temp.add(f + "]");
         }
-        res = new HashSet(temp);
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());

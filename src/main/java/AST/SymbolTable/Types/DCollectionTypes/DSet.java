@@ -186,6 +186,12 @@ public class DSet implements DCollection {
         String res = "{" + value.stream().map(v -> type.formatPrint(v)).collect(Collectors.joining(", ")) + "}";
         return res;
     }
+    @Override
+    public String formatEnsures(Object object) {
+        Set<Object> value = (Set<Object>) object;
+        String res = "{" + value.stream().map(v -> type.formatEnsures(v)).collect(Collectors.joining(", ")) + "}";
+        return res;
+    }
 
 
     @Override

@@ -13,11 +13,13 @@ public class VariableNameGenerator {
     private static final Map<String, Integer> variableValues = new HashMap<>();
     private static final Map<String, Integer> datatypeValues = new HashMap<>();
     private static final Map<String, Integer> datatypeFieldValues = new HashMap<>();
+    private static final Map<String, Integer> dclassFieldValues = new HashMap<>();
     private static Integer methodName = 0;
     private static Integer datatypeName = 0;
     private static Integer typeAliasName = 0;
     private static Integer genericName = 0;
     private static Integer functionName = 0;
+    private static Integer dclassName = 0;
 
     public static String generateReturnVariableName(String method) {
         Integer i = returnValues.getOrDefault(method, 1);
@@ -80,5 +82,18 @@ public class VariableNameGenerator {
     public static String generateTypeAliasName() {
         typeAliasName++;
         return String.format("TYPE_%d", typeAliasName);
+    }
+
+    public static String generateDClassName() {
+        dclassName++;
+        return String.format("CLASS_%d", dclassName);
+    }
+
+    public static String generateDClassFieldName(Type type) {
+        String typeName = type.getName();
+        Integer i = dclassFieldValues.getOrDefault(typeName, 1);
+        dclassFieldValues.put(typeName, i + 1);
+        String format = String.format("FIELD_%s_%d", typeName, i);
+        return format;
     }
 }
