@@ -21,10 +21,6 @@ public class RandomMethodGenerator {
             return null;
         }
 
-        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-        RandomStatementGenerator statementGenerator = new RandomStatementGenerator();
-
-        methodDepth++;
         List<Method> methodWithSameType = symbolTable.getMethodWithTypes(returnTypes);
 
         double probReuseMethod = GeneratorConfig.getRandom().nextDouble();
@@ -34,16 +30,26 @@ public class RandomMethodGenerator {
             return methodWithSameType.get(i);
         }
 
+        double probClassMethod = GeneratorConfig.getRandom().nextDouble();
+        if (probClassMethod < PROB_CLASS_METHOD) {
+            return generateClassMethod(returnTypes, symbolTable);
+        }
+
+        return generateBaseMethod(returnTypes, symbolTable);
+    }
+
+    private Method generateBaseMethod(List<Type> returnTypes, SymbolTable symbolTable) {
         String methodName = VariableNameGenerator.generateMethodName();
         Method m = new Method(returnTypes, methodName);
 
-        int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
-        List<Type> args = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
+        List<Type> args = generateArgTypes(symbolTable);
         for (Type t : args) {
             Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
             m.addArgument(var);
         }
 
+        methodDepth++;
+        RandomStatementGenerator statementGenerator = new RandomStatementGenerator();
         Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
         methodDepth--;
         m.setBody(statement);
@@ -52,6 +58,18 @@ public class RandomMethodGenerator {
 
         return m;
     }
+
+    private List<Type> generateArgTypes(SymbolTable symbolTable) {
+        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+        int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
+        List<Type> args = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
+        return args;
+    }
+
+    private Method generateClassMethod(List<Type> returnTypes, SymbolTable symbolTable) {
+        return generateBaseMethod(returnTypes, symbolTable);
+    }
+
 
     public void enableMethods() {
         methodDepth -= MAX_METHOD_DEPTH;
