@@ -1,11 +1,11 @@
 package AST.Generator;
 
+import AST.Expressions.Method.CallMethodExpression;
 import AST.Statements.AssertStatement;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.BlockStatement;
 import AST.Statements.BreakStatement;
 import AST.Statements.ContinueStatement;
-import AST.Expressions.CallMethodExpression;
 import AST.Expressions.Expression;
 import AST.Expressions.IntLiteral;
 import AST.Expressions.Operator.BinaryOperator;

@@ -2,7 +2,7 @@ package AST.Expressions.Operator;
 
 import AST.Generator.GeneratorConfig;
 import AST.Expressions.BaseExpression;
-import AST.Expressions.CallMethodExpression;
+import AST.Expressions.Method.CallBaseMethodExpression;
 import AST.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -108,7 +108,7 @@ public class OperatorExpression extends BaseExpression {
 
     private void generateMethodCallReplacement(Map<Variable, Variable> paramsMap, StringBuilder s) {
         if (convertToCall && operator.equals(BinaryOperator.Divide)) {
-            CallMethodExpression safe_division = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_division"), args);
+            CallBaseMethodExpression safe_division = new CallBaseMethodExpression(symbolTable, symbolTable.getMethod("safe_division"), args);
             for (Statement stat : safe_division.expand()) {
                 stat.execute(paramsMap, s);
             }
@@ -118,7 +118,7 @@ public class OperatorExpression extends BaseExpression {
             update = true;
 
         } else if (convertToCall && operator.equals(BinaryOperator.Modulus)) {
-            CallMethodExpression safe_modulus = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_modulus"), args);
+            CallBaseMethodExpression safe_modulus = new CallBaseMethodExpression(symbolTable, symbolTable.getMethod("safe_modulus"), args);
             for (Statement stat : safe_modulus.expand()) {
                 stat.execute(paramsMap, s);
             }

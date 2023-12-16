@@ -4,7 +4,7 @@ import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Expressions.BaseExpression;
-import AST.Expressions.CallMethodExpression;
+import AST.Expressions.Method.CallBaseMethodExpression;
 import AST.Expressions.Expression;
 import AST.Expressions.VariableExpression;
 import AST.Statements.Statement;
@@ -33,7 +33,7 @@ public class SeqUpdateExpression extends BaseExpression {
     private Variable seqVar;
     private Variable indVar;
     private Expression exp;
-    private CallMethodExpression callExp;
+    private CallBaseMethodExpression callExp;
 
     private List<List<Statement>> expanded;
 
@@ -57,7 +57,7 @@ public class SeqUpdateExpression extends BaseExpression {
         seqAssign = new AssignmentStatement(symbolTable, List.of(seqVar), seq);
         VariableExpression seqVarExp = getSequenceVariableExpression();
 
-        callExp = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(seqVarExp, ind));
+        callExp = new CallBaseMethodExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(seqVarExp, ind));
 
         indVar = new Variable(VariableNameGenerator.generateVariableValueName(new Int(), symbolTable), new Int());
 

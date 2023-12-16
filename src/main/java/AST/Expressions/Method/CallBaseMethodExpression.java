@@ -1,5 +1,7 @@
-package AST.Expressions;
+package AST.Expressions.Method;
 
+import AST.Expressions.BaseExpression;
+import AST.Expressions.Expression;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CallMethodExpression extends BaseExpression {
+public class CallBaseMethodExpression extends CallMethodExpression {
 
     private SymbolTable symbolTable;
     private Method method;
@@ -25,7 +27,7 @@ public class CallMethodExpression extends BaseExpression {
 
     private List<List<Statement>> expanded;
 
-    public CallMethodExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
+    public CallBaseMethodExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
         super();
         this.symbolTable = symbolTable;
         this.method = method;

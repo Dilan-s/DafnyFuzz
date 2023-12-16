@@ -3,7 +3,7 @@ package AST.Program;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.BlockStatement;
-import AST.Expressions.CallMethodExpression;
+import AST.Expressions.Method.CallBaseMethodExpression;
 import AST.Expressions.Expression;
 import AST.Expressions.IfElseExpression;
 import AST.Expressions.IntLiteral;
@@ -87,7 +87,7 @@ public class SafeMethods {
         Variable iVar = new Variable(i, iT);
         VariableExpression iVarExp = new VariableExpression(symbolTable, iVar, iT);
 
-        CallMethodExpression iSafeIndex = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p2VarExp));
+        CallBaseMethodExpression iSafeIndex = new CallBaseMethodExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p2VarExp));
 
         AssignmentStatement asI = new AssignmentStatement(symbolTable, List.of(iVar), iSafeIndex);
         statement.addStatement(asI);
@@ -97,7 +97,7 @@ public class SafeMethods {
         Variable jVar = new Variable(j, jT);
         VariableExpression jVarExp = new VariableExpression(symbolTable, jVar, jT);
 
-        CallMethodExpression jSafeIndex = new CallMethodExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p3VarExp));
+        CallBaseMethodExpression jSafeIndex = new CallBaseMethodExpression(symbolTable, symbolTable.getMethod("safe_index_seq"), List.of(p1VarExp, p3VarExp));
 
         AssignmentStatement asJ = new AssignmentStatement(symbolTable, List.of(jVar), jSafeIndex);
         statement.addStatement(asJ);

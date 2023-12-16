@@ -1,7 +1,6 @@
 package AST.Generator;
 
 import AST.Expressions.CallFunctionExpression;
-import AST.Expressions.CallMethodExpression;
 import AST.Expressions.DMap.DMapSelection;
 import AST.Expressions.DMap.DMapUpdateExpression;
 import AST.Expressions.Expression;
@@ -9,6 +8,7 @@ import AST.Expressions.IfElseExpression;
 import AST.Expressions.IntLiteral;
 import AST.Expressions.Match.MatchExpression;
 import AST.Expressions.Match.MatchExpressionCase;
+import AST.Expressions.Method.CallMethodExpression;
 import AST.Expressions.Operator.BinaryOperator;
 import AST.Expressions.Operator.Operator;
 import AST.Expressions.Operator.UnaryOperator;
@@ -367,18 +367,7 @@ public class RandomExpressionGenerator {
             return null;
         }
 
-        List<Type> argTypes = m.getArgTypes();
-        List<Expression> args = new ArrayList<>();
-        for (Type t : argTypes) {
-            Type concrete = t.concrete(symbolTable);
-            Expression exp = generateExpression(concrete, symbolTable);
-            args.add(exp);
-        }
-        CallMethodExpression expression = new CallMethodExpression(symbolTable, m, args);
-
-
+        CallMethodExpression expression = m.generateCall(symbolTable);
         return expression;
     }
-
-
 }

@@ -1,7 +1,11 @@
 package AST.SymbolTable;
 
 import AST.Expressions.DClass.DClassValue;
+import AST.Expressions.Expression;
+import AST.Expressions.Method.CallBaseMethodExpression;
+import AST.Expressions.Method.CallMethodExpression;
 import AST.Generator.GeneratorConfig;
+import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.Statement;
@@ -479,5 +483,20 @@ public class Method implements Identifier {
 
         res.putAll(body.invalidValidationTests());
         return res;
+    }
+
+    public CallMethodExpression generateCall(SymbolTable symbolTable) {
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+
+        List<Type> argTypes = getArgTypes();
+        List<Expression> args = new ArrayList<>();
+        for (Type t : argTypes) {
+            Type concrete = t.concrete(symbolTable);
+            Expression exp = expressionGenerator.generateExpression(concrete, symbolTable);
+            args.add(exp);
+        }
+
+        CallBaseMethodExpression expression = new CallBaseMethodExpression(symbolTable, this, args);
+        return expression;
     }
 }
