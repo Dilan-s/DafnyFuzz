@@ -46,8 +46,8 @@ public class DClass implements UserDefinedType {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
             typeList = typeGenerator.generateTypes(noTypes, symbolTable);
             fieldNames = typeList.stream()
-                .map(VariableNameGenerator::generateDClassFieldName)
-                .collect(Collectors.toList());;
+                .map((Type type) -> VariableNameGenerator.generateDClassFieldName(name, type))
+                .collect(Collectors.toList());
         }
         return this;
     }

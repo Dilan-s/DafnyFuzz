@@ -81,19 +81,19 @@ public class VariableNameGenerator {
 
     public static String generateTypeAliasName() {
         typeAliasName++;
-        return String.format("TYPE_%d", typeAliasName);
+        return String.format("TY_%d", typeAliasName);
     }
 
     public static String generateDClassName() {
         dclassName++;
-        return String.format("CLASS_%d", dclassName);
+        return String.format("C_%d", dclassName);
     }
 
-    public static String generateDClassFieldName(Type type) {
+    public static String generateDClassFieldName(String className, Type type) {
         String typeName = type.getName();
-        Integer i = dclassFieldValues.getOrDefault(typeName, 1);
-        dclassFieldValues.put(typeName, i + 1);
-        String format = String.format("FIELD_%s_%d", typeName, i);
+        Integer i = dclassFieldValues.getOrDefault(className, 1);
+        dclassFieldValues.put(className, i + 1);
+        String format = String.format("F_%s_%s_%d", className, typeName, i);
         return format;
     }
 }
