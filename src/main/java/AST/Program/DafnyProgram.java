@@ -3,7 +3,7 @@ package AST.Program;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomStatementGenerator;
 import AST.Statements.Statement;
-import AST.SymbolTable.Method;
+import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 public class DafnyProgram {

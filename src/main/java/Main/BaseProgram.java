@@ -1,7 +1,7 @@
 package Main;
 
 import AST.Program.DafnyProgram;
-import AST.SymbolTable.Method;
+import AST.SymbolTable.Method.Method;
 import java.io.File;
 
 public class BaseProgram {

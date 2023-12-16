@@ -13,7 +13,7 @@ import AST.Expressions.Operator.OperatorExpression;
 import AST.Expressions.VariableExpression;
 import AST.Statements.IfElseStatement;
 import AST.Statements.ReturnStatement;
-import AST.SymbolTable.Method;
+import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;

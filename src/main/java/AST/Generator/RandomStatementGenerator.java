@@ -20,7 +20,7 @@ import AST.Statements.WhileStatement;
 import AST.Statements.util.MatchStatementCase;
 import AST.Statements.util.PrintAll;
 import AST.Statements.util.ReturnStatus;
-import AST.SymbolTable.Method;
+import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;

@@ -1,6 +1,6 @@
 package AST.Generator;
 
-import AST.SymbolTable.Method;
+import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.HashMap;

@@ -4,7 +4,7 @@ import AST.Errors.SemanticException;
 import AST.Expressions.Expression;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomTypeGenerator;
-import AST.SymbolTable.Method;
+import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.DCollectionTypes.DSet;

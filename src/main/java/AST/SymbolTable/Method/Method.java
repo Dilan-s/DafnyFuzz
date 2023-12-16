@@ -1,6 +1,5 @@
-package AST.SymbolTable;
+package AST.SymbolTable.Method;
 
-import AST.Expressions.DClass.DClassValue;
 import AST.Expressions.Expression;
 import AST.Expressions.Method.CallBaseMethodExpression;
 import AST.Expressions.Method.CallMethodExpression;
@@ -11,6 +10,8 @@ import AST.Generator.VariableNameGenerator;
 import AST.Statements.Statement;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
+import AST.SymbolTable.Function;
+import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
