@@ -1,6 +1,6 @@
 package AST.Statements;
 
-import AST.Expressions.CallFunctionExpression;
+import AST.Expressions.Function.CallFunctionExpression;
 import AST.Expressions.Expression;
 import AST.Expressions.VariableExpression;
 import AST.Generator.VariableNameGenerator;

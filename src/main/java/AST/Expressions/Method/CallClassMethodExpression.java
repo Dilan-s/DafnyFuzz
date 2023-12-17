@@ -97,7 +97,7 @@ public class CallClassMethodExpression extends CallMethodExpression {
 
         @Override
         protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
-            method.assignThis(classVariable, paramMap, s);
+            method.assignThis(classVariable);
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();

@@ -1,6 +1,8 @@
 package AST.SymbolTable.Function;
 
+import AST.Expressions.Function.CallFunctionExpression;
 import AST.Generator.GeneratorConfig;
+import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.Expressions.Expression;
 import AST.Statements.Statement;
@@ -282,5 +284,27 @@ public class Function implements Identifier {
             clauses.add(v);
         }
         return clauses;
+    }
+
+    public void assignThis(Variable classVariable) {
+    }
+
+    public CallFunctionExpression generateCall(SymbolTable symbolTable) {
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+
+        List<Type> argTypes = getArgTypes();
+        List<Expression> args = new ArrayList<>();
+
+        for (Type t : argTypes) {
+            Type concrete = t.concrete(symbolTable);
+            Expression exp = expressionGenerator.generateExpression(concrete, symbolTable);
+            args.add(exp);
+        }
+
+        CallFunctionExpression expression = new CallFunctionExpression(symbolTable, this, args);
+
+        return expression;
+
+
     }
 }

@@ -3,9 +3,7 @@ package AST.SymbolTable.Method;
 import AST.Expressions.Expression;
 import AST.Expressions.Method.CallClassMethodExpression;
 import AST.Expressions.Method.CallMethodExpression;
-import AST.Expressions.VariableExpression;
 import AST.Generator.RandomExpressionGenerator;
-import AST.Statements.AssignmentStatement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DClass;
@@ -18,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class ClassMethod extends Method {
 
-    private DClass dClass;
+    private final DClass dClass;
     private VariableThis thisVariable;
 
     public ClassMethod(List<Type> returnTypes, String name, SymbolTable symbolTable,
@@ -73,7 +71,7 @@ public class ClassMethod extends Method {
     }
 
     @Override
-    public void assignThis(Variable classVariable, Map<Variable, Variable> paramMap, StringBuilder s) {
+    public void assignThis(Variable classVariable) {
         thisVariable.set(classVariable);
     }
 

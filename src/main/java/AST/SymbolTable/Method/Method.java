@@ -501,7 +501,7 @@ public class Method implements Identifier {
         return expression;
     }
 
-    public void assignThis(Variable classVariable, Map<Variable, Variable> paramMap, StringBuilder s) {
+    public void assignThis(Variable classVariable) {
 
     }
 }

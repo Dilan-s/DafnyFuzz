@@ -1,5 +1,8 @@
-package AST.Expressions;
+package AST.Expressions.Function;
 
+import AST.Expressions.BaseExpression;
+import AST.Expressions.Expression;
+import AST.Expressions.VariableExpression;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
