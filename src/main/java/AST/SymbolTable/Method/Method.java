@@ -10,7 +10,7 @@ import AST.Generator.VariableNameGenerator;
 import AST.Statements.Statement;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
-import AST.SymbolTable.Function;
+import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.Identifier;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.SymbolTable.SymbolTable;

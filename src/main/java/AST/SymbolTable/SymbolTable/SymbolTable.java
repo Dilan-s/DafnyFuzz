@@ -1,6 +1,6 @@
 package AST.SymbolTable.SymbolTable;
 
-import AST.SymbolTable.Function;
+import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.Method.ClassMethod;
 import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.Types.Type;

@@ -11,7 +11,7 @@ import AST.Expressions.Array.DArrayLiteralByElements;
 import AST.Expressions.Array.DArrayLiteralInline;
 import AST.Expressions.Expression;
 import AST.Expressions.VariableExpression;
-import AST.SymbolTable.Function;
+import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;

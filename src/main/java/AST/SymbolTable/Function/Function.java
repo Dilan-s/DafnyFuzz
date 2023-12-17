@@ -1,10 +1,11 @@
-package AST.SymbolTable;
+package AST.SymbolTable.Function;
 
 import AST.Generator.GeneratorConfig;
 import AST.Generator.VariableNameGenerator;
 import AST.Expressions.Expression;
 import AST.Statements.Statement;
 import AST.StringUtils;
+import AST.SymbolTable.Identifier;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.Type;

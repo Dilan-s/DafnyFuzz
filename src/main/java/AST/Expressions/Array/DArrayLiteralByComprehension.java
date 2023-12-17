@@ -4,7 +4,7 @@ import AST.Expressions.BaseExpression;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
-import AST.SymbolTable.Function;
+import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;

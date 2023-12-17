@@ -2,7 +2,7 @@ package AST.Expressions.DSeq;
 
 import AST.Expressions.BaseExpression;
 import AST.Statements.Statement;
-import AST.SymbolTable.Function;
+import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;

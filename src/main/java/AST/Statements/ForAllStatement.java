@@ -6,7 +6,7 @@ import AST.Expressions.VariableExpression;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
-import AST.SymbolTable.Function;
+import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.Type;
@@ -14,10 +14,8 @@ import AST.SymbolTable.Types.Variables.Variable;
 import AST.SymbolTable.Types.Variables.VariableArrayIndex;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ForAllStatement extends BaseStatement {
 
