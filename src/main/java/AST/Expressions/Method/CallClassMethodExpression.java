@@ -8,6 +8,7 @@ import AST.Statements.Statement;
 import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,10 +16,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CallBaseMethodExpression extends CallMethodExpression {
+public class CallClassMethodExpression extends CallMethodExpression {
 
-    public CallBaseMethodExpression(SymbolTable symbolTable, Method method, List<Expression> args) {
+    private Expression classExpression;
+    private Variable classVariable;
+    private AssignmentStatement classAssign;
+
+    public CallClassMethodExpression(SymbolTable symbolTable, Method method, Expression classExpression, List<Expression> args) {
         super(symbolTable, method, args);
+        this.classExpression = classExpression;
+        DClass dClass = classExpression.getTypes().get(0).asDClass();
+
+        this.classVariable = new Variable(VariableNameGenerator.generateVariableValueName(dClass, symbolTable), dClass);
+        this.classAssign = new AssignmentStatement(symbolTable, List.of(classVariable), classExpression);
+
+        expanded.add(assignments.size(), classAssign.expand());
+    }
+
+    @Override
+    public List<Statement> expand() {
+        int i;
+        for (i = 0; i < assignments.size(); i++) {
+            Statement assignment = assignments.get(i);
+            if (assignment.requireUpdate()) {
+                expanded.set(i, assignment.expand());
+            }
+        }
+        if (classAssign.requireUpdate()) {
+            expanded.set(i, classAssign.expand());
+        }
+        i++;
+        if (assignStat.requireUpdate()) {
+            expanded.set(i, assignStat.expand());
+        }
+        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean requireUpdate() {
+        return super.requireUpdate() || classAssign.requireUpdate();
     }
 
     @Override
@@ -44,7 +80,7 @@ public class CallBaseMethodExpression extends CallMethodExpression {
 
         @Override
         public String toString() {
-            return String.format("%s(%s)", method.getName(), args.stream()
+            return String.format("%s.%s(%s)", classVariable.getName(), method.getName(), args.stream()
                 .map(Variable::getName)
                 .collect(Collectors.joining(", ")));
         }
@@ -60,7 +96,8 @@ public class CallBaseMethodExpression extends CallMethodExpression {
         }
 
         @Override
-        public List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+        protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+            method.assignThis(classVariable, paramMap, s);
             List<Object> r = new ArrayList<>();
 
             List<Object> l = new ArrayList<>();
@@ -82,4 +119,6 @@ public class CallBaseMethodExpression extends CallMethodExpression {
             return true;
         }
     }
+
+
 }

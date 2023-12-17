@@ -93,7 +93,7 @@ public class DataType implements UserDefinedType {
                         int t = GeneratorConfig.getRandom().nextInt(generics.size());
                         types.add(generics.get(t));
                     } else {
-                        List<Type> ts = randomTypeGenerator.generateTypes(1, symbolTable)
+                        List<Type> ts = randomTypeGenerator.generateTypesWithoutCurrent(1, symbolTable, this)
                             .stream().map(t -> t.equals(new DataType()) ? t : t.concrete(symbolTable))
                             .collect(Collectors.toList());
                         types.addAll(ts);

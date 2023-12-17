@@ -20,6 +20,7 @@ import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import AST.SymbolTable.Types.UserDefinedTypes.TypeAlias;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RandomTypeGenerator {
 
@@ -181,15 +182,7 @@ public class RandomTypeGenerator {
                     }
                 } else if ((probType -= PROB_DCLASS) < 0) {
                     PROB_DCLASS *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                    double prob_reuse = GeneratorConfig.getRandom().nextDouble();
-                    if (!DEFINED_DCLASS.isEmpty() && prob_reuse < PROB_REUSE) {
-                        int ind = GeneratorConfig.getRandom().nextInt(DEFINED_DCLASS.size());
-                        t = DEFINED_DCLASS.get(ind);
-                    } else {
-                        DClass dClass = new DClass();
-                        t = dClass;
-                        DEFINED_DCLASS.add(dClass);
-                    }
+                    t = generateClass();
 
                 }
             }
@@ -262,6 +255,18 @@ public class RandomTypeGenerator {
         return types;
     }
 
+    public List<Type> generateTypesWithoutCurrent(int noTypes, SymbolTable symbolTable, Type current) {
+        typeDepth++;
+        List<Type> ret = new ArrayList<>();
+        while (ret.size() != noTypes) {
+            List<Type> types = generateTypes(noTypes - ret.size(), symbolTable);
+            ret.addAll(types.stream().filter(t -> t != current).collect(Collectors.toList()));
+        }
+
+        typeDepth--;
+        return ret;
+    }
+
     public Type generateMatchType(SymbolTable symbolTable) {
         Type t = null;
         while (t == null) {
@@ -286,5 +291,17 @@ public class RandomTypeGenerator {
         }
 
         return t;
+    }
+
+    public DClass generateClass() {
+        double prob_reuse = GeneratorConfig.getRandom().nextDouble();
+        if (!DEFINED_DCLASS.isEmpty() && prob_reuse < PROB_REUSE) {
+            int ind = GeneratorConfig.getRandom().nextInt(DEFINED_DCLASS.size());
+            return DEFINED_DCLASS.get(ind);
+        } else {
+            DClass dClass = new DClass();
+            DEFINED_DCLASS.add(dClass);
+            return dClass;
+        }
     }
 }

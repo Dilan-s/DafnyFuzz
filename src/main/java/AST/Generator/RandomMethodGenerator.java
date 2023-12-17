@@ -1,9 +1,11 @@
 package AST.Generator;
 
 import AST.Statements.Statement;
+import AST.SymbolTable.Method.ClassMethod;
 import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
 
@@ -67,7 +69,29 @@ public class RandomMethodGenerator {
     }
 
     private Method generateClassMethod(List<Type> returnTypes, SymbolTable symbolTable) {
-        return generateBaseMethod(returnTypes, symbolTable);
+        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+
+        DClass dClass = typeGenerator.generateClass().concrete(symbolTable).asDClass();
+
+        String methodName = VariableNameGenerator.generateMethodName();
+        ClassMethod m = new ClassMethod(returnTypes, methodName, dClass);
+
+        List<Type> args = generateArgTypes(symbolTable);
+        for (Type t : args) {
+            Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
+            m.addArgument(var);
+        }
+
+        methodDepth++;
+        RandomStatementGenerator statementGenerator = new RandomStatementGenerator();
+        Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
+        methodDepth--;
+        m.setBody(statement);
+
+        symbolTable.addClassMethod(m);
+        dClass.addMethod(m);
+
+        return m;
     }
 
 

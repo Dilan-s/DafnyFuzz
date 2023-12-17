@@ -9,9 +9,12 @@ import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.StringUtils;
+import AST.SymbolTable.Method.ClassMethod;
+import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
+import AST.SymbolTable.Types.Variables.VariableThis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +28,7 @@ public class DClass implements UserDefinedType {
     private String name;
     private List<Type> typeList;
     private List<String> fieldNames;
+    private List<Method> methods;
 
     public DClass() {
         this(null, null, null);
@@ -34,6 +38,7 @@ public class DClass implements UserDefinedType {
         this.name = name;
         this.typeList = typeList;
         this.fieldNames = fieldNames;
+        this.methods = new ArrayList<>();
     }
 
     @Override
@@ -44,7 +49,7 @@ public class DClass implements UserDefinedType {
         if (typeList == null) {
             int noTypes = GeneratorConfig.getRandom().nextInt(MAX_NO_FIELDS) + MIN_NO_FIELDS;
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            typeList = typeGenerator.generateTypes(noTypes, symbolTable);
+            typeList = typeGenerator.generateTypesWithoutCurrent(noTypes, symbolTable, this);
             fieldNames = typeList.stream()
                 .map((Type type) -> VariableNameGenerator.generateDClassFieldName(name, type))
                 .collect(Collectors.toList());
@@ -75,7 +80,8 @@ public class DClass implements UserDefinedType {
         if (symbolTable.variableInScope(v)) {
             return new VariableExpression(symbolTable, v, this);
         }
-        return null;    }
+        return null;
+    }
 
     @Override
     public String formatPrint(Object object) {
@@ -135,11 +141,13 @@ public class DClass implements UserDefinedType {
 
         DClass dClass = other.asDClass();
 
-        if (typeList == null || dClass.typeList == null || fieldNames == null || dClass.fieldNames == null) {
+        if (typeList == null || dClass.typeList == null || fieldNames == null
+            || dClass.fieldNames == null) {
             return true;
         }
 
-        if (typeList.size() != dClass.typeList.size() || fieldNames.size() != dClass.fieldNames.size()) {
+        if (typeList.size() != dClass.typeList.size()
+            || fieldNames.size() != dClass.fieldNames.size()) {
             return false;
         }
 
@@ -170,7 +178,8 @@ public class DClass implements UserDefinedType {
         DClassValue rhsDV = (DClassValue) rhsV;
 
         return lhsDV.getName().equals(rhsDV.getName()) &&
-            Objects.equals(lhsDV.getContents(), rhsDV.getContents()) && lhsDV.getNum() == rhsDV.getNum();
+            Objects.equals(lhsDV.getContents(), rhsDV.getContents())
+            && lhsDV.getNum() == rhsDV.getNum();
 
     }
 
@@ -180,14 +189,18 @@ public class DClass implements UserDefinedType {
         List<String> fieldDeclarations =
             IntStream.range(0, fieldNames.size())
                 .mapToObj(i -> {
-                String field = fieldNames.get(i);
-                Type t = typeList.get(i);
-                return String.format("var %s: %s", field, t.getVariableType());
-            }).collect(Collectors.toList());
+                    String field = fieldNames.get(i);
+                    Type t = typeList.get(i);
+                    return String.format("var %s: %s", field, t.getVariableType());
+                }).collect(Collectors.toList());
 
         res.append(StringUtils.intersperse("\n", StringUtils.indent(fieldDeclarations)) + "\n");
 
-        res.append(StringUtils.indent(constructor()));
+        res.append(StringUtils.indent(constructor()) + "\n");
+
+        methods.stream()
+            .map(m -> m.toCode(false))
+            .forEach(s -> res.append(StringUtils.indent(s) + "\n"));
 
         res.append("\n}");
         return res.toString();
@@ -197,10 +210,10 @@ public class DClass implements UserDefinedType {
         StringBuilder res = new StringBuilder();
         res.append(String.format("constructor (%s) {\n", IntStream.range(0, fieldNames.size())
             .mapToObj(i -> {
-            String field = fieldNames.get(i);
-            Type t = typeList.get(i);
-            return String.format("%s: %s", field, t.getVariableType());
-        }).collect(Collectors.joining(", "))));
+                String field = fieldNames.get(i);
+                Type t = typeList.get(i);
+                return String.format("%s: %s", field, t.getVariableType());
+            }).collect(Collectors.joining(", "))));
         res.append(StringUtils.intersperse("\n", StringUtils.indent(fieldNames.stream()
             .map(f -> String.format("this.%s := %s;", f, f))
             .collect(Collectors.toList()))));
@@ -217,4 +230,11 @@ public class DClass implements UserDefinedType {
     }
 
 
+    public VariableThis getThis() {
+        return new VariableThis(this);
+    }
+
+    public void addMethod(ClassMethod method) {
+        methods.add(method);
+    }
 }

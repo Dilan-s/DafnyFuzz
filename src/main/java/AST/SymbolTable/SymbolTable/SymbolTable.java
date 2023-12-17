@@ -1,6 +1,7 @@
 package AST.SymbolTable.SymbolTable;
 
 import AST.SymbolTable.Function;
+import AST.SymbolTable.Method.ClassMethod;
 import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -13,6 +14,7 @@ public class SymbolTable {
 
     private final HashMap<String, Variable> variables;
     private final HashMap<String, Method> methods;
+    private final HashMap<String, ClassMethod> classMethods;
     private final HashMap<String, Function> functions;
     private SymbolTable enclosingSymbolTable;
 
@@ -28,6 +30,7 @@ public class SymbolTable {
         this.enclosingSymbolTable = enclosingSymbolTable;
         this.variables = new HashMap<>();
         this.methods = new HashMap<>();
+        this.classMethods = new HashMap<>();
         this.functions = new HashMap<>();
     }
 
@@ -37,6 +40,14 @@ public class SymbolTable {
 
     public void addVariable(Variable variable) {
         variables.put(variable.getName(), variable);
+    }
+
+    public void addClassMethod(ClassMethod method) {
+        if (enclosingSymbolTable == null) {
+            classMethods.put(method.getName(), method);
+        } else {
+            enclosingSymbolTable.addClassMethod(method);
+        }
     }
 
     public void addMethod(Method method) {
@@ -63,10 +74,20 @@ public class SymbolTable {
 
     public Method getMethod(String methodName) {
         Method method = methods.getOrDefault(methodName, null);
+        if (method != null) {
+            return method;
+        }
 
-        return method == null && enclosingSymbolTable != null
+        ClassMethod classMethod = classMethods.getOrDefault(methodName, null);
+        if (classMethod != null) {
+            return classMethod;
+        }
+
+        return enclosingSymbolTable != null
             ? enclosingSymbolTable.getMethod(methodName)
-            : method;
+            : null;
+
+
     }
 
     public List<Function> getAllFunctions() {
@@ -77,9 +98,18 @@ public class SymbolTable {
         return fs;
     }
 
-    public List<Method> getAllMethods() {
+    public List<Method> getAllBaseMethods() {
         List<Method> ms = new ArrayList<>(methods.values());
 
+        if (enclosingSymbolTable != null) {
+            ms.addAll(enclosingSymbolTable.getAllBaseMethods());
+        }
+        return ms;
+    }
+
+    public List<Method> getAllMethods() {
+        List<Method> ms = new ArrayList<>(methods.values());
+        ms.addAll(classMethods.values());
         if (enclosingSymbolTable != null) {
             ms.addAll(enclosingSymbolTable.getAllMethods());
         }

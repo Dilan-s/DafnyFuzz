@@ -157,7 +157,7 @@ public class Method implements Identifier {
                 code.add(t.declaration());
             }
 
-            List<Method> allMethods = symbolTable.getAllMethods();
+            List<Method> allMethods = symbolTable.getAllBaseMethods();
             for (Method m : allMethods) {
                 code.add(m.toCode(false));
             }
@@ -223,7 +223,7 @@ public class Method implements Identifier {
             }
             res = new HashSet<>(temp);
 
-            List<Method> allMethods = symbolTable.getAllMethods();
+            List<Method> allMethods = symbolTable.getAllBaseMethods();
 
             for (Method m : allMethods) {
                 List<String> methodBodyOptions = m.toOutput(false);
@@ -443,7 +443,7 @@ public class Method implements Identifier {
                 code.add(t.declaration());
             }
 
-            List<Method> allMethods = symbolTable.getAllMethods();
+            List<Method> allMethods = symbolTable.getAllBaseMethods();
             for (Method m : allMethods) {
                 if (m.getNoOfUses() > 0) {
                     if (m.getName().startsWith("safe")) {
@@ -474,7 +474,7 @@ public class Method implements Identifier {
         Map<String, String> res = new HashMap<>();
 
         if (printAll) {
-            List<Method> allMethods = symbolTable.getAllMethods();
+            List<Method> allMethods = symbolTable.getAllBaseMethods();
             for (Method m : allMethods) {
                 if (m.getNoOfUses() > 0) {
                     res.putAll(m.invalidValidationTests(false));
@@ -499,5 +499,9 @@ public class Method implements Identifier {
 
         CallBaseMethodExpression expression = new CallBaseMethodExpression(symbolTable, this, args);
         return expression;
+    }
+
+    public void assignThis(Variable classVariable, Map<Variable, Variable> paramMap, StringBuilder s) {
+
     }
 }

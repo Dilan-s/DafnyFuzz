@@ -97,6 +97,11 @@ public class DClassLiteral extends BaseExpression {
         return variable.getValue(paramsMap);
     }
 
+    @Override
+    public boolean validForFunction() {
+        return true;
+    }
+
     private class DClassInit extends BaseExpression {
 
         private final List<Expression> values;

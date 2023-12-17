@@ -22,7 +22,7 @@ public class Variable implements Identifier {
     protected Type type;
     private boolean isConstant;
     private boolean isDeclared;
-    private Object value;
+    protected Object value;
 
 
     public Variable(String name, Type type) {
@@ -176,6 +176,13 @@ public class Variable implements Identifier {
             List<String> fieldNames = dataTypeRule.getFieldNames();
             for (int i = 0; i < fieldTypes.size(); i++) {
                 vars.addAll(new VariableDataTypeIndex(this, fieldTypes.get(i), fieldNames.get(i), i).getSymbolTableArgs());
+            }
+        } else if (type.equals(new DClass())) {
+            DClass dClass = type.asDClass();
+            List<Type> fieldTypes = dClass.getFieldTypes();
+            List<String> fieldNames = dClass.getFieldNames();
+            for (int i = 0; i < fieldTypes.size(); i++) {
+                vars.addAll(new VariableClassIndex(this, fieldTypes.get(i), fieldNames.get(i), i).getSymbolTableArgs());
             }
         }
         vars.add(this);

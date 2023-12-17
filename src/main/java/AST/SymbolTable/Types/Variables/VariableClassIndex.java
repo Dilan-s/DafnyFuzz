@@ -77,4 +77,9 @@ public class VariableClassIndex extends Variable {
         VariableClassIndex other = (VariableClassIndex) obj;
         return other.variable.equals(variable) && other.index == index && other.name.equals(name);
     }
+
+    @Override
+    public boolean isDeclared() {
+        return true;
+    }
 }

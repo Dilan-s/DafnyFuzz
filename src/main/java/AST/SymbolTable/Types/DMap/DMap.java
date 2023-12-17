@@ -48,7 +48,23 @@ public class DMap implements Type {
         res.add(String.format("(%s == map[%s])", variableName,
             String.join(", ", mapContents)));
         return String.join(" && ", res);
+    }
 
+    @Override
+    public String formatEnsures(Object object) {
+        if (keyType == null || valueType == null) {
+            return null;
+        }
+        Map<Object, Object> m = (Map<Object, Object>) object;
+
+        List<String> mapContents = new ArrayList<>();
+
+        for (Entry<Object, Object> x : m.entrySet()) {
+            String s = String.format("%s := %s", keyType.formatEnsures(x.getKey()), valueType.formatEnsures(x.getValue()));
+            mapContents.add(s);
+        }
+        return String.format("map[%s]",
+            String.join(", ", mapContents));
     }
 
     public Type setKeyAndValueType(Type keyType, Type valueType) {
