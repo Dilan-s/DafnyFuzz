@@ -394,7 +394,7 @@ public class Method implements Identifier {
         return ensures;
     }
 
-    private List<String> getRequiresClauses(Map<Variable, Variable> requiresEnsures) {
+    protected List<String> getRequiresClauses(Map<Variable, Variable> requiresEnsures) {
         List<String> clauses = new ArrayList<>();
 
         for (Map.Entry<Variable, Variable> entry : requiresEnsures.entrySet()) {

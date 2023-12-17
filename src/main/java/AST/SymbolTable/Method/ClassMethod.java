@@ -14,6 +14,7 @@ import AST.SymbolTable.Types.Variables.VariableThis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ClassMethod extends Method {
 
@@ -73,8 +74,27 @@ public class ClassMethod extends Method {
 
     @Override
     public void assignThis(Variable classVariable, Map<Variable, Variable> paramMap, StringBuilder s) {
-        VariableExpression varExp = new VariableExpression(getSymbolTable(), classVariable, classVariable.getType());
         thisVariable.set(classVariable);
-//        new AssignmentStatement(getSymbolTable(), List.of(thisVariable), varExp).execute(paramMap, s);
+    }
+
+    @Override
+    protected List<String> getRequiresClauses(Map<Variable, Variable> requiresEnsures) {
+        List<String> requiresClauses = super.getRequiresClauses(requiresEnsures);
+        if (requiresClauses == null) {
+            return null;
+        }
+
+        List<Variable> symbolTableArgs = thisVariable.getSymbolTableArgs().stream()
+            .filter(v -> v != thisVariable)
+            .collect(Collectors.toList());
+        for (Variable variable : symbolTableArgs) {
+            String name = variable.getName();
+            String v = variable.getType().formatEnsures(name, variable.getValue().get(0));
+            if (v == null) {
+                return null;
+            }
+            requiresClauses.add(v);
+        }
+        return requiresClauses;
     }
 }
