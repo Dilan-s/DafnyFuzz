@@ -92,7 +92,7 @@ public class Seq implements DCollection {
 
         double probType = GeneratorConfig.getRandom().nextDouble();
         if (type.validFunctionType() && probType < PROB_USE_FUNC) {
-            Function f = functionGenerator.generateFunction(type, symbolTable, List.of(new Int()));
+            Function f = functionGenerator.generateBaseFunction(type, symbolTable, List.of(new Int()));
             SeqFuncLiteral expression = new SeqFuncLiteral(symbolTable, this, length, f);
             return expression;
         }

@@ -1,5 +1,6 @@
 package AST.SymbolTable.Function;
 
+import AST.Expressions.Function.CallBaseFunctionExpression;
 import AST.Expressions.Function.CallFunctionExpression;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
@@ -11,6 +12,7 @@ import AST.SymbolTable.Identifier;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +30,8 @@ public class Function implements Identifier {
     private final Variable returnArg;
     private final List<Variable> args;
     private final SymbolTable symbolTable;
-    private final Expression body;
+
+    private Expression body;
 
     private final Set<String> requires;
     private final Set<String> ensures;
@@ -36,25 +39,26 @@ public class Function implements Identifier {
 
     private int noOfUses;
 
-    public Function(String name, Type returnType, List<Variable> args, Expression body, SymbolTable symbolTable) {
+    public Function(String name, Type returnType, List<Variable> args, SymbolTable symbolTable) {
         this.name = name;
         this.returnType = returnType;
         this.args = args;
         this.symbolTable = symbolTable;
-        this.body = body;
 
         this.requires = new HashSet<>();
         this.ensures = new HashSet<>();
         this.reads = args.stream()
-            .filter(x -> x.getType().equals(new DArray()))
+            .filter(x -> x.getType().equals(new DArray()) || x.getType().equals(new DClass()))
             .map(Variable::getName)
             .collect(Collectors.toSet());
 
         this.noOfUses = 0;
 
         this.returnArg = new Variable(VariableNameGenerator.generateReturnVariableName(getName()), returnType);
+    }
 
-
+    public void setBody(Expression body) {
+        this.body = body;
     }
 
     public int getNoOfUses() {
@@ -267,7 +271,7 @@ public class Function implements Identifier {
         return ensures;
     }
 
-    private List<String> getRequiresClauses(Map<Variable, Variable> requiresEnsures) {
+    protected List<String> getRequiresClauses(Map<Variable, Variable> requiresEnsures) {
         List<String> clauses = new ArrayList<>();
 
         for (Map.Entry<Variable, Variable> entry : requiresEnsures.entrySet()) {
@@ -301,10 +305,8 @@ public class Function implements Identifier {
             args.add(exp);
         }
 
-        CallFunctionExpression expression = new CallFunctionExpression(symbolTable, this, args);
+        CallFunctionExpression expression = new CallBaseFunctionExpression(symbolTable, this, args);
 
         return expression;
-
-
     }
 }

@@ -99,7 +99,7 @@ public class DClassLiteral extends BaseExpression {
 
     @Override
     public boolean validForFunction() {
-        return true;
+        return false;
     }
 
     private class DClassInit extends BaseExpression {

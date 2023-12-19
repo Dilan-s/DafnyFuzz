@@ -161,7 +161,7 @@ public class Method implements Identifier {
             for (Method m : allMethods) {
                 code.add(m.toCode(false));
             }
-            List<Function> allFunctions = symbolTable.getAllFunctions();
+            List<Function> allFunctions = symbolTable.getAllBaseFunctions();
             for (Function f : allFunctions) {
                 code.add(f.toCode());
             }
@@ -241,7 +241,7 @@ public class Method implements Identifier {
                 res = new HashSet<>(r.subList(0, Math.min(5, res.size())));
             }
 
-            List<Function> allFunctions = symbolTable.getAllFunctions();
+            List<Function> allFunctions = symbolTable.getAllBaseFunctions();
 
             for (Function func : allFunctions) {
                 List<String> functionBodyOptions = func.toOutput();
@@ -453,7 +453,7 @@ public class Method implements Identifier {
                     }
                 }
             }
-            List<Function> allFunctions = symbolTable.getAllFunctions();
+            List<Function> allFunctions = symbolTable.getAllBaseFunctions();
             for (Function f : allFunctions) {
                 if (f.getNoOfUses() > 0) {
                     code.add(f.minimizedTestCase());

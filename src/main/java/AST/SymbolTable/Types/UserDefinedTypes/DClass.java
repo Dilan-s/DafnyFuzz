@@ -9,6 +9,8 @@ import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.Generator.VariableNameGenerator;
 import AST.StringUtils;
+import AST.SymbolTable.Function.ClassFunction;
+import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.Method.ClassMethod;
 import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -29,6 +31,7 @@ public class DClass implements UserDefinedType {
     private List<Type> typeList;
     private List<String> fieldNames;
     private List<Method> methods;
+    private List<Function> functions;
 
     public DClass() {
         this(null, null, null);
@@ -39,6 +42,7 @@ public class DClass implements UserDefinedType {
         this.typeList = typeList;
         this.fieldNames = fieldNames;
         this.methods = new ArrayList<>();
+        this.functions = new ArrayList<>();
     }
 
     @Override
@@ -202,6 +206,10 @@ public class DClass implements UserDefinedType {
             .map(m -> m.toCode(false))
             .forEach(s -> res.append(StringUtils.indent(s) + "\n"));
 
+        functions.stream()
+            .map(Function::toCode)
+            .forEach(s -> res.append(StringUtils.indent(s) + "\n"));
+
         res.append("\n}");
         return res.toString();
     }
@@ -229,12 +237,15 @@ public class DClass implements UserDefinedType {
         return typeList;
     }
 
-
     public VariableThis getThis() {
         return new VariableThis(this);
     }
 
     public void addMethod(ClassMethod method) {
         methods.add(method);
+    }
+
+    public void addFunction(ClassFunction function) {
+        functions.add(function);
     }
 }

@@ -1,5 +1,6 @@
 package AST.SymbolTable.SymbolTable;
 
+import AST.SymbolTable.Function.ClassFunction;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.Method.ClassMethod;
 import AST.SymbolTable.Method.Method;
@@ -16,6 +17,7 @@ public class SymbolTable {
     private final HashMap<String, Method> methods;
     private final HashMap<String, ClassMethod> classMethods;
     private final HashMap<String, Function> functions;
+    private final HashMap<String, ClassFunction> classFunctions;
     private SymbolTable enclosingSymbolTable;
 
     SymbolTable(boolean global) {
@@ -32,6 +34,7 @@ public class SymbolTable {
         this.methods = new HashMap<>();
         this.classMethods = new HashMap<>();
         this.functions = new HashMap<>();
+        this.classFunctions = new HashMap<>();
     }
 
     public void setEnclosingSymbolTable(SymbolTable enclosingSymbolTable) {
@@ -56,7 +59,14 @@ public class SymbolTable {
         } else {
             enclosingSymbolTable.addMethod(method);
         }
+    }
 
+    public void addClassFunction(ClassFunction function) {
+        if (enclosingSymbolTable == null) {
+            classFunctions.put(function.getName(), function);
+        } else {
+            enclosingSymbolTable.addClassFunction(function);
+        }
     }
 
     public void addFunction(Function function) {
@@ -90,8 +100,17 @@ public class SymbolTable {
 
     }
 
+    public List<Function> getAllBaseFunctions() {
+        List<Function> fs = new ArrayList<>(functions.values());
+        if (enclosingSymbolTable != null) {
+            fs.addAll(enclosingSymbolTable.getAllBaseFunctions());
+        }
+        return fs;
+    }
+
     public List<Function> getAllFunctions() {
         List<Function> fs = new ArrayList<>(functions.values());
+        fs.addAll(classFunctions.values());
         if (enclosingSymbolTable != null) {
             fs.addAll(enclosingSymbolTable.getAllFunctions());
         }

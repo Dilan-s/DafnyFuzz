@@ -1,7 +1,8 @@
 package AST.Statements;
 
-import AST.Expressions.Function.CallFunctionExpression;
+import AST.Expressions.Function.CallBaseFunctionExpression;
 import AST.Expressions.Expression;
+import AST.Expressions.Function.CallFunctionVariableExpression;
 import AST.Expressions.VariableExpression;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.util.ReturnStatus;
@@ -45,7 +46,7 @@ public class ForAllStatement extends BaseStatement {
 
         Variable index = new VariableArrayIndex(variable, type, loopVar);
         index.setDeclared();
-        Expression funcCall = new CallFunctionExpression(bodySt, func, new VariableExpression(symbolTable, loopVar, type));
+        Expression funcCall = new CallFunctionVariableExpression(bodySt, func, new VariableExpression(symbolTable, loopVar, type));
         this.innerAssignment = new AssignmentStatement(bodySt, List.of(
             index), funcCall);
 

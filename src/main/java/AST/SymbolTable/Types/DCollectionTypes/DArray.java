@@ -113,7 +113,7 @@ public class DArray implements DCollection {
             return expression;
         } else if ((probInitType -= PROB_COMPREHENSION) < 0) {
             if (this.validFunctionType()) {
-                Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable,
+                Function func = randomFunctionGenerator.generateBaseFunction(innerT, symbolTable,
                     List.of(new Int()));
 
                 DArrayLiteralByComprehension expression = new DArrayLiteralByComprehension(
@@ -122,7 +122,7 @@ public class DArray implements DCollection {
             }
         } else if ((probInitType -= PROB_FORALL) < 0) {
             if (this.validFunctionType()) {
-                Function func = randomFunctionGenerator.generateFunction(innerT, symbolTable,
+                Function func = randomFunctionGenerator.generateBaseFunction(innerT, symbolTable,
                     List.of(new Int()));
 
                 DArrayLiteralByForAll expression = new DArrayLiteralByForAll(symbolTable, this,

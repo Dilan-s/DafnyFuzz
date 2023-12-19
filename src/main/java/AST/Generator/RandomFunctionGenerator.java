@@ -1,9 +1,11 @@
 package AST.Generator;
 
 import AST.Expressions.Expression;
+import AST.SymbolTable.Function.ClassFunction;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 public class RandomFunctionGenerator {
 
     public static final double PROB_REUSE_FUNCTION = 0.75;
+    public static final double PROB_CLASS_FUNCTION = 0.25;
     public static final int MAX_FUNCTION_DEPTH = 5;
     public static final int MAX_NO_OF_ARGS = 5;
 
@@ -35,25 +38,34 @@ public class RandomFunctionGenerator {
         int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
         List<Type> argsT = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
 
-        return generateFunction(returnType, symbolTable, argsT);
+        double probClassFunction = GeneratorConfig.getRandom().nextDouble();
+        if (probClassFunction < PROB_CLASS_FUNCTION + 1) {
+            return generateClassFunction(returnType, symbolTable, argsT);
+        }
+
+        return generateBaseFunction(returnType, symbolTable, argsT);
     }
 
-    public Function generateFunction(Type returnType, SymbolTable symbolTable, List<Type> argsT) {
-
+    private Function generateClassFunction(Type returnType, SymbolTable symbolTable, List<Type> argsT) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         RandomMethodGenerator methodGenerator = new RandomMethodGenerator();
+        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
 
-        functionDepth++;
+        DClass dClass = typeGenerator.generateClass().concrete(symbolTable).asDClass();
+
         String functionName = VariableNameGenerator.generateFunctionName();
 
         List<Variable> args = argsT.stream()
             .map(t -> new Variable(VariableNameGenerator.generateArgumentName(functionName), t))
             .collect(Collectors.toList());
 
+        functionDepth++;
+        ClassFunction f;
         SymbolTable st;
         Expression body;
         do {
             st = new SymbolTable();
+            f = new ClassFunction(functionName, returnType, args, st, dClass);
             for (Variable arg : args) {
                 arg.setConstant();
                 for (Variable tableArg : arg.getSymbolTableArgs()) {
@@ -66,9 +78,49 @@ public class RandomFunctionGenerator {
             body = expressionGenerator.generateExpression(returnType, st);
         } while (body.validForFunction());
 
+        f.setBody(body);
         methodGenerator.enableMethods();
 
-        Function f = new Function(functionName, returnType, args, body, st);
+        functionDepth--;
+
+        symbolTable.addClassFunction(f);
+        dClass.addFunction(f);
+        return f;
+    }
+
+    public Function generateBaseFunction(Type returnType, SymbolTable symbolTable, List<Type> argsT) {
+
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+        RandomMethodGenerator methodGenerator = new RandomMethodGenerator();
+
+        String functionName = VariableNameGenerator.generateFunctionName();
+
+        List<Variable> args = argsT.stream()
+            .map(t -> new Variable(VariableNameGenerator.generateArgumentName(functionName), t))
+            .collect(Collectors.toList());
+
+        functionDepth++;
+        Function f;
+        SymbolTable st;
+        Expression body;
+        do {
+            st = new SymbolTable();
+            f = new Function(functionName, returnType, args, symbolTable);
+            for (Variable arg : args) {
+                arg.setConstant();
+                for (Variable tableArg : arg.getSymbolTableArgs()) {
+                    st.addVariable(tableArg);
+                    tableArg.setDeclared();
+                }
+            }
+
+            methodGenerator.disableMethods();
+            body = expressionGenerator.generateExpression(returnType, st);
+        } while (body.validForFunction());
+
+        f.setBody(body);
+        methodGenerator.enableMethods();
+
         functionDepth--;
 
         symbolTable.addFunction(f);
