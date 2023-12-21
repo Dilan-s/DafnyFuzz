@@ -88,4 +88,9 @@ public class CallClassFunctionExpression extends CallFunctionExpression {
         }
         return function.execute(variables, s);
     }
+
+    @Override
+    public boolean validForFunction() {
+        return true;
+    }
 }

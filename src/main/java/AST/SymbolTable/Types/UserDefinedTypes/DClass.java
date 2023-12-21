@@ -155,6 +155,10 @@ public class DClass implements UserDefinedType {
             return false;
         }
 
+        if (!name.equals(dClass.name)) {
+            return false;
+        }
+
         for (int i = 0; i < typeList.size(); i++) {
             Type type = typeList.get(i);
             Type otype = dClass.typeList.get(i);

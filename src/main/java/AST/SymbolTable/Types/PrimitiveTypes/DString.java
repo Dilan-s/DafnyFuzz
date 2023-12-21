@@ -60,8 +60,18 @@ public class DString implements BaseType {
 
     @Override
     public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
-        String v = value.toString();
-        return new StringLiteral(this, symbolTable, v);
+        String vs;
+        if (value instanceof List) {
+            String v = "";
+            List<Character> chrs = (List<Character>) value;
+            for (Character c : chrs) {
+                v += c;
+            }
+            vs = v;
+        } else {
+            vs = value.toString();
+        }
+        return new StringLiteral(this, symbolTable, vs);
     }
 
     @Override

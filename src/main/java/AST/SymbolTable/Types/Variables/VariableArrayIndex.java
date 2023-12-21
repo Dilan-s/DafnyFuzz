@@ -86,4 +86,9 @@ public class VariableArrayIndex extends Variable {
         VariableArrayIndex other = (VariableArrayIndex) obj;
         return other.variable.equals(variable) && (Objects.equals(other.indexInt, indexInt) || Objects.equals(other.indexVar, indexVar));
     }
+
+    @Override
+    public boolean isDeclared() {
+        return true;
+    }
 }
