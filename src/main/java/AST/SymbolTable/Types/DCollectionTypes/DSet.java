@@ -10,6 +10,7 @@ import AST.SymbolTable.Types.Type;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -207,7 +208,23 @@ public class DSet implements DCollection {
         Set<Object> rhsVS = (Set<Object>) rhsV;
         Set<Object> lhsVS = (Set<Object>) lhsV;
 
-        return rhsVS.equals(lhsVS);
+        if (lhsVS.size() != rhsVS.size()) {
+            return false;
+        }
+
+        for (Object lhsK : lhsVS) {
+            boolean found = false;
+            for (Iterator<Object> iterator = rhsVS.iterator(); !found && iterator.hasNext(); ) {
+                Object rhsK = iterator.next();
+                if (type.equal(lhsK, rhsK)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

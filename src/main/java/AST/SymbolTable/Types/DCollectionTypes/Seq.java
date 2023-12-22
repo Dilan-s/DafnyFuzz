@@ -172,7 +172,7 @@ public class Seq implements DCollection {
         }
 
         for (int i = 0; i < lhsVL.size(); i++) {
-            if (!Objects.equals(lhsVL.get(i), rhsVL.get(i))) {
+            if (!type.equal(lhsVL.get(i), rhsVL.get(i))) {
                 return false;
             }
         }

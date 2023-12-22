@@ -10,6 +10,7 @@ import AST.SymbolTable.Types.Type;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -285,12 +286,31 @@ public class Multiset implements DCollection {
         Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
         Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
-        for (Object k : lhsVM.keySet()) {
-            if (!rhsVM.containsKey(k) || !Objects.equals(lhsVM.get(k), rhsVM.get(k))) {
+        Set<Object> lhsKeys = lhsVM.keySet();
+        Set<Object> rhsKeys = rhsVM.keySet();
+
+        if (lhsKeys.size() != rhsKeys.size()) {
+            return false;
+        }
+
+        for (Object lhsK : lhsKeys) {
+            boolean inBoth = false;
+            for (Iterator<Object> iterator = rhsKeys.iterator(); !inBoth && iterator.hasNext(); ) {
+                Object rhsK = iterator.next();
+                if (type.equal(lhsK, rhsK)) {
+                    inBoth = true;
+                    if (!lhsVM.get(lhsK).equals(rhsVM.get(rhsK))) {
+                        return false;
+                    }
+                }
+            }
+            if (!inBoth) {
                 return false;
             }
         }
-        return lhsVM.keySet().containsAll(rhsVM.keySet());
+        return true;
+
+
     }
 
     @Override
