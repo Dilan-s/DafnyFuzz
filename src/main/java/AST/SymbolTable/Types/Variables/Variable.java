@@ -106,6 +106,7 @@ public class Variable implements Identifier {
 
                 List<Type> fieldTypes = dClass.getFieldTypes();
                 List<String> fieldNames = dClass.getFieldNames();
+                List<Boolean> isConst = dClass.getIsConst();
                 for (int i = 0; i < prevV.size(); i++) {
                     Variable variableClassIndex = new VariableClassIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
                     remove.add(variableClassIndex);
@@ -113,6 +114,9 @@ public class Variable implements Identifier {
                 DClassValue newV = (DClassValue) value;
                 for (int i = 0; i < newV.size(); i++) {
                     Variable variableClassIndex = new VariableClassIndex(this, fieldTypes.get(i), fieldNames.get(i), i);
+                    if (isConst.get(i)) {
+                        variableClassIndex.setConstant();
+                    }
                     replace.add(variableClassIndex);
                 }
             } else if (type.equals(new DataTypeRule())) {
@@ -181,8 +185,14 @@ public class Variable implements Identifier {
             DClass dClass = type.asDClass();
             List<Type> fieldTypes = dClass.getFieldTypes();
             List<String> fieldNames = dClass.getFieldNames();
+            List<Boolean> isConst = dClass.getIsConst();
             for (int i = 0; i < fieldTypes.size(); i++) {
-                vars.addAll(new VariableClassIndex(this, fieldTypes.get(i), fieldNames.get(i), i).getSymbolTableArgs());
+                VariableClassIndex variableClassIndex = new VariableClassIndex(this,
+                  fieldTypes.get(i), fieldNames.get(i), i);
+                if (isConst.get(i)) {
+                    variableClassIndex.setConstant();
+                }
+                vars.addAll(variableClassIndex.getSymbolTableArgs());
             }
         }
         vars.add(this);

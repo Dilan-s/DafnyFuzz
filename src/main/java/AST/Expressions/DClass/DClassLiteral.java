@@ -53,10 +53,14 @@ public class DClassLiteral extends BaseExpression {
         DClass t = this.type.asDClass();
         List<Type> fieldTypes = t.getFieldTypes();
         List<String> fieldNames = t.getFieldNames();
+        List<Boolean> fieldIsConst = t.getIsConst();
 
         for (int i = 0; i < fieldTypes.size(); i++) {
             VariableClassIndex v = new VariableClassIndex(variable, fieldTypes.get(i), fieldNames.get(i), i);
             v.setDeclared();
+            if (fieldIsConst.get(i)) {
+                v.setConstant();
+            }
             symbolTable.addVariable(v);
         }
     }

@@ -25,231 +25,258 @@ import java.util.stream.IntStream;
 
 public class DClass implements UserDefinedType {
 
-    private static final int MAX_NO_FIELDS = 5;
-    private static final int MIN_NO_FIELDS = 2;
-    private String name;
-    private List<Type> typeList;
-    private List<String> fieldNames;
-    private List<Method> methods;
-    private List<Function> functions;
+  private static final int MAX_NO_FIELDS = 3;
+  private static final int MIN_NO_FIELDS = 1;
+  private String name;
+  private List<Type> typeList;
+  private List<String> fieldNames;
+  private List<Boolean> isConst;
+  private List<Method> methods;
+  private List<Function> functions;
 
-    public DClass() {
-        this(null, null, null);
+  public DClass() {
+    this(null, null, null, null);
+  }
+
+  public DClass(String name, List<Type> typeList, List<String> fieldNames, List<Boolean> isConst) {
+    this.name = name;
+    this.typeList = typeList;
+    this.fieldNames = fieldNames;
+    this.isConst = isConst;
+    this.methods = new ArrayList<>();
+    this.functions = new ArrayList<>();
+  }
+
+  @Override
+  public Type concrete(SymbolTable symbolTable) {
+    if (name == null) {
+      name = VariableNameGenerator.generateDClassName();
+    }
+    if (typeList == null) {
+      int noVarTypes = GeneratorConfig.getRandom().nextInt(MAX_NO_FIELDS) + MIN_NO_FIELDS;
+      RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+      List<Type> varTypes = typeGenerator.generateTypesWithoutCurrent(noVarTypes, symbolTable,
+        this);
+      this.typeList = varTypes;
+      fieldNames = varTypes.stream()
+        .map((Type type) -> VariableNameGenerator.generateDClassFieldName(name, type))
+        .collect(Collectors.toList());
+      isConst = IntStream.range(0, noVarTypes)
+        .mapToObj(x -> false)
+        .collect(Collectors.toList());
+
+      int noConstTypes = GeneratorConfig.getRandom().nextInt(MAX_NO_FIELDS) + MIN_NO_FIELDS;
+      List<Type> constTypes = typeGenerator.generateTypesWithoutCurrent(noConstTypes, symbolTable,
+        this);
+      this.typeList.addAll(constTypes);
+      fieldNames.addAll(constTypes.stream()
+        .map((Type type) -> VariableNameGenerator.generateDClassFieldName(name, type))
+        .collect(Collectors.toList()));
+      isConst.addAll(IntStream.range(0, noConstTypes)
+        .mapToObj(x -> true)
+        .collect(Collectors.toList()));
+    }
+    return this;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public Expression generateLiteral(SymbolTable symbolTable) {
+    RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+    List<Expression> values = new ArrayList<>();
+    for (int i = 0; i < typeList.size(); i++) {
+      Type concrete = typeList.get(i).concrete(symbolTable);
+      values.add(expressionGenerator.generateExpression(concrete, symbolTable));
+    }
+    return new DClassLiteral(symbolTable, this, values);
+  }
+
+  @Override
+  public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+    DClassValue vs = (DClassValue) value;
+    Variable v = vs.getVariable();
+    if (symbolTable.variableInScope(v)) {
+      return new VariableExpression(symbolTable, v, this);
+    }
+    return null;
+  }
+
+  @Override
+  public String formatPrint(Object object) {
+    DClassValue value = (DClassValue) object;
+    return value.getName();
+  }
+
+  @Override
+  public boolean isPrintable() {
+    return false;
+  }
+
+  @Override
+  public String formatEnsures(String variableName, Object object) {
+    if (typeList == null) {
+      return null;
     }
 
-    public DClass(String name, List<Type> typeList, List<String> fieldNames) {
-        this.name = name;
-        this.typeList = typeList;
-        this.fieldNames = fieldNames;
-        this.methods = new ArrayList<>();
-        this.functions = new ArrayList<>();
-    }
+    List<String> res = new ArrayList<>();
+    DClassValue value = (DClassValue) object;
 
-    @Override
-    public Type concrete(SymbolTable symbolTable) {
-        if (name == null) {
-            name = VariableNameGenerator.generateDClassName();
-        }
-        if (typeList == null) {
-            int noTypes = GeneratorConfig.getRandom().nextInt(MAX_NO_FIELDS) + MIN_NO_FIELDS;
-            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            typeList = typeGenerator.generateTypesWithoutCurrent(noTypes, symbolTable, this);
-            fieldNames = typeList.stream()
-                .map((Type type) -> VariableNameGenerator.generateDClassFieldName(name, type))
-                .collect(Collectors.toList());
-        }
-        return this;
-    }
+    for (int i = 0; i < typeList.size(); i++) {
+      Type t = typeList.get(i);
 
-    @Override
-    public String getName() {
-        return name;
-    }
+      String field = fieldNames.get(i);
+      Object v = t.of(value.get(i));
 
-    @Override
-    public Expression generateLiteral(SymbolTable symbolTable) {
-        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
-        List<Expression> values = new ArrayList<>();
-        for (int i = 0; i < typeList.size(); i++) {
-            Type concrete = typeList.get(i).concrete(symbolTable);
-            values.add(expressionGenerator.generateExpression(concrete, symbolTable));
-        }
-        return new DClassLiteral(symbolTable, this, values);
-    }
+      String element = t.formatEnsures(String.format("(%s).%s", variableName, field), v);
 
-    @Override
-    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
-        DClassValue vs = (DClassValue) value;
-        Variable v = vs.getVariable();
-        if (symbolTable.variableInScope(v)) {
-            return new VariableExpression(symbolTable, v, this);
-        }
+      if (element == null) {
         return null;
+      }
+      res.add(element);
+
+    }
+    return String.join(" && ", res);
+  }
+
+  public Type getType(int i) {
+    return typeList.get(i);
+  }
+
+  @Override
+  public int hashCode() {
+    return getName().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Type)) {
+      return false;
+    }
+    Type other = (Type) obj;
+    if (!(other instanceof DClass)) {
+      return false;
     }
 
-    @Override
-    public String formatPrint(Object object) {
-        DClassValue value = (DClassValue) object;
-        return value.getName();
+    DClass dClass = other.asDClass();
+
+    if (typeList == null || dClass.typeList == null || fieldNames == null
+      || dClass.fieldNames == null) {
+      return true;
     }
 
-    @Override
-    public boolean isPrintable() {
+    if (typeList.size() != dClass.typeList.size()
+      || fieldNames.size() != dClass.fieldNames.size()) {
+      return false;
+    }
+
+    if (!name.equals(dClass.name)) {
+      return false;
+    }
+
+    for (int i = 0; i < typeList.size(); i++) {
+      Type type = typeList.get(i);
+      Type otype = dClass.typeList.get(i);
+
+      if (type != null && otype != null && !type.equals(otype)) {
         return false;
+      }
     }
+    return true;
+  }
 
-    @Override
-    public String formatEnsures(String variableName, Object object) {
-        if (typeList == null) {
-            return null;
-        }
+  @Override
+  public boolean validMethodType() {
+    return false;
+  }
 
-        List<String> res = new ArrayList<>();
-        DClassValue value = (DClassValue) object;
+  @Override
+  public boolean validFunctionType() {
+    return false;
+  }
 
-        for (int i = 0; i < typeList.size(); i++) {
-            Type t = typeList.get(i);
+  @Override
+  public Boolean equal(Object lhsV, Object rhsV) {
+    DClassValue lhsDV = (DClassValue) lhsV;
+    DClassValue rhsDV = (DClassValue) rhsV;
 
-            String field = fieldNames.get(i);
-            Object v = t.of(value.get(i));
+    return lhsDV.getName().equals(rhsDV.getName()) &&
+      Objects.equals(lhsDV.getContents(), rhsDV.getContents())
+      && lhsDV.getNum() == rhsDV.getNum();
 
-            String element = t.formatEnsures(String.format("(%s).%s", variableName, field), v);
+  }
 
-            if (element == null) {
-                return null;
-            }
-            res.add(element);
+  public String declaration() {
+    StringBuilder res = new StringBuilder();
+    res.append(String.format("class %s {\n", name));
+    List<String> fieldDeclarations =
+      IntStream.range(0, fieldNames.size())
+        .mapToObj(i -> {
+          String field = fieldNames.get(i);
+          Type t = typeList.get(i);
+          if (isConst.get(i)) {
+            return String.format("const %s: %s", field, t.getVariableType());
+          } else {
+            return String.format("var %s: %s", field, t.getVariableType());
+          }
+        }).collect(Collectors.toList());
 
-        }
-        return String.join(" && ", res);
-    }
+    res.append(StringUtils.intersperse("\n", StringUtils.indent(fieldDeclarations)) + "\n");
 
-    public Type getType(int i) {
-        return typeList.get(i);
-    }
+    res.append(StringUtils.indent(constructor()) + "\n");
 
-    @Override
-    public int hashCode() {
-        return getName().hashCode();
-    }
+    methods.stream()
+      .map(m -> m.toCode(false))
+      .forEach(s -> res.append(StringUtils.indent(s) + "\n"));
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Type)) {
-            return false;
-        }
-        Type other = (Type) obj;
-        if (!(other instanceof DClass)) {
-            return false;
-        }
+    functions.stream()
+      .map(Function::toCode)
+      .forEach(s -> res.append(StringUtils.indent(s) + "\n"));
 
-        DClass dClass = other.asDClass();
+    res.append("\n}");
+    return res.toString();
+  }
 
-        if (typeList == null || dClass.typeList == null || fieldNames == null
-            || dClass.fieldNames == null) {
-            return true;
-        }
+  private String constructor() {
+    StringBuilder res = new StringBuilder();
+    res.append(String.format("constructor (%s) {\n", IntStream.range(0, fieldNames.size())
+      .mapToObj(i -> {
+        String field = fieldNames.get(i);
+        Type t = typeList.get(i);
 
-        if (typeList.size() != dClass.typeList.size()
-            || fieldNames.size() != dClass.fieldNames.size()) {
-            return false;
-        }
+        return String.format("%s: %s", field, t.getVariableType());
+      }).collect(Collectors.joining(", "))));
+    res.append(StringUtils.intersperse("\n", StringUtils.indent(fieldNames.stream()
+      .map(f -> String.format("this.%s := %s;", f, f))
+      .collect(Collectors.toList()))));
+    res.append("\n}");
+    return res.toString();
+  }
 
-        if (!name.equals(dClass.name)) {
-            return false;
-        }
+  public List<String> getFieldNames() {
+    return fieldNames;
+  }
 
-        for (int i = 0; i < typeList.size(); i++) {
-            Type type = typeList.get(i);
-            Type otype = dClass.typeList.get(i);
+  public List<Type> getFieldTypes() {
+    return typeList;
+  }
 
-            if (type != null && otype != null && !type.equals(otype)) {
-                return false;
-            }
-        }
-        return true;
-    }
+  public VariableThis getThis() {
+    return new VariableThis(this);
+  }
 
-    @Override
-    public boolean validMethodType() {
-        return false;
-    }
+  public void addMethod(ClassMethod method) {
+    methods.add(method);
+  }
 
-    @Override
-    public boolean validFunctionType() {
-        return false;
-    }
+  public void addFunction(ClassFunction function) {
+    functions.add(function);
+  }
 
-    @Override
-    public Boolean equal(Object lhsV, Object rhsV) {
-        DClassValue lhsDV = (DClassValue) lhsV;
-        DClassValue rhsDV = (DClassValue) rhsV;
-
-        return lhsDV.getName().equals(rhsDV.getName()) &&
-            Objects.equals(lhsDV.getContents(), rhsDV.getContents())
-            && lhsDV.getNum() == rhsDV.getNum();
-
-    }
-
-    public String declaration() {
-        StringBuilder res = new StringBuilder();
-        res.append(String.format("class %s {\n", name));
-        List<String> fieldDeclarations =
-            IntStream.range(0, fieldNames.size())
-                .mapToObj(i -> {
-                    String field = fieldNames.get(i);
-                    Type t = typeList.get(i);
-                    return String.format("var %s: %s", field, t.getVariableType());
-                }).collect(Collectors.toList());
-
-        res.append(StringUtils.intersperse("\n", StringUtils.indent(fieldDeclarations)) + "\n");
-
-        res.append(StringUtils.indent(constructor()) + "\n");
-
-        methods.stream()
-            .map(m -> m.toCode(false))
-            .forEach(s -> res.append(StringUtils.indent(s) + "\n"));
-
-        functions.stream()
-            .map(Function::toCode)
-            .forEach(s -> res.append(StringUtils.indent(s) + "\n"));
-
-        res.append("\n}");
-        return res.toString();
-    }
-
-    private String constructor() {
-        StringBuilder res = new StringBuilder();
-        res.append(String.format("constructor (%s) {\n", IntStream.range(0, fieldNames.size())
-            .mapToObj(i -> {
-                String field = fieldNames.get(i);
-                Type t = typeList.get(i);
-                return String.format("%s: %s", field, t.getVariableType());
-            }).collect(Collectors.joining(", "))));
-        res.append(StringUtils.intersperse("\n", StringUtils.indent(fieldNames.stream()
-            .map(f -> String.format("this.%s := %s;", f, f))
-            .collect(Collectors.toList()))));
-        res.append("\n}");
-        return res.toString();
-    }
-
-    public List<String> getFieldNames() {
-        return fieldNames;
-    }
-
-    public List<Type> getFieldTypes() {
-        return typeList;
-    }
-
-    public VariableThis getThis() {
-        return new VariableThis(this);
-    }
-
-    public void addMethod(ClassMethod method) {
-        methods.add(method);
-    }
-
-    public void addFunction(ClassFunction function) {
-        functions.add(function);
-    }
+  public List<Boolean> getIsConst() {
+    return isConst;
+  }
 }
