@@ -69,8 +69,7 @@ public class MatchExpression extends BaseExpression {
 
     @Override
     public boolean validForFunction() {
-        return test.validForFunction() || cases.stream().anyMatch(Expression::validForFunction)
-            || defaultCase.validForFunction();
+        return true; //test.validForFunction() || cases.stream().anyMatch(Expression::validForFunction) || defaultCase.validForFunction();
     }
 
     @Override
