@@ -13,6 +13,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.ArrowType;
 import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
@@ -45,12 +46,15 @@ public class RandomTypeGenerator {
     public static double PROB_DATATYPE = 20.0;
     public static double PROB_TYPE_ALIAS = 20.0;
     public static double PROB_DCLASS = 20.0;
+    public static double PROB_ARROW_TYPE = 10.0;
 
     public static double PROB_SWARM = 0.05;
     private static int typeDepth = 0;
 
 
     private Type generateType() {
+        typeDepth++;
+
         Type t = null;
         boolean swarm = GeneratorConfig.getRandom().nextDouble() < PROB_SWARM;
         while (t == null) {
@@ -64,7 +68,7 @@ public class RandomTypeGenerator {
             } else {
                 double ratioSum = PROB_INT + PROB_BOOL + PROB_CHAR + PROB_REAL + PROB_DSTRING +
                     PROB_DMAP + PROB_DARRAY + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE +
-                    PROB_DATATYPE + PROB_TYPE_ALIAS + PROB_DCLASS;
+                    PROB_DATATYPE + PROB_TYPE_ALIAS + PROB_DCLASS + PROB_ARROW_TYPE;
                 double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
                 if (swarm) {
@@ -169,6 +173,10 @@ public class RandomTypeGenerator {
                         t = dataType;
                         DEFINED_DATA_TYPES.add(dataType);
                     }
+
+                    if (swarm) {
+                        PROB_DATATYPE *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
                 } else if ((probType -= PROB_TYPE_ALIAS) < 0) {
                     PROB_TYPE_ALIAS *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     double prob_reuse = GeneratorConfig.getRandom().nextDouble();
@@ -180,14 +188,28 @@ public class RandomTypeGenerator {
                         t = typeAlias;
                         DEFINED_TYPE_ALIAS.add(typeAlias);
                     }
+
+                    if (swarm) {
+                        PROB_TYPE_ALIAS *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
                 } else if ((probType -= PROB_DCLASS) < 0) {
                     PROB_DCLASS *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     t = generateClass();
 
+                    if (swarm) {
+                        PROB_DCLASS *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
+                } else if ((probType -= PROB_ARROW_TYPE) < 0) {
+                    PROB_ARROW_TYPE *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    t = new ArrowType();
+
+                    if (swarm) {
+                        PROB_ARROW_TYPE *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
+                    }
                 }
             }
         }
-
+        typeDepth--;
         return t;
     }
 
@@ -206,22 +228,20 @@ public class RandomTypeGenerator {
         PROB_DATATYPE = 20.0;
         PROB_TYPE_ALIAS = 20.0;
         PROB_DCLASS = 20.0;
+        PROB_ARROW_TYPE = 10.0;
     }
 
     public List<Type> generateTypes(int noOfTypes, SymbolTable symbolTable) {
-        typeDepth++;
         List<Type> types = new ArrayList<>();
         for (int i = 0; i < noOfTypes; i++) {
             Type t = generateType();
             Type concrete = t.concrete(symbolTable);
             types.add(concrete);
         }
-        typeDepth--;
         return types;
     }
 
     public List<Type> generateMapTypes(int noOfTypes, SymbolTable symbolTable) {
-        typeDepth++;
         List<Type> types = new ArrayList<>();
         int i = 0;
         while (i < noOfTypes) {
@@ -232,12 +252,10 @@ public class RandomTypeGenerator {
                 i++;
             }
         }
-        typeDepth--;
         return types;
     }
 
     public List<Type> generateMethodTypes(int noOfArgs, SymbolTable symbolTable) {
-        typeDepth++;
         List<Type> types = new ArrayList<>();
 
         int i = 0;
@@ -251,19 +269,33 @@ public class RandomTypeGenerator {
             }
         }
 
-        typeDepth--;
+        return types;
+    }
+
+    public List<Type> generateFunctionTypes(int noOfArgs, SymbolTable symbolTable) {
+        List<Type> types = new ArrayList<>();
+
+        int i = 0;
+        while (i < noOfArgs) {
+            Type t = generateTypes(1, symbolTable).get(0);
+            Type concrete = t.concrete(symbolTable);
+
+            if (concrete.validFunctionType()) {
+                types.add(concrete);
+                i++;
+            }
+        }
+
         return types;
     }
 
     public List<Type> generateTypesWithoutCurrent(int noTypes, SymbolTable symbolTable, Type current) {
-        typeDepth++;
         List<Type> ret = new ArrayList<>();
         while (ret.size() != noTypes) {
             List<Type> types = generateTypes(noTypes - ret.size(), symbolTable);
             ret.addAll(types.stream().filter(t -> t != current).collect(Collectors.toList()));
         }
 
-        typeDepth--;
         return ret;
     }
 

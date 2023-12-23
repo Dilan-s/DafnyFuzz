@@ -16,7 +16,7 @@ import AST.Expressions.Operator.OperatorExpression;
 import AST.Expressions.DSeq.SeqUpdateExpression;
 import AST.Expressions.DSeq.SeqIndexExpression;
 import AST.Expressions.DSeq.SeqSubsequenceExpression;
-import AST.Expressions.VariableExpression;
+import AST.Expressions.Variable.VariableExpression;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.Types.DMap.DMap;

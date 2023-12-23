@@ -1,5 +1,6 @@
-package AST.Expressions;
+package AST.Expressions.Variable;
 
+import AST.Expressions.BaseExpression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;

@@ -36,17 +36,17 @@ public class RandomFunctionGenerator {
         }
 
         int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
-        List<Type> argsT = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
+        List<Type> argTypes = typeGenerator.generateFunctionTypes(noOfArgs, symbolTable);
 
         double probClassFunction = GeneratorConfig.getRandom().nextDouble();
-        if (probClassFunction < PROB_CLASS_FUNCTION + 1) {
-            return generateClassFunction(returnType, symbolTable, argsT);
+        if (probClassFunction < PROB_CLASS_FUNCTION) {
+            return generateClassFunction(returnType, symbolTable, argTypes);
         }
 
-        return generateBaseFunction(returnType, symbolTable, argsT);
+        return generateBaseFunction(returnType, symbolTable, argTypes);
     }
 
-    private Function generateClassFunction(Type returnType, SymbolTable symbolTable, List<Type> argsT) {
+    private Function generateClassFunction(Type returnType, SymbolTable symbolTable, List<Type> argTypes) {
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         RandomMethodGenerator methodGenerator = new RandomMethodGenerator();
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
@@ -55,7 +55,7 @@ public class RandomFunctionGenerator {
 
         String functionName = VariableNameGenerator.generateFunctionName();
 
-        List<Variable> args = argsT.stream()
+        List<Variable> args = argTypes.stream()
             .map(t -> new Variable(VariableNameGenerator.generateArgumentName(functionName), t))
             .collect(Collectors.toList());
 
@@ -88,14 +88,14 @@ public class RandomFunctionGenerator {
         return f;
     }
 
-    public Function generateBaseFunction(Type returnType, SymbolTable symbolTable, List<Type> argsT) {
+    public Function generateBaseFunction(Type returnType, SymbolTable symbolTable, List<Type> argTypes) {
 
         RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
         RandomMethodGenerator methodGenerator = new RandomMethodGenerator();
 
         String functionName = VariableNameGenerator.generateFunctionName();
 
-        List<Variable> args = argsT.stream()
+        List<Variable> args = argTypes.stream()
             .map(t -> new Variable(VariableNameGenerator.generateArgumentName(functionName), t))
             .collect(Collectors.toList());
 

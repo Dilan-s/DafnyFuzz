@@ -5,7 +5,7 @@ import AST.Statements.AssignmentStatement;
 import AST.Expressions.BaseExpression;
 import AST.Expressions.Method.CallBaseMethodExpression;
 import AST.Expressions.Expression;
-import AST.Expressions.VariableExpression;
+import AST.Expressions.Variable.VariableExpression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;

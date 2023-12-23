@@ -3,7 +3,7 @@ package AST.SymbolTable.Types.UserDefinedTypes;
 import AST.Expressions.DClass.DClassLiteral;
 import AST.Expressions.DClass.DClassValue;
 import AST.Expressions.Expression;
-import AST.Expressions.VariableExpression;
+import AST.Expressions.Variable.VariableExpression;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
@@ -190,11 +190,6 @@ public class DClass implements UserDefinedType {
 
   @Override
   public boolean validMethodType() {
-    return false;
-  }
-
-  @Override
-  public boolean validFunctionType() {
     return false;
   }
 

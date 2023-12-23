@@ -10,7 +10,7 @@ import AST.Expressions.Array.ArrayValue;
 import AST.Expressions.Array.DArrayLiteralByElements;
 import AST.Expressions.Array.DArrayLiteralInline;
 import AST.Expressions.Expression;
-import AST.Expressions.VariableExpression;
+import AST.Expressions.Variable.VariableExpression;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;

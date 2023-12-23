@@ -1,9 +1,8 @@
 package AST.Statements;
 
-import AST.Expressions.Function.CallBaseFunctionExpression;
 import AST.Expressions.Expression;
 import AST.Expressions.Function.CallFunctionVariableExpression;
-import AST.Expressions.VariableExpression;
+import AST.Expressions.Variable.VariableExpression;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;

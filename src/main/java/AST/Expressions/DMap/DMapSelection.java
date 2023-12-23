@@ -7,7 +7,7 @@ import AST.Expressions.Expression;
 import AST.Expressions.IfElseExpression;
 import AST.Expressions.Operator.BinaryOperator;
 import AST.Expressions.Operator.OperatorExpression;
-import AST.Expressions.VariableExpression;
+import AST.Expressions.Variable.VariableExpression;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;

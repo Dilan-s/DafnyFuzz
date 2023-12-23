@@ -10,7 +10,7 @@ import AST.Expressions.IntLiteral;
 import AST.Expressions.Operator.BinaryOperator;
 import AST.Expressions.Operator.UnaryOperator;
 import AST.Expressions.Operator.OperatorExpression;
-import AST.Expressions.VariableExpression;
+import AST.Expressions.Variable.VariableExpression;
 import AST.Statements.IfElseStatement;
 import AST.Statements.ReturnStatement;
 import AST.SymbolTable.Method.Method;

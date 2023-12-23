@@ -4,7 +4,7 @@ import AST.Expressions.Expression;
 import AST.Expressions.Operator.BinaryOperator;
 import AST.Expressions.Operator.OperatorExpression;
 import AST.Expressions.StringLiteral;
-import AST.Expressions.VariableExpression;
+import AST.Expressions.Variable.VariableExpression;
 import AST.Statements.util.ReturnStatus;
 import AST.StringUtils;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -98,6 +98,7 @@ public class PrintStatement extends BaseStatement {
         for (int i = 0; i < values.size(); i++) {
             Expression exp = values.get(i);
             List<Type> types = exp.getTypes();
+
             List<Object> value = exp.getValue(paramMap, s);
             if (types.stream().allMatch(Type::isPrintable)) {
                 for (int j = 0; j < value.size(); j++) {
@@ -122,11 +123,19 @@ public class PrintStatement extends BaseStatement {
                         this.update = true;
                         String str = "true";
                         joiner.add(str);
+                    } else {
+                        this.values.set(i, null);
+                        this.expanded.set(i, null);
+
+                        this.update = true;
                     }
                 }
             }
         }
         String printValues = String.join(" ", joiner);
+
+        this.values = this.values.stream().filter(Objects::nonNull).collect(Collectors.toList());;
+        this.expanded = this.expanded.stream().filter(Objects::nonNull).collect(Collectors.toList());;
 
         if (!joiner.isEmpty()) {
             s.append(printValues);

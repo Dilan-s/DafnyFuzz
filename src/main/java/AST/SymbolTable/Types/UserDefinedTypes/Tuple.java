@@ -19,7 +19,7 @@ public class Tuple implements UserDefinedType {
     private List<Type> typeList;
 
     public Tuple() {
-        this.typeList = null;
+        this(null);
     }
 
     public Tuple(List<Type> typeList) {
