@@ -354,4 +354,9 @@ public class ForStatement extends BaseStatement {
             }
         }
     }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
+    }
 }

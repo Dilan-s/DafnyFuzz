@@ -103,7 +103,7 @@ public interface Statement {
      * Is the current statement allowed to be the body of a function
      * @return boolean
      */
-    default boolean validForFunction() {
-        return false;
+    default boolean validForFunctionBody() {
+        return expand().stream().allMatch(Statement::validForFunctionBody);
     }
 }

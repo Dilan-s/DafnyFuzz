@@ -93,9 +93,8 @@ public class DMapSelection extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return mapAssign.validForFunction() || indexAssign.validForFunction() ||
-            ifElseExp.validForFunction();
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody() && ifElseExp.validForFunctionBody();
     }
 
 

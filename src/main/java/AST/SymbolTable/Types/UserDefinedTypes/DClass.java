@@ -274,4 +274,9 @@ public class DClass implements UserDefinedType {
   public List<Boolean> getIsConst() {
     return isConst;
   }
+
+  @Override
+  public boolean validForFunctionBody() {
+    return false;
+  }
 }

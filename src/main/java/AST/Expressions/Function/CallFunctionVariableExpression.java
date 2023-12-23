@@ -40,4 +40,9 @@ public class CallFunctionVariableExpression extends CallFunctionExpression {
         }
         return function.execute(variables, s);
     }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
+    }
 }

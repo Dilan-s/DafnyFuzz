@@ -53,4 +53,9 @@ public class ContinueStatement extends BaseStatement {
     public String minimizedTestCase() {
         return toString();
     }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
+    }
 }

@@ -324,7 +324,7 @@ public class DMap implements Type {
   }
 
   @Override
-  public boolean validFunctionType() {
-    return keyType.validFunctionType() && valueType.validFunctionType();
+  public boolean validForFunctionBody() {
+    return keyType.validForFunctionBody() && valueType.validForFunctionBody();
   }
 }

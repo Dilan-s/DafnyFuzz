@@ -90,8 +90,8 @@ public class DataTypeLiteral extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return fields.stream().anyMatch(Expression::validForFunction) || statement.validForFunction();
+    public boolean validForFunctionBody() {
+        return false;
     }
 
     @Override

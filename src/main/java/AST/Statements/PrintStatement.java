@@ -160,4 +160,9 @@ public class PrintStatement extends BaseStatement {
         update = false;
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
+    }
 }

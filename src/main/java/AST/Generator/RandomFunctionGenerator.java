@@ -76,7 +76,7 @@ public class RandomFunctionGenerator {
 
             methodGenerator.disableMethods();
             body = expressionGenerator.generateExpression(returnType, st);
-        } while (body.validForFunction());
+        } while (!body.validForFunctionBody());
 
         f.setBody(body);
         methodGenerator.enableMethods();
@@ -116,7 +116,7 @@ public class RandomFunctionGenerator {
 
             methodGenerator.disableMethods();
             body = expressionGenerator.generateExpression(returnType, st);
-        } while (body.validForFunction());
+        } while (!body.validForFunctionBody());
 
         f.setBody(body);
         methodGenerator.enableMethods();

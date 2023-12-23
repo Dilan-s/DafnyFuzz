@@ -16,6 +16,7 @@ import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
+import AST.SymbolTable.Types.UserDefinedTypes.ArrowType;
 import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataTypeRule;
@@ -199,10 +200,9 @@ public interface Type extends Identifier {
      *
      * @return boolean
      */
-    default boolean validFunctionType() {
-        return validMethodType();
+    default boolean validForFunctionBody() {
+        return true;
     }
-
     /**
      * Return the value given it is of this type (allowing for any additional processing)
      *
@@ -294,4 +294,10 @@ public interface Type extends Identifier {
     }
 
     default DClass asDClass() { return (DClass) this; };
+
+    default ArrowType asArrowType() {
+        return (ArrowType) this;
+    }
+
+
 }

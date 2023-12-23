@@ -164,6 +164,10 @@ public class AssertStatement extends BaseStatement {
 
         res.put("assert " + String.join(" && ", disJSVal), "assert " + String.join(" || ", disJSInv));
         return res;
+    }
 
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
     }
 }

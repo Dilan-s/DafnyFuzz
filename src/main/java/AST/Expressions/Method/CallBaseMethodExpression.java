@@ -76,10 +76,5 @@ public class CallBaseMethodExpression extends CallMethodExpression {
             }
             return method.execute(args, s);
         }
-
-        @Override
-        public boolean validForFunction() {
-            return true;
-        }
     }
 }

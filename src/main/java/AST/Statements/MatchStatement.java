@@ -252,4 +252,9 @@ public class MatchStatement extends BaseStatement {
         res = res + "\n}\n";
         return res;
     }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
+    }
 }

@@ -131,10 +131,9 @@ public class SeqLiteral extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return values.stream().anyMatch(Expression::validForFunction);
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody() && values.stream().allMatch(Expression::validForFunctionBody);
     }
-
 
     @Override
     public boolean requireUpdate() {

@@ -53,4 +53,9 @@ public class BreakStatement extends BaseStatement {
     public String minimizedTestCase() {
         return toString();
     }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
+    }
 }

@@ -17,14 +17,12 @@ import java.util.stream.Collectors;
 
 public class CallClassFunctionExpression extends CallFunctionExpression {
 
-    private final Expression classExpression;
     private final AssignmentStatement classAssign;
     private final Variable classVariable;
 
     public CallClassFunctionExpression(SymbolTable symbolTable, Function function, Expression classExpression, List<Expression> args) {
         super(symbolTable, function, args);
 
-        this.classExpression = classExpression;
         DClass dClass = classExpression.getTypes().get(0).asDClass();
         this.classVariable = new Variable(VariableNameGenerator.generateVariableValueName(dClass, symbolTable), dClass);
         this.classAssign = new AssignmentStatement(symbolTable, List.of(classVariable), classExpression);
@@ -90,7 +88,7 @@ public class CallClassFunctionExpression extends CallFunctionExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return true;
+    public boolean validForFunctionBody() {
+        return false;
     }
 }

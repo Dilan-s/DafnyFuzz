@@ -237,4 +237,9 @@ public class WhileStatement extends BaseStatement {
 
         return res;
     }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
+    }
 }

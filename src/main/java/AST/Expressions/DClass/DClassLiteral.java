@@ -102,7 +102,7 @@ public class DClassLiteral extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
+    public boolean validForFunctionBody() {
         return false;
     }
 

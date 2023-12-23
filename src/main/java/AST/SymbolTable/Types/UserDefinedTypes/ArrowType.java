@@ -31,7 +31,12 @@ public class ArrowType implements UserDefinedType {
 
   @Override
   public boolean validMethodType() {
-    return false;
+    return true;
+  }
+
+  @Override
+  public boolean validForFunctionBody() {
+    return fromTypes.stream().allMatch(Type::validForFunctionBody) && toType.validForFunctionBody();
   }
 
   @Override
@@ -99,5 +104,37 @@ public class ArrowType implements UserDefinedType {
     FunctionVariableValue fValueRhs = (FunctionVariableValue) rhsV;
 
     return fValueLhs.getFunction() == fValueRhs.getFunction();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Type)) {
+      return false;
+    }
+    Type other = (Type) obj;
+    if (!(other instanceof ArrowType)) {
+      return false;
+    }
+
+    ArrowType arrowTypeOther = other.asArrowType();
+
+    if (fromTypes == null || toType == null || arrowTypeOther.fromTypes == null || arrowTypeOther.toType == null) {
+      return true;
+    }
+
+    if (arrowTypeOther.fromTypes.size() != fromTypes.size()) {
+      return false;
+    }
+
+    for (int i = 0; i < fromTypes.size(); i++) {
+      Type type = fromTypes.get(i);
+      Type otype = arrowTypeOther.fromTypes.get(i);
+
+      if (type != null && otype != null && !type.equals(otype)) {
+        return false;
+      }
+    }
+
+    return arrowTypeOther.toType.equals(toType);
   }
 }

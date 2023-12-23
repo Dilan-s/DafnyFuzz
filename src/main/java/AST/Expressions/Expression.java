@@ -96,11 +96,11 @@ public interface Expression {
      * Is the current statement allowed to be the body of a function
      * @return boolean
      */
-    default boolean validForFunction() {
-        return false;
+    default boolean validForFunctionBody() {
+        return expand().stream().allMatch(Statement::validForFunctionBody) && getTypes().stream().allMatch(Type::validForFunctionBody);
     }
 
     default void setType(List<Type> types) {
-
     }
+
 }

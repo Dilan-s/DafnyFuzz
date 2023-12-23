@@ -359,7 +359,7 @@ public class Multiset implements DCollection {
     }
 
     @Override
-    public boolean validFunctionType() {
-        return type.validFunctionType();
+    public boolean validForFunctionBody() {
+        return type.validForFunctionBody();
     }
 }

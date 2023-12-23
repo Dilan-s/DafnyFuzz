@@ -95,8 +95,8 @@ public class DArrayLiteralInline extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return true;
+    public boolean validForFunctionBody() {
+        return false;
     }
 
     private class ArrayInitValues extends BaseExpression {
@@ -201,8 +201,8 @@ public class DArrayLiteralInline extends BaseExpression {
         }
 
         @Override
-        public boolean validForFunction() {
-            return true;
+        public boolean validForFunctionBody() {
+            return false;
         }
     }
 }

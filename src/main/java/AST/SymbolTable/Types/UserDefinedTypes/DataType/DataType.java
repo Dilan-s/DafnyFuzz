@@ -178,7 +178,7 @@ public class DataType implements UserDefinedType {
     }
 
     @Override
-    public boolean validFunctionType() {
+    public boolean validForFunctionBody() {
         return false;
     }
 }

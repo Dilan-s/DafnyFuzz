@@ -98,8 +98,8 @@ public class SeqSubsequenceExpression extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return true;
+    public boolean validForFunctionBody() {
+        return false;
     }
 
     @Override

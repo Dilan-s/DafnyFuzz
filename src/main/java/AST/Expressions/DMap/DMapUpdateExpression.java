@@ -83,8 +83,8 @@ public class DMapUpdateExpression extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return map.validForFunction() || key.validForFunction() || value.validForFunction();
+    public boolean validForFunctionBody() {
+        return false;
     }
 
 

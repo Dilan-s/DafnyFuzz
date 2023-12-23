@@ -119,7 +119,8 @@ public abstract class CallMethodExpression extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return true;
+    public boolean validForFunctionBody() {
+        return false;
     }
+
 }

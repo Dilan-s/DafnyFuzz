@@ -146,12 +146,6 @@ public class MultisetLiteral extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return (collection.isPresent() && collection.get().validForFunction()) ||
-            (collection.isEmpty() && values.stream().anyMatch(Expression::validForFunction));
-    }
-
-    @Override
     public boolean requireUpdate() {
         return (collection.isPresent() && collection.get().requireUpdate()) || values.stream().anyMatch(Expression::requireUpdate);
     }
@@ -204,5 +198,11 @@ public class MultisetLiteral extends BaseExpression {
             r.add(m);
         }
         return r;
+    }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody()
+          && ((collection.isPresent() && collection.get().validForFunctionBody()) || (collection.isEmpty() && values.stream().allMatch(Expression::validForFunctionBody)));
     }
 }

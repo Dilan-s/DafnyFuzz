@@ -1,6 +1,7 @@
 package AST.Expressions.DMap;
 
 import AST.Expressions.BaseExpression;
+import AST.Expressions.Expression;
 import AST.Generator.GeneratorConfig;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
@@ -102,9 +103,9 @@ public class DMapLiteral extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return entries.stream()
-            .anyMatch(e -> e.getKey().validForFunction() || e.getValue().validForFunction());
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody()
+          && entriesInMap.stream().allMatch(e -> e.getKey().validForFunctionBody() && e.getValue().validForFunctionBody());
     }
 
     @Override

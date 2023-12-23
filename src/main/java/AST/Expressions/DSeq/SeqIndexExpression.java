@@ -83,8 +83,8 @@ public class SeqIndexExpression extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return true;
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody() && asStatInd.isEmpty();
     }
 
 

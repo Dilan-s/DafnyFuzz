@@ -80,11 +80,6 @@ public class DString implements BaseType {
     }
 
     @Override
-    public boolean validFunctionType() {
-        return true;
-    }
-
-    @Override
     public boolean operatorExists() {
         return true;
     }

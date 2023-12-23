@@ -173,8 +173,11 @@ public class IfElseExpression extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return test.validForFunction() || ifExp.validForFunction() || elseExp.validForFunction();
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody()
+          && test.validForFunctionBody()
+          && ifExp.validForFunctionBody()
+          && elseExp.validForFunctionBody();
     }
 
     @Override

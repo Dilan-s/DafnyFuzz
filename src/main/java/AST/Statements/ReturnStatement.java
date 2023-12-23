@@ -145,4 +145,9 @@ public class ReturnStatement extends BaseStatement {
         }
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return false;
+    }
 }

@@ -68,8 +68,8 @@ public class MatchExpression extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return true; //test.validForFunction() || cases.stream().anyMatch(Expression::validForFunction) || defaultCase.validForFunction();
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody() && test.validForFunctionBody() && distinctCases.stream().allMatch(Expression::validForFunctionBody) && defaultCase.validForFunctionBody();
     }
 
     @Override

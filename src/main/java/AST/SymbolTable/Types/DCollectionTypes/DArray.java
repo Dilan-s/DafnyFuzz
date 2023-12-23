@@ -90,7 +90,7 @@ public class DArray implements DCollection {
         Type innerT = type.concrete(symbolTable);
 
         int length = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_ARRAY) + MIN_SIZE_OF_ARRAY;
-        double ratioSum = (PROB_EXPAND + PROB_INLINE + PROB_COMPREHENSION + (innerT.validFunctionType() ? PROB_FORALL : 0));
+        double ratioSum = (PROB_EXPAND + PROB_INLINE + (innerT.validForFunctionBody() ? PROB_FORALL + PROB_COMPREHENSION : 0));
         double probInitType = ratioSum * GeneratorConfig.getRandom().nextDouble();
 
         if ((probInitType -= PROB_INLINE) < 0) {
@@ -112,7 +112,7 @@ public class DArray implements DCollection {
             DArrayLiteralByElements expression = new DArrayLiteralByElements(symbolTable, this, values);
             return expression;
         } else if ((probInitType -= PROB_COMPREHENSION) < 0) {
-            if (this.validFunctionType()) {
+            if (this.validForFunctionBody()) {
                 Function func = randomFunctionGenerator.generateBaseFunction(innerT, symbolTable,
                     List.of(new Int()));
 
@@ -121,7 +121,7 @@ public class DArray implements DCollection {
                 return expression;
             }
         } else if ((probInitType -= PROB_FORALL) < 0) {
-            if (this.validFunctionType()) {
+            if (this.validForFunctionBody()) {
                 Function func = randomFunctionGenerator.generateBaseFunction(innerT, symbolTable,
                     List.of(new Int()));
 
@@ -242,7 +242,7 @@ public class DArray implements DCollection {
     }
 
     @Override
-    public boolean validFunctionType() {
+    public boolean validForFunctionBody() {
         return false;
     }
 }

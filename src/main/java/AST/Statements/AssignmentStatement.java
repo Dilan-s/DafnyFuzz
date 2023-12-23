@@ -42,8 +42,8 @@ public class AssignmentStatement extends BaseStatement {
     }
 
     @Override
-    public boolean validForFunction() {
-        return values.stream().anyMatch(Expression::validForFunction) || this.declared;
+    public boolean validForFunctionBody() {
+        return values.stream().allMatch(Expression::validForFunctionBody);
     }
 
     private void declareVariables() {

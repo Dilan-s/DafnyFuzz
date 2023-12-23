@@ -73,8 +73,8 @@ public class DArrayLiteralByComprehension extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return true;
+    public boolean validForFunctionBody() {
+        return false;
     }
 
 
@@ -142,8 +142,8 @@ public class DArrayLiteralByComprehension extends BaseExpression {
         }
 
         @Override
-        public boolean validForFunction() {
-            return true;
+        public boolean validForFunctionBody() {
+            return false;
         }
     }
 }

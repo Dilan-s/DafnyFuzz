@@ -48,9 +48,12 @@ public class DSetLiteral extends BaseExpression {
         return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
+
+
     @Override
-    public boolean validForFunction() {
-        return values.stream().anyMatch(Expression::validForFunction);
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody()
+          && values.stream().allMatch(Expression::validForFunctionBody);
     }
 
     @Override

@@ -201,7 +201,7 @@ public class Tuple implements UserDefinedType {
     }
 
     @Override
-    public boolean validFunctionType() {
-        return typeList.stream().allMatch(Type::validFunctionType);
+    public boolean validForFunctionBody() {
+        return typeList.stream().allMatch(Type::validForFunctionBody);
     }
 }

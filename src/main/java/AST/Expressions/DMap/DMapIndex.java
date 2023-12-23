@@ -76,8 +76,8 @@ public class DMapIndex extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return map.validForFunction() || index.validForFunction();
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody() && map.validForFunctionBody() && index.validForFunctionBody();
     }
 
     @Override

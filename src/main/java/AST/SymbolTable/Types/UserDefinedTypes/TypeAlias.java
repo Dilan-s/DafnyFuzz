@@ -157,10 +157,6 @@ public class TypeAlias implements Type {
         return type.validMethodType();
     }
 
-    @Override
-    public boolean validFunctionType() {
-        return type.validFunctionType();
-    }
 
     @Override
     public Object of(Object value) {
@@ -269,5 +265,15 @@ public class TypeAlias implements Type {
     @Override
     public String formatEnsures(Object object) {
         return type.formatEnsures(object);
+    }
+
+    @Override
+    public ArrowType asArrowType() {
+        return type.asArrowType();
+    }
+
+    @Override
+    public boolean validForFunctionBody() {
+        return type.validForFunctionBody();
     }
 }

@@ -115,7 +115,7 @@ public class RandomExpressionGenerator {
                 }
             }  else if ((probTypeOfExpression -= PROB_CALL_FUNCTION_EXPRESSION) < 0) {
                 //call
-                if (type.validFunctionType()) {
+                if (type.validForFunctionBody()) {
                     PROB_CALL_FUNCTION_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     ret = generateCallFunctionExpression(type, symbolTable);
                 }
@@ -329,7 +329,7 @@ public class RandomExpressionGenerator {
     }
 
     private Expression generateCallFunctionExpression(Type type, SymbolTable symbolTable) {
-        if (!type.validFunctionType()) {
+        if (!type.validForFunctionBody()) {
             return null;
         }
         RandomFunctionGenerator functionGenerator = new RandomFunctionGenerator();

@@ -53,8 +53,8 @@ public abstract class CallFunctionExpression extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return false;
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody() && args.stream().allMatch(Expression::validForFunctionBody);
     }
 
     @Override

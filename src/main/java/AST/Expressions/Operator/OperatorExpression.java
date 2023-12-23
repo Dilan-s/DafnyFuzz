@@ -130,11 +130,9 @@ public class OperatorExpression extends BaseExpression {
     }
 
     @Override
-    public boolean validForFunction() {
-        return operator.equals(BinaryOperator.Divide) || operator.equals(BinaryOperator.Modulus) ||
-            args.stream().anyMatch(Expression::validForFunction);
+    public boolean validForFunctionBody() {
+        return super.validForFunctionBody() && !(operator.equals(BinaryOperator.Divide) || operator.equals(BinaryOperator.Modulus)) && args.stream().allMatch(Expression::validForFunctionBody);
     }
-
 
     @Override
     protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
