@@ -7,20 +7,24 @@ import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class BreakStatement extends BaseStatement {
 
     private Statement statement;
+    private int breakDepth;
     private SymbolTable symbolTable;
 
-    public BreakStatement(SymbolTable symbolTable) {
+    public BreakStatement(SymbolTable symbolTable, int breakDepth) {
         this.symbolTable = symbolTable;
         this.statement = new PrintAll(symbolTable);
+        this.breakDepth = breakDepth;
     }
 
     @Override
     protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
-        return ReturnStatus.BREAK;
+        return ReturnStatus.breakWithDepth(breakDepth);
     }
 
     @Override
@@ -37,16 +41,9 @@ public class BreakStatement extends BaseStatement {
     }
 
     @Override
-    public List<String> toOutput() {
-        List<String> r = new ArrayList<>();
-        String curr = "break;";
-        r.add(curr);
-        return r;
-    }
-
-    @Override
     public String toString() {
-        return "break;";
+        String curr = IntStream.range(0, breakDepth + 1).mapToObj(x -> "break").collect(Collectors.joining(" "));
+        return curr + ";";
     }
 
     @Override

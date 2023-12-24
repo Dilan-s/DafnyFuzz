@@ -38,12 +38,17 @@ public class RandomFunctionGenerator {
         int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
         List<Type> argTypes = typeGenerator.generateFunctionTypes(noOfArgs, symbolTable);
 
+        return generateFunction(returnType, symbolTable, argTypes);
+    }
+
+    public Function generateFunction(Type returnType, SymbolTable symbolTable, List<Type> argTypes) {
         double probClassFunction = GeneratorConfig.getRandom().nextDouble();
         if (probClassFunction < PROB_CLASS_FUNCTION) {
             return generateClassFunction(returnType, symbolTable, argTypes);
         }
 
         return generateBaseFunction(returnType, symbolTable, argTypes);
+
     }
 
     private Function generateClassFunction(Type returnType, SymbolTable symbolTable, List<Type> argTypes) {

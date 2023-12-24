@@ -2,6 +2,7 @@ package AST.SymbolTable.Function;
 
 import AST.Expressions.Function.CallBaseFunctionExpression;
 import AST.Expressions.Function.CallFunctionExpression;
+import AST.Expressions.Variable.VariableFunctionExpression;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.VariableNameGenerator;
@@ -12,6 +13,7 @@ import AST.SymbolTable.Identifier;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.ArrowType;
 import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
@@ -308,5 +310,9 @@ public class Function implements Identifier {
         CallFunctionExpression expression = new CallBaseFunctionExpression(symbolTable, this, args);
 
         return expression;
+    }
+
+    public Expression generateFunctionVariable(SymbolTable symbolTable, Type type) {
+        return new VariableFunctionExpression(symbolTable, this, type);
     }
 }

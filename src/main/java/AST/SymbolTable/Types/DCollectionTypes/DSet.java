@@ -120,7 +120,7 @@ public class DSet implements DCollection {
     public Type concrete(SymbolTable symbolTable) {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            Type t = typeGenerator.generateEqualTypes(1, symbolTable).get(0);
             return new DSet(t);
         }
         return new DSet(type.concrete(symbolTable));

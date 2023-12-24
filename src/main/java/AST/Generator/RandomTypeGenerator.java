@@ -241,6 +241,24 @@ public class RandomTypeGenerator {
         return types;
     }
 
+    public List<Type> generateEqualTypes(int noOfTypes, SymbolTable symbolTable) {
+        typeDepth++;
+        List<Type> types = new ArrayList<>();
+        int i = 0;
+        while (i < noOfTypes) {
+            Type t = generateTypes(1, symbolTable).get(0);
+            if (!t.equals(new ArrowType())) {
+                Type concrete = t.concrete(symbolTable);
+                types.add(concrete);
+                i++;
+            }
+        }
+
+        typeDepth--;
+        return types;
+    }
+
+
     public List<Type> generateMapTypes(int noOfTypes, SymbolTable symbolTable) {
         typeDepth++;
         List<Type> types = new ArrayList<>();

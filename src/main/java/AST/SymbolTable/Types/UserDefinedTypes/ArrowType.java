@@ -1,8 +1,8 @@
 package AST.SymbolTable.Types.UserDefinedTypes;
 
 import AST.Expressions.Expression;
-import AST.Expressions.Variable.FunctionVariableValue;
-import AST.Expressions.Variable.VariableFunctionExpression;
+import AST.Expressions.Variable.Function.FunctionValue;
+import AST.Expressions.Variable.Function.FunctionVariableValue;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomFunctionGenerator;
 import AST.Generator.RandomTypeGenerator;
@@ -10,6 +10,7 @@ import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ArrowType implements UserDefinedType {
@@ -75,8 +76,8 @@ public class ArrowType implements UserDefinedType {
   @Override
   public Expression generateLiteral(SymbolTable symbolTable) {
     RandomFunctionGenerator functionGenerator = new RandomFunctionGenerator();
-    Function function = functionGenerator.generateBaseFunction(toType, symbolTable, fromTypes);
-    Expression expression = new VariableFunctionExpression(symbolTable, function, this);
+    Function function = functionGenerator.generateFunction(toType, symbolTable, fromTypes);
+    Expression expression = function.generateFunctionVariable(symbolTable, this);
     return expression;
   }
 
@@ -87,14 +88,13 @@ public class ArrowType implements UserDefinedType {
 
   @Override
   public String formatPrint(Object object) {
-    FunctionVariableValue fValue = (FunctionVariableValue) object;
-    return fValue.getFunction().getName();
+    FunctionValue fValue = (FunctionValue) object;
+    return fValue.getFunctionName();
   }
 
   @Override
   public String formatEnsures(String variableName, Object object) {
-    FunctionVariableValue fValue = (FunctionVariableValue) object;
-    return String.format("%s == %s", variableName, fValue.getFunction().getName());
+    return "true";
   }
 
   @Override
@@ -104,10 +104,10 @@ public class ArrowType implements UserDefinedType {
 
   @Override
   public Boolean equal(Object lhsV, Object rhsV) {
-    FunctionVariableValue fValueLhs = (FunctionVariableValue) lhsV;
-    FunctionVariableValue fValueRhs = (FunctionVariableValue) rhsV;
+    FunctionValue fValueLhs = (FunctionValue) lhsV;
+    FunctionValue fValueRhs = (FunctionValue) rhsV;
 
-    return fValueLhs.getFunction() == fValueRhs.getFunction();
+    return Objects.equals(fValueLhs.getFunctionName(), fValueRhs.getFunctionName());
   }
 
   @Override

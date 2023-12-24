@@ -174,7 +174,8 @@ public class RandomStatementGenerator {
     }
 
     private Statement generateBreakStatement(Method method, SymbolTable symbolTable) {
-        BreakStatement breakStatement = new BreakStatement(symbolTable);
+        int breakDepth = GeneratorConfig.getRandom().nextInt(loopDepth);
+        BreakStatement breakStatement = new BreakStatement(symbolTable, breakDepth);
         return breakStatement;
     }
 

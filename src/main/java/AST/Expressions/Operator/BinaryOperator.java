@@ -644,7 +644,7 @@ public enum BinaryOperator implements Operator {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            Type t = typeGenerator.generateEqualTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
             DMap map = types.get(0).asDMap();
@@ -671,7 +671,7 @@ public enum BinaryOperator implements Operator {
         @Override
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable, Type expected) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            Type t = typeGenerator.generateEqualTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
             DMap map = types.get(0).asDMap();
@@ -714,7 +714,7 @@ public enum BinaryOperator implements Operator {
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            Type t = typeGenerator.generateEqualTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
             DCollection collection = types.get(0).asDCollection();
@@ -742,7 +742,7 @@ public enum BinaryOperator implements Operator {
         public List<Type> concreteType(List<Type> types, SymbolTable symbolTable,
             Type expected) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            Type t = typeGenerator.generateEqualTypes(1, symbolTable).get(0);
             List<Type> ret = new ArrayList<>();
             ret.add(t);
             DCollection collection = types.get(0).asDCollection();

@@ -1,9 +1,11 @@
-package AST.Expressions.Variable;
+package AST.Expressions.Variable.Function;
 
 import AST.SymbolTable.Function.Function;
+import AST.SymbolTable.Types.Variables.Variable;
+import java.util.List;
 import java.util.Objects;
 
-public class FunctionVariableValue {
+public class FunctionVariableValue implements FunctionValue {
 
   private Function function;
 
@@ -28,5 +30,15 @@ public class FunctionVariableValue {
 
   public Function getFunction() {
     return function;
+  }
+
+  @Override
+  public List<Object> execute(List<Variable> variables, StringBuilder s) {
+    return function.execute(variables, s);
+  }
+
+  @Override
+  public String getFunctionName() {
+    return function.getName();
   }
 }

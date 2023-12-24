@@ -16,8 +16,21 @@ public enum ReturnStatus {
     ;
 
     private List<Object> values;
+    private int depth;
 
     ReturnStatus() {
+        this.values = null;
+        this.depth = 0;
+    }
+
+    public static ReturnStatus breakWithDepth(int depth) {
+        ReturnStatus breakStatus = BREAK;
+        breakStatus.setDepth(depth);
+        return breakStatus;
+    }
+
+    private void setDepth(int depth) {
+        this.depth = depth;
     }
 
     public static ReturnStatus returnValues(List<Object> values) {
@@ -36,5 +49,9 @@ public enum ReturnStatus {
 
     public List<Object> getValues() {
         return values;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 }

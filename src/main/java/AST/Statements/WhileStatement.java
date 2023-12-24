@@ -64,6 +64,9 @@ public class WhileStatement extends BaseStatement {
                 if (execute == ReturnStatus.RETURN) {
                     return execute;
                 } else if (execute == ReturnStatus.BREAK) {
+                    if (execute.getDepth() > 0) {
+                        return ReturnStatus.breakWithDepth(execute.getDepth() - 1);
+                    }
                     return ReturnStatus.UNKNOWN;
                 }
             } else {

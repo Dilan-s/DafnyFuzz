@@ -2,13 +2,13 @@ package AST.Expressions.Function;
 
 import AST.Expressions.BaseExpression;
 import AST.Expressions.Expression;
-import AST.Expressions.Variable.FunctionVariableValue;
+import AST.Expressions.Variable.Function.FunctionValue;
+import AST.Expressions.Variable.Function.FunctionVariableValue;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
-import AST.SymbolTable.Types.UserDefinedTypes.ArrowType;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,7 +85,7 @@ public class CallVariableExpression extends BaseExpression {
   @Override
   protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
     List<Object> fValueVar = funcVariable.getValue(paramMap);
-    FunctionVariableValue fValue = (FunctionVariableValue) fValueVar.get(0);
+    FunctionValue fValue = (FunctionValue) fValueVar.get(0);
 
     List<Object> r = new ArrayList<>();
 
@@ -100,7 +100,7 @@ public class CallVariableExpression extends BaseExpression {
         l.add(v);
       }
     }
-    return fValue.getFunction().execute(variables, s);
+    return fValue.execute(variables, s);
   }
 
   @Override

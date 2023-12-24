@@ -30,4 +30,9 @@ public abstract class BaseStatement implements Statement {
     }
 
     protected abstract ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused);
+
+    @Override
+    public List<String> toOutput() {
+        return List.of(toString());
+    }
 }

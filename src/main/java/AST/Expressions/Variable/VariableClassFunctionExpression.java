@@ -1,13 +1,15 @@
 package AST.Expressions.Variable;
 
 import AST.Expressions.BaseExpression;
-import AST.Expressions.Variable.Function.FunctionVariableValue;
+import AST.Expressions.Expression;
+import AST.Expressions.Variable.Function.FunctionClassVariableValue;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,27 +17,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class VariableFunctionExpression extends BaseExpression {
+public class VariableClassFunctionExpression extends BaseExpression {
 
   private Function function;
   private Type type;
   private SymbolTable symbolTable;
 
+  private Variable classExpVariable;
+  private AssignmentStatement classExpAssign;
   private Variable functionVariable;
   private AssignmentStatement functionAssign;
 
   private List<List<Statement>> expanded;
 
-  public VariableFunctionExpression(SymbolTable symbolTable, Function function, Type type) {
+  public VariableClassFunctionExpression(SymbolTable symbolTable, Function function, Type type,
+    DClass dClass, Expression classExp) {
     super();
     this.symbolTable = symbolTable;
     this.function = function;
     this.type = type;
 
+    this.classExpVariable = new Variable(VariableNameGenerator.generateVariableValueName(dClass, symbolTable), dClass);
+    this.classExpAssign = new AssignmentStatement(symbolTable, List.of(classExpVariable), classExp);
+
     this.functionVariable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-    this.functionAssign = new AssignmentStatement(symbolTable, List.of(functionVariable), new FunctionExpression(function));
+    this.functionAssign = new AssignmentStatement(symbolTable, List.of(functionVariable), new FunctionExpression(classExpVariable, function));
 
     this.expanded = new ArrayList<>();
+    expanded.add(classExpAssign.expand());
     expanded.add(functionAssign.expand());
   }
 
@@ -63,17 +72,23 @@ public class VariableFunctionExpression extends BaseExpression {
 
   @Override
   public List<Statement> expand() {
+    if (classExpAssign.requireUpdate()) {
+      expanded.set(0, classExpAssign.expand());
+    }
     if (functionAssign.requireUpdate()) {
-      expanded.set(0, functionAssign.expand());
+      expanded.set(1, functionAssign.expand());
     }
     return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
   }
 
   private class FunctionExpression extends BaseExpression {
 
+    private Variable classExpVariable;
     private final Function function;
 
-    public FunctionExpression(Function function) {
+    public FunctionExpression(Variable classExpVariable,
+      Function function) {
+      this.classExpVariable = classExpVariable;
       this.function = function;
     }
 
@@ -90,13 +105,13 @@ public class VariableFunctionExpression extends BaseExpression {
     @Override
     public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
       List<Object> r = new ArrayList<>();
-      r.add(new FunctionVariableValue(function));
+      r.add(new FunctionClassVariableValue(classExpVariable, function));
       return r;
     }
 
     @Override
     public String toString() {
-      return function.getName();
+      return String.format("%s.%s", classExpVariable.getName(), function.getName());
     }
 
     @Override

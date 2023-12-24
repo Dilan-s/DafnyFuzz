@@ -144,7 +144,7 @@ public class Multiset implements DCollection {
     public Type concrete(SymbolTable symbolTable) {
         if (type == null) {
             RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateTypes(1, symbolTable).get(0);
+            Type t = typeGenerator.generateEqualTypes(1, symbolTable).get(0);
             return new Multiset(t);
         }
         return new Multiset(type.concrete(symbolTable));

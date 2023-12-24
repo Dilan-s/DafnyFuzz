@@ -4,6 +4,8 @@ import AST.Expressions.Expression;
 import AST.Expressions.Function.CallBaseFunctionExpression;
 import AST.Expressions.Function.CallClassFunctionExpression;
 import AST.Expressions.Function.CallFunctionExpression;
+import AST.Expressions.Variable.VariableClassFunctionExpression;
+import AST.Expressions.Variable.VariableFunctionExpression;
 import AST.Generator.RandomExpressionGenerator;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -76,6 +78,15 @@ public class ClassFunction extends Function {
         Expression classExp = expressionGenerator.generateExpression(dClass, symbolTable);
 
         CallFunctionExpression expression = new CallClassFunctionExpression(symbolTable, this, classExp, args);
+        return expression;
+    }
+
+    @Override
+    public Expression generateFunctionVariable(SymbolTable symbolTable, Type type) {
+        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+        Expression classExp = expressionGenerator.generateExpression(dClass, symbolTable);
+        Expression expression = new VariableClassFunctionExpression(
+          symbolTable, this, type, dClass, classExp);
         return expression;
     }
 }
