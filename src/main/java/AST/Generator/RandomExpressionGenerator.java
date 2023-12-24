@@ -1,5 +1,6 @@
 package AST.Generator;
 
+import AST.Expressions.DSeq.SeqFromArrayExpression;
 import AST.Expressions.Function.CallFunctionExpression;
 import AST.Expressions.DMap.DMapSelection;
 import AST.Expressions.DMap.DMapUpdateExpression;
@@ -23,6 +24,7 @@ import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.Method.Method;
+import AST.SymbolTable.Types.DCollectionTypes.DArray;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
@@ -46,6 +48,7 @@ public class RandomExpressionGenerator {
     public static double PROB_DMAP_SELECTION_EXPRESSION = 8.0;
     public static double PROB_SEQ_SUBSEQUENCE_EXPRESSION = 8.0;
     public static double PROB_SEQ_UPDATE_EXPRESSION = 8.0;
+    public static double PROB_SEQ_FROM_ARRAY_EXPRESSION = 8.0;
     public static double PROB_DMAP_UPDATE_EXPRESSION = 8.0;
     public static double PROB_IF_ELSE_EXPRESSION = 8.0;
     public static double PROB_CALL_METHOD_EXPRESSION = 20.0;
@@ -65,7 +68,7 @@ public class RandomExpressionGenerator {
         while (ret == null) {
             double ratioSum = PROB_LITERAL_EXPRESSION + PROB_OPERATOR_EXPRESSION +
                 PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_DMAP_SELECTION_EXPRESSION +
-                PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION +
+                PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION + PROB_SEQ_FROM_ARRAY_EXPRESSION +
                 PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_METHOD_EXPRESSION
                 + PROB_CALL_FUNCTION_EXPRESSION + PROB_MATCH_EXPRESSION + PROB_CALL_VARIABLE_EXPRESSION;
 
@@ -104,6 +107,11 @@ public class RandomExpressionGenerator {
                     PROB_SEQ_UPDATE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     ret = generateSeqUpdateExpression(type, symbolTable);
                 }
+            } else if ((probTypeOfExpression -= PROB_SEQ_FROM_ARRAY_EXPRESSION) < 0) {
+                if (type.equals(new Seq())) {
+                    PROB_SEQ_FROM_ARRAY_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateSeqFromArray(type, symbolTable);
+                }
             } else if ((probTypeOfExpression -= PROB_DMAP_UPDATE_EXPRESSION) < 0) {
                 if (type.equals(new DMap())) {
                     PROB_DMAP_UPDATE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
@@ -126,34 +134,19 @@ public class RandomExpressionGenerator {
                     PROB_CALL_FUNCTION_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     ret = generateCallFunctionExpression(type, symbolTable);
                 }
-            } else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
-                //match
-                PROB_MATCH_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                ret = generateMatchExpression(type, symbolTable);
             } else if ((probTypeOfExpression -= PROB_CALL_VARIABLE_EXPRESSION) < 0) {
                 if (type.validForFunctionBody()) {
                     PROB_CALL_VARIABLE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
                     ret = generateVariableCallExpression(type, symbolTable);
                 }
+            } else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
+                //match
+                PROB_MATCH_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                ret = generateMatchExpression(type, symbolTable);
             }
         }
         expressionDepth--;
         return ret;
-    }
-
-    private Expression generateVariableCallExpression(Type type, SymbolTable symbolTable) {
-        ArrowType arrowType = new ArrowType(type).concrete(symbolTable).asArrowType();
-
-        Expression arrowTypeExpression = generateExpression(arrowType, symbolTable);
-
-        List<Expression> args = arrowType.getFromTypes().stream()
-          .map(t -> generateExpression(t, symbolTable))
-          .collect(Collectors.toList());
-
-        Variable funcVariable = new Variable(VariableNameGenerator.generateVariableValueName(arrowType, symbolTable), arrowType);
-        Statement funcVariableAssign = new AssignmentStatement(symbolTable, List.of(funcVariable), arrowTypeExpression);
-
-        return new CallVariableExpression(symbolTable, type, funcVariable, funcVariableAssign, args);
     }
 
     private Expression generateMatchExpression(Type type, SymbolTable symbolTable) {
@@ -185,6 +178,21 @@ public class RandomExpressionGenerator {
         return matchExpression;
     }
 
+    private Expression generateVariableCallExpression(Type type, SymbolTable symbolTable) {
+        ArrowType arrowType = new ArrowType(type).concrete(symbolTable).asArrowType();
+
+        Expression arrowTypeExpression = generateExpression(arrowType, symbolTable);
+
+        List<Expression> args = arrowType.getFromTypes().stream()
+          .map(t -> generateExpression(t, symbolTable))
+          .collect(Collectors.toList());
+
+        Variable funcVariable = new Variable(VariableNameGenerator.generateVariableValueName(arrowType, symbolTable), arrowType);
+        Statement funcVariableAssign = new AssignmentStatement(symbolTable, List.of(funcVariable), arrowTypeExpression);
+
+        return new CallVariableExpression(symbolTable, type, funcVariable, funcVariableAssign, args);
+    }
+
     private Expression generateDMapUpdateExpression(Type type, SymbolTable symbolTable) {
         DMap mapT = type.concrete(symbolTable).asDMap();
 
@@ -195,6 +203,19 @@ public class RandomExpressionGenerator {
         DMapUpdateExpression mapUpdateExpression = new DMapUpdateExpression(symbolTable, type, map,
             key, value);
         return mapUpdateExpression;
+    }
+
+    private Expression generateSeqFromArray(Type type, SymbolTable symbolTable) {
+        Seq seq = type.asSeq();
+        DArray array = new DArray(seq.getInnerType()).concrete(symbolTable).asDArray();
+
+        Expression arraySeq = generateExpression(array, symbolTable);
+        Variable funcVariable = new Variable(VariableNameGenerator.generateVariableValueName(array, symbolTable), array);
+        Statement funcVariableAssign = new AssignmentStatement(symbolTable, List.of(funcVariable), arraySeq);
+
+        SeqFromArrayExpression expression = new SeqFromArrayExpression(symbolTable, type, funcVariable, funcVariableAssign);
+        return expression;
+
     }
 
     private Expression generateSeqUpdateExpression(Type type, SymbolTable symbolTable) {
@@ -267,15 +288,25 @@ public class RandomExpressionGenerator {
 
         Int indT = new Int();
         Expression ind = generateExpression(indT, symbolTable);
+        Variable indVar = new Variable(VariableNameGenerator.generateVariableValueName(indT, symbolTable), indT);
+        VariableExpression indVarExp = new VariableExpression(symbolTable, indVar, indT);
 
-        SeqIndexExpression expression = new SeqIndexExpression(symbolTable, type, seq, ind);
+        Statement asStatIndPre = new AssignmentStatement(symbolTable, List.of(indVar), ind);
+
+        SeqIndexExpression expression = new SeqIndexExpression(symbolTable, type, seq, indVar, asStatIndPre);
 
         VariableExpression seqVar = expression.getSequenceVariableExpression();
 
         OperatorExpression size = new OperatorExpression(symbolTable, new Int(), UnaryOperator.Cardinality, List.of(seqVar));
 
         IntLiteral zero = new IntLiteral(new Int(), symbolTable, 0);
-        OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Greater_Than, List.of(size, zero));
+        OperatorExpression testBiggerThanZero = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Greater_Than, List.of(size, zero));
+
+        OperatorExpression testSmallerThanLength = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Less_Than, List.of(indVarExp, size));
+        OperatorExpression testLengthBiggerThanZero = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.Greater_Than, List.of(indVarExp, zero));
+
+        OperatorExpression testP1 = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.And, List.of(testBiggerThanZero, testSmallerThanLength));
+        OperatorExpression test = new OperatorExpression(symbolTable, new Bool(), BinaryOperator.And, List.of(testP1, testLengthBiggerThanZero));
 
         Type defT = type.concrete(symbolTable);
         Expression def = generateExpression(defT, symbolTable);

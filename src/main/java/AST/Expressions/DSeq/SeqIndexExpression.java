@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class SeqIndexExpression extends BaseExpression {
 
-    private AssignmentStatement asStatIndPre;
+    private Statement asStatIndPre;
     private AssignmentStatement asStatSeq;
     private Variable seqVar;
     private Variable indVar;
@@ -36,27 +36,27 @@ public class SeqIndexExpression extends BaseExpression {
 
     private List<List<Statement>> expanded;
 
-    public SeqIndexExpression(SymbolTable symbolTable, Type type, Expression seq, Expression index) {
+    public SeqIndexExpression(SymbolTable symbolTable, Type type, Expression seq, Variable indVar, Statement asStatIndPre) {
         super();
         this.symbolTable = symbolTable;
         this.type = type;
         this.update = false;
-        setSeqAssignAndIndAssign(seq, index);
+        this.indVar = indVar;
+        this.asStatIndPre = asStatIndPre;
+        setSeqAssignAndIndAssign(seq);
+
         this.asStatInd = Optional.empty();
+
 
         expanded = new ArrayList<>();
         expanded.add(asStatSeq.expand());
         expanded.add(asStatIndPre.expand());
     }
 
-    private void setSeqAssignAndIndAssign(Expression seq, Expression index) {
+    private void setSeqAssignAndIndAssign(Expression seq) {
         DCollection seqT = seq.getTypes().get(0).asDCollection();
         seqVar = new Variable(VariableNameGenerator.generateVariableValueName(seqT, symbolTable), seqT);
         asStatSeq = new AssignmentStatement(symbolTable, List.of(seqVar), seq);
-
-        Int indT = new Int();
-        indVar = new Variable(VariableNameGenerator.generateVariableValueName(indT, symbolTable), indT);
-        asStatIndPre = new AssignmentStatement(symbolTable, List.of(indVar), index);
     }
 
     public VariableExpression getSequenceVariableExpression() {

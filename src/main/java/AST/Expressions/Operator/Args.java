@@ -11,8 +11,10 @@ import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.DClass;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
+import AST.SymbolTable.Types.UserDefinedTypes.TypeAlias;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,8 @@ public class Args {
     public static final List<Type> DARRAY = List.of(new DArray());
     public static final List<Type> TUPLE = List.of(new Tuple());
     public static final List<Type> DATATYPE = List.of(new DataType());
+    public static final List<Type> DCLASS = List.of(new DClass());
+    public static final List<Type> TYPE_ALIAS = List.of(new TypeAlias());
 
     public static List<Type> PAIR_NULL;
     static {
