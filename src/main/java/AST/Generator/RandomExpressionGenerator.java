@@ -4,6 +4,7 @@ import AST.Expressions.Function.CallFunctionExpression;
 import AST.Expressions.DMap.DMapSelection;
 import AST.Expressions.DMap.DMapUpdateExpression;
 import AST.Expressions.Expression;
+import AST.Expressions.Function.CallVariableExpression;
 import AST.Expressions.IfElseExpression;
 import AST.Expressions.IntLiteral;
 import AST.Expressions.Match.MatchExpression;
@@ -17,6 +18,9 @@ import AST.Expressions.DSeq.SeqUpdateExpression;
 import AST.Expressions.DSeq.SeqIndexExpression;
 import AST.Expressions.DSeq.SeqSubsequenceExpression;
 import AST.Expressions.Variable.VariableExpression;
+import AST.Expressions.Variable.VariableFunctionExpression;
+import AST.Statements.AssignmentStatement;
+import AST.Statements.Statement;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.Types.DMap.DMap;
@@ -25,9 +29,11 @@ import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.PrimitiveTypes.Int;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
+import AST.SymbolTable.Types.UserDefinedTypes.ArrowType;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +51,7 @@ public class RandomExpressionGenerator {
     public static double PROB_CALL_METHOD_EXPRESSION = 20.0;
     public static double PROB_CALL_FUNCTION_EXPRESSION = 20.0;
     public static double PROB_MATCH_EXPRESSION = 5.0;
+    public static double PROB_CALL_VARIABLE_EXPRESSION = 10.0;
 
     private static final int MAX_MATCH_CASES_VALUES = 2;
     public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.7;
@@ -60,7 +67,7 @@ public class RandomExpressionGenerator {
                 PROB_VARIABLE_EXPRESSION + PROB_SEQ_INDEX_EXPRESSION + PROB_DMAP_SELECTION_EXPRESSION +
                 PROB_SEQ_SUBSEQUENCE_EXPRESSION + PROB_SEQ_UPDATE_EXPRESSION +
                 PROB_DMAP_UPDATE_EXPRESSION + PROB_IF_ELSE_EXPRESSION + PROB_CALL_METHOD_EXPRESSION
-                + PROB_CALL_FUNCTION_EXPRESSION + PROB_MATCH_EXPRESSION;
+                + PROB_CALL_FUNCTION_EXPRESSION + PROB_MATCH_EXPRESSION + PROB_CALL_VARIABLE_EXPRESSION;
 
             double probTypeOfExpression = GeneratorConfig.getRandom().nextDouble() * ratioSum;
             if (expressionDepth > MAX_EXPRESSION_DEPTH || (probTypeOfExpression -= PROB_LITERAL_EXPRESSION) < 0) {
@@ -122,14 +129,34 @@ public class RandomExpressionGenerator {
             } else if ((probTypeOfExpression -= PROB_MATCH_EXPRESSION) < 0) {
                 //match
                 PROB_MATCH_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
-                ret = generateMatchExpression(symbolTable, type);
+                ret = generateMatchExpression(type, symbolTable);
+            } else if ((probTypeOfExpression -= PROB_CALL_VARIABLE_EXPRESSION) < 0) {
+                if (type.validForFunctionBody()) {
+                    PROB_CALL_VARIABLE_EXPRESSION *= GeneratorConfig.OPTION_DECAY_FACTOR;
+                    ret = generateVariableCallExpression(type, symbolTable);
+                }
             }
         }
         expressionDepth--;
         return ret;
     }
 
-    private Expression generateMatchExpression(SymbolTable symbolTable, Type type) {
+    private Expression generateVariableCallExpression(Type type, SymbolTable symbolTable) {
+        ArrowType arrowType = new ArrowType(type).concrete(symbolTable).asArrowType();
+
+        Expression arrowTypeExpression = generateExpression(arrowType, symbolTable);
+
+        List<Expression> args = arrowType.getFromTypes().stream()
+          .map(t -> generateExpression(t, symbolTable))
+          .collect(Collectors.toList());
+
+        Variable funcVariable = new Variable(VariableNameGenerator.generateVariableValueName(arrowType, symbolTable), arrowType);
+        Statement funcVariableAssign = new AssignmentStatement(symbolTable, List.of(funcVariable), arrowTypeExpression);
+
+        return new CallVariableExpression(symbolTable, type, funcVariable, funcVariableAssign, args);
+    }
+
+    private Expression generateMatchExpression(Type type, SymbolTable symbolTable) {
         int noOfCases = GeneratorConfig.getRandom().nextInt(MAX_MATCH_CASES_VALUES) + 1;
 
         RandomTypeGenerator typeGenerator = new RandomTypeGenerator();

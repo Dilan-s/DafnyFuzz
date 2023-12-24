@@ -24,6 +24,10 @@ public class ArrowType implements UserDefinedType {
     this(null, null);
   }
 
+  public ArrowType(Type toType) {
+    this(null, toType);
+  }
+
   public ArrowType(List<Type> fromTypes, Type toType) {
     this.fromTypes = fromTypes;
     this.toType = toType;
@@ -49,8 +53,8 @@ public class ArrowType implements UserDefinedType {
   @Override
   public String getVariableType() {
     return String.format("(%s)->(%s)", fromTypes.stream()
-      .map(Type::getName)
-      .collect(Collectors.joining(", ")), toType.getName());
+      .map(Type::getVariableType)
+      .collect(Collectors.joining(", ")), toType.getVariableType());
   }
 
   @Override
@@ -118,7 +122,8 @@ public class ArrowType implements UserDefinedType {
 
     ArrowType arrowTypeOther = other.asArrowType();
 
-    if (fromTypes == null || toType == null || arrowTypeOther.fromTypes == null || arrowTypeOther.toType == null) {
+    if (fromTypes == null || toType == null || arrowTypeOther.fromTypes == null
+      || arrowTypeOther.toType == null) {
       return true;
     }
 
@@ -136,5 +141,13 @@ public class ArrowType implements UserDefinedType {
     }
 
     return arrowTypeOther.toType.equals(toType);
+  }
+
+  public List<Type> getFromTypes() {
+    return fromTypes;
+  }
+
+  public Type getToType() {
+    return toType;
   }
 }
