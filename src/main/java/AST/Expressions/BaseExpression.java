@@ -5,28 +5,30 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BaseExpression implements Expression {
-    private int useFreq;
 
-    public BaseExpression() {
-        this.useFreq = 0;
-    }
+  private int useFreq;
 
-    @Override
-    public void incrementUse() {
-        this.useFreq++;
-    }
+  public BaseExpression() {
+    this.useFreq = 0;
+  }
 
-    @Override
-    public int getNoOfUses() {
-        return useFreq;
-    }
+  @Override
+  public void incrementUse() {
+    this.useFreq++;
+  }
 
-    @Override
-    public List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s) {
-        incrementUse();
-        return getValue(paramMap, s, true);
-    }
+  @Override
+  public int getNoOfUses() {
+    return useFreq;
+  }
 
-    protected abstract List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused);
+  @Override
+  public List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s) {
+    incrementUse();
+    return getValue(paramMap, s, true);
+  }
+
+  protected abstract List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s,
+    boolean unused);
 
 }

@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class FunctionVariableValue implements FunctionValue {
 
-  private Function function;
+  private final Function function;
 
   public FunctionVariableValue(Function function) {
     this.function = function;

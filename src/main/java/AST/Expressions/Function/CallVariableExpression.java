@@ -3,7 +3,6 @@ package AST.Expressions.Function;
 import AST.Expressions.BaseExpression;
 import AST.Expressions.Expression;
 import AST.Expressions.Variable.Function.FunctionValue;
-import AST.Expressions.Variable.Function.FunctionVariableValue;
 import AST.Generator.VariableNameGenerator;
 import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
@@ -21,15 +20,16 @@ public class CallVariableExpression extends BaseExpression {
   private final SymbolTable symbolTable;
   private final Type type;
 
-  private List<Statement> assignments;
-  private List<Variable> variables;
+  private final List<Statement> assignments;
+  private final List<Variable> variables;
 
-  private Variable funcVariable;
-  private Statement funcVariableAssign;
+  private final Variable funcVariable;
+  private final Statement funcVariableAssign;
 
-  private List<List<Statement>> expanded;
+  private final List<List<Statement>> expanded;
 
-  public CallVariableExpression(SymbolTable symbolTable, Type type, Variable funcVariable, Statement funcVariableAssign, List<Expression> args) {
+  public CallVariableExpression(SymbolTable symbolTable, Type type, Variable funcVariable,
+    Statement funcVariableAssign, List<Expression> args) {
     super();
     this.symbolTable = symbolTable;
     this.type = type;
@@ -42,7 +42,6 @@ public class CallVariableExpression extends BaseExpression {
 
     this.expanded = new ArrayList<>();
     expanded.add(funcVariableAssign.expand());
-
 
     args.forEach(e -> {
       Type t = e.getTypes().get(0);
@@ -59,18 +58,14 @@ public class CallVariableExpression extends BaseExpression {
   @Override
   public List<Statement> expand() {
     int i = 0;
-    if (funcVariableAssign.requireUpdate()) {
-      expanded.set(i, funcVariableAssign.expand());
-    }
+    expanded.set(i, funcVariableAssign.expand());
     i++;
 
     for (int j = 0; j < assignments.size(); j++) {
       Statement assignment = assignments.get(j);
-      if (assignment.requireUpdate()) {
-        expanded.set(i + j, assignment.expand());
-      }
+      expanded.set(i, assignment.expand());
+      i++;
     }
-
 
     return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
   }
@@ -83,7 +78,8 @@ public class CallVariableExpression extends BaseExpression {
   }
 
   @Override
-  protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+  protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s,
+    boolean unused) {
     List<Object> fValueVar = funcVariable.getValue(paramMap);
     FunctionValue fValue = (FunctionValue) fValueVar.get(0);
 

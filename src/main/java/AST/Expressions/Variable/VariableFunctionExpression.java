@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 
 public class VariableFunctionExpression extends BaseExpression {
 
-  private Function function;
-  private Type type;
-  private SymbolTable symbolTable;
+  private final Function function;
+  private final Type type;
+  private final SymbolTable symbolTable;
 
-  private Variable functionVariable;
-  private AssignmentStatement functionAssign;
+  private final Variable functionVariable;
+  private final AssignmentStatement functionAssign;
 
-  private List<List<Statement>> expanded;
+  private final List<List<Statement>> expanded;
 
   public VariableFunctionExpression(SymbolTable symbolTable, Function function, Type type) {
     super();
@@ -32,8 +32,10 @@ public class VariableFunctionExpression extends BaseExpression {
     this.function = function;
     this.type = type;
 
-    this.functionVariable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-    this.functionAssign = new AssignmentStatement(symbolTable, List.of(functionVariable), new FunctionExpression(function));
+    this.functionVariable = new Variable(
+      VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
+    this.functionAssign = new AssignmentStatement(symbolTable, List.of(functionVariable),
+      new FunctionExpression(function));
 
     this.expanded = new ArrayList<>();
     expanded.add(functionAssign.expand());
@@ -50,7 +52,8 @@ public class VariableFunctionExpression extends BaseExpression {
   }
 
   @Override
-  protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
+  protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+    boolean unused) {
     if (paramsMap.containsKey(functionVariable)) {
       return paramsMap.get(functionVariable).getValue(paramsMap);
     }
@@ -63,9 +66,7 @@ public class VariableFunctionExpression extends BaseExpression {
 
   @Override
   public List<Statement> expand() {
-    if (functionAssign.requireUpdate()) {
-      expanded.set(0, functionAssign.expand());
-    }
+    expanded.set(0, functionAssign.expand());
     return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
   }
 
@@ -88,7 +89,8 @@ public class VariableFunctionExpression extends BaseExpression {
     }
 
     @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+      boolean unused) {
       List<Object> r = new ArrayList<>();
       r.add(new FunctionVariableValue(function));
       return r;
@@ -97,11 +99,6 @@ public class VariableFunctionExpression extends BaseExpression {
     @Override
     public String toString() {
       return function.getName();
-    }
-
-    @Override
-    public boolean requireUpdate() {
-      return false;
     }
   }
 }

@@ -6,47 +6,47 @@ import java.util.Objects;
 
 public class DataTypeValue {
 
-    private final Type type;
-    private final List<Object> values;
+  private final Type type;
+  private final List<Object> values;
 
-    public DataTypeValue(Type type, List<Object> values) {
-        this.type = type;
-        this.values = values;
+  public DataTypeValue(Type type, List<Object> values) {
+    this.type = type;
+    this.values = values;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(type, values);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof DataTypeValue)) {
+      return false;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, values);
-    }
+    DataTypeValue other = (DataTypeValue) obj;
+    return other.type.equals(type) && other.values.equals(values);
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof DataTypeValue)) {
-            return false;
-        }
+  @Override
+  public String toString() {
+    return type.getName() + values.toString();
+  }
 
-        DataTypeValue other = (DataTypeValue) obj;
-        return other.type.equals(type) && other.values.equals(values);
-    }
+  public Object get(int index) {
+    return values.get(index);
+  }
 
-    @Override
-    public String toString() {
-        return type.getName() + values.toString();
-    }
+  public void set(int index, Object value) {
+    values.set(index, value);
+  }
 
-    public Object get(int index) {
-        return values.get(index);
-    }
+  public int size() {
+    return values.size();
+  }
 
-    public void set(int index, Object value) {
-        values.set(index, value);
-    }
-
-    public int size() {
-        return values.size();
-    }
-
-    public Type getType() {
-        return type;
-    }
+  public Type getType() {
+    return type;
+  }
 }

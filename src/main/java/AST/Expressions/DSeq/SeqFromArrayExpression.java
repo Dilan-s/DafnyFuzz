@@ -14,14 +14,15 @@ import java.util.stream.Collectors;
 
 public class SeqFromArrayExpression extends BaseExpression {
 
-  private SymbolTable symbolTable;
-  private Type type;
-  private Variable arrayVariable;
-  private Statement arrayAssign;
+  private final SymbolTable symbolTable;
+  private final Type type;
+  private final Variable arrayVariable;
+  private final Statement arrayAssign;
 
-  private List<List<Statement>> expanded;
+  private final List<List<Statement>> expanded;
 
-  public SeqFromArrayExpression(SymbolTable symbolTable, Type type, Variable arrayVariable, Statement arrayAssign) {
+  public SeqFromArrayExpression(SymbolTable symbolTable, Type type, Variable arrayVariable,
+    Statement arrayAssign) {
     super();
     this.symbolTable = symbolTable;
     this.type = type;
@@ -38,7 +39,8 @@ public class SeqFromArrayExpression extends BaseExpression {
   }
 
   @Override
-  protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+  protected List<Object> getValue(Map<Variable, Variable> paramMap, StringBuilder s,
+    boolean unused) {
     List<Object> arrValues = arrayVariable.getValue(paramMap);
 
     ArrayValue arrayValue = (ArrayValue) arrValues.get(0);
@@ -50,9 +52,7 @@ public class SeqFromArrayExpression extends BaseExpression {
 
   @Override
   public List<Statement> expand() {
-    if (arrayAssign.requireUpdate()) {
-      expanded.set(0, arrayAssign.expand());
-    }
+    expanded.set(0, arrayAssign.expand());
     return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
   }
 

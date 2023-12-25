@@ -1,8 +1,8 @@
 package AST.Expressions.DMap;
 
-import AST.Generator.GeneratorConfig;
 import AST.Expressions.BaseExpression;
 import AST.Expressions.Expression;
+import AST.Generator.GeneratorConfig;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
@@ -18,96 +18,87 @@ import java.util.stream.Collectors;
 
 public class DMapIndex extends BaseExpression {
 
-    private final SymbolTable symbolTable;
-    private final Type type;
-    private final Expression map;
-    private final Expression index;
+  private final SymbolTable symbolTable;
+  private final Type type;
+  private final Expression map;
+  private final Expression index;
 
-    private List<List<Statement>> expanded;
+  private final List<List<Statement>> expanded;
 
-    public DMapIndex(SymbolTable symbolTable, Type type, Expression map, Expression index) {
-        super();
-        this.symbolTable = symbolTable;
-        this.type = type;
-        this.map = map;
-        this.index = index;
+  public DMapIndex(SymbolTable symbolTable, Type type, Expression map, Expression index) {
+    super();
+    this.symbolTable = symbolTable;
+    this.type = type;
+    this.map = map;
+    this.index = index;
 
-        this.expanded = new ArrayList<>();
-        expanded.add(map.expand());
-        expanded.add(index.expand());
-    }
+    this.expanded = new ArrayList<>();
+    expanded.add(map.expand());
+    expanded.add(index.expand());
+  }
 
-    @Override
-    public List<Type> getTypes() {
-        return List.of(type);
-    }
+  @Override
+  public List<Type> getTypes() {
+    return List.of(type);
+  }
 
-    @Override
-    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
-        List<Object> r = new ArrayList<>();
+  @Override
+  protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+    boolean unused) {
+    List<Object> r = new ArrayList<>();
 
-        Object mapVarValue = map.getValue(paramsMap).get(0);
-        Object indexValue = index.getValue(paramsMap).get(0);
+    Object mapVarValue = map.getValue(paramsMap).get(0);
+    Object indexValue = index.getValue(paramsMap).get(0);
 
-        if (mapVarValue != null && indexValue != null) {
-            Map<Object, Object> map = (Map<Object, Object>) mapVarValue;
+    if (mapVarValue != null && indexValue != null) {
+      Map<Object, Object> map = (Map<Object, Object>) mapVarValue;
 
-            if (map.containsKey(indexValue)) {
-                r.add(map.get(indexValue));
-                return r;
-            }
-        }
-
-        r.add(null);
+      if (map.containsKey(indexValue)) {
+        r.add(map.get(indexValue));
         return r;
+      }
     }
 
-    @Override
-    public List<Statement> expand() {
-        if (map.requireUpdate()) {
-            expanded.set(0, map.expand());
-        }
+    r.add(null);
+    return r;
+  }
 
-        if (index.requireUpdate()) {
-            expanded.set(1, index.expand());
-        }
+  @Override
+  public List<Statement> expand() {
+    expanded.set(0, map.expand());
+    expanded.set(1, index.expand());
+    return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+  }
 
-        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+  @Override
+  public boolean validForFunctionBody() {
+    return super.validForFunctionBody() && map.validForFunctionBody()
+      && index.validForFunctionBody();
+  }
+
+
+  @Override
+  public List<String> toOutput() {
+    Set<String> res = new HashSet<>();
+
+    for (String m : map.toOutput()) {
+      for (String i : index.toOutput()) {
+        res.add(m + "[" + i + "]");
+      }
     }
 
-    @Override
-    public boolean validForFunctionBody() {
-        return super.validForFunctionBody() && map.validForFunctionBody() && index.validForFunctionBody();
-    }
+    List<String> r = new ArrayList<>(res);
+    Collections.shuffle(r, GeneratorConfig.getRandom());
+    return r.subList(0, Math.min(5, res.size()));
+  }
 
-    @Override
-    public boolean requireUpdate() {
-        return map.requireUpdate() || index.requireUpdate();
-    }
+  @Override
+  public String toString() {
+    return map.toString() + "[" + index.toString() + "]";
+  }
 
-
-    @Override
-    public List<String> toOutput() {
-        Set<String> res = new HashSet<>();
-
-        for (String m : map.toOutput()) {
-            for (String i : index.toOutput()) {
-                res.add(m + "[" + i + "]");
-            }
-        }
-
-        List<String> r = new ArrayList<>(res);
-        Collections.shuffle(r, GeneratorConfig.getRandom());
-        return r.subList(0, Math.min(5, res.size()));
-    }
-
-    @Override
-    public String toString() {
-        return map.toString() + "[" + index.toString() + "]";
-    }
-
-    @Override
-    public String minimizedTestCase() {
-        return map.minimizedTestCase() + "[" + index.minimizedTestCase() + "]";
-    }
+  @Override
+  public String minimizedTestCase() {
+    return map.minimizedTestCase() + "[" + index.minimizedTestCase() + "]";
+  }
 }

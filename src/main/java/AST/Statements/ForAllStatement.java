@@ -19,70 +19,74 @@ import java.util.Map;
 
 public class ForAllStatement extends BaseStatement {
 
-    private SymbolTable symbolTable;
-    private int length;
-    private Function func;
-    private Variable variable;
-    private Type type;
+  private final SymbolTable symbolTable;
+  private final int length;
+  private final Function func;
+  private final Variable variable;
+  private Type type;
 
-    private Variable loopVar;
-    private Statement innerAssignment;
-    private SymbolTable bodySt;
+  private final Variable loopVar;
+  private final Statement innerAssignment;
+  private final SymbolTable bodySt;
 
-    public ForAllStatement(SymbolTable symbolTable, Type type, int length,
-        Function func, Variable variable) {
-        super();
-        this.symbolTable = symbolTable;
-        this.length = length;
-        this.func = func;
-        this.variable = variable;
+  public ForAllStatement(SymbolTable symbolTable, Type type, int length,
+    Function func, Variable variable) {
+    super();
+    this.symbolTable = symbolTable;
+    this.length = length;
+    this.func = func;
+    this.variable = variable;
 
-        bodySt = new SymbolTable(symbolTable);
+    bodySt = new SymbolTable(symbolTable);
 
-        Int loopVarType = new Int();
-        this.loopVar = new Variable(VariableNameGenerator.generateVariableValueName(loopVarType, bodySt), loopVarType);
-        loopVar.setDeclared();
+    Int loopVarType = new Int();
+    this.loopVar = new Variable(
+      VariableNameGenerator.generateVariableValueName(loopVarType, bodySt), loopVarType);
+    loopVar.setDeclared();
 
-        Variable index = new VariableArrayIndex(variable, type, loopVar);
-        index.setDeclared();
-        Expression funcCall = new CallFunctionVariableExpression(bodySt, func, new VariableExpression(symbolTable, loopVar, type));
-        this.innerAssignment = new AssignmentStatement(bodySt, List.of(
-            index), funcCall);
+    Variable index = new VariableArrayIndex(variable, type, loopVar);
+    index.setDeclared();
+    Expression funcCall = new CallFunctionVariableExpression(bodySt, func,
+      new VariableExpression(symbolTable, loopVar, type));
+    this.innerAssignment = new AssignmentStatement(bodySt, List.of(
+      index), funcCall);
 
+  }
+
+  @Override
+  protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s,
+    boolean unused) {
+    for (int i = 0; i < length; i++) {
+      loopVar.setValue(bodySt, paramMap, BigInteger.valueOf(i));
+      innerAssignment.execute(paramMap, s);
     }
+    return ReturnStatus.UNKNOWN;
+  }
 
-    @Override
-    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s,
-        boolean unused) {
-        for (int i = 0; i < length; i++) {
-            loopVar.setValue(bodySt, paramMap, BigInteger.valueOf(i));
-            innerAssignment.execute(paramMap, s);
-        }
-        return ReturnStatus.UNKNOWN;
-    }
+  @Override
+  public String toString() {
+    List<String> code = new ArrayList<>();
+    code.add(
+      String.format("forall %s | 0 <= %s < %s.Length {", loopVar.getName(), loopVar.getName(),
+        variable.getName()));
+    code.add(StringUtils.indent(innerAssignment.toString()));
+    code.add("}");
 
-    @Override
-    public String toString() {
-        List<String> code = new ArrayList<>();
-        code.add(String.format("forall %s | 0 <= %s < %s.Length {", loopVar.getName(), loopVar.getName(), variable.getName()));
-        code.add(StringUtils.indent(innerAssignment.toString()));
-        code.add("}");
+    return StringUtils.intersperse("\n", code);
+  }
 
-        return StringUtils.intersperse("\n", code);
-    }
+  @Override
+  public List<Statement> expand() {
+    return List.of(this);
+  }
 
-    @Override
-    public List<Statement> expand() {
-        return List.of(this);
-    }
+  @Override
+  public List<String> toOutput() {
+    return List.of(toString());
+  }
 
-    @Override
-    public List<String> toOutput() {
-        return List.of(toString());
-    }
-
-    @Override
-    public String minimizedTestCase() {
-        return toString();
-    }
+  @Override
+  public String minimizedTestCase() {
+    return toString();
+  }
 }

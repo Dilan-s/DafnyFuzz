@@ -11,41 +11,42 @@ import java.util.Objects;
 
 public class CharLiteral extends BaseExpression {
 
-    private final char value;
-    private final Type type;
-    private SymbolTable symbolTable;
+  private final char value;
+  private final Type type;
+  private final SymbolTable symbolTable;
 
-    public CharLiteral(Type type, SymbolTable symbolTable, char value) {
-        super();
-        this.type = type;
-        this.symbolTable = symbolTable;
-        this.value = value;
-    }
+  public CharLiteral(Type type, SymbolTable symbolTable, char value) {
+    super();
+    this.type = type;
+    this.symbolTable = symbolTable;
+    this.value = value;
+  }
 
-    @Override
-    public List<Type> getTypes() {
-        return List.of(type);
-    }
+  @Override
+  public List<Type> getTypes() {
+    return List.of(type);
+  }
 
-    @Override
-    public String toString() {
-        return String.format("'%c'", value);
-    }
+  @Override
+  public String toString() {
+    return String.format("'%c'", value);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
+  }
 
-    @Override
-    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s, boolean unused) {
-        List<Object> r = new ArrayList<>();
-        r.add(value);
-        return r;
-    }
+  @Override
+  protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+    boolean unused) {
+    List<Object> r = new ArrayList<>();
+    r.add(value);
+    return r;
+  }
 
-    @Override
-    public List<Statement> expand() {
-        return new ArrayList<>();
-    }
+  @Override
+  public List<Statement> expand() {
+    return new ArrayList<>();
+  }
 }

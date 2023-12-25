@@ -19,8 +19,8 @@ import java.util.Set;
 public class DMap implements Type {
 
   private static final int MAX_NUMBER_OF_ELEMS = 5;
-  private Type keyType;
-  private Type valueType;
+  private final Type keyType;
+  private final Type valueType;
 
   public DMap(Type keyType, Type valueType) {
     this.keyType = keyType;

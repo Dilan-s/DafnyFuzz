@@ -2,7 +2,6 @@ package AST.SymbolTable.Types.UserDefinedTypes;
 
 import AST.Expressions.Expression;
 import AST.Expressions.Variable.Function.FunctionValue;
-import AST.Expressions.Variable.Function.FunctionVariableValue;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomFunctionGenerator;
 import AST.Generator.RandomTypeGenerator;

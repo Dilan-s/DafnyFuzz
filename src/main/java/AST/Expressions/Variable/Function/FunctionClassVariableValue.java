@@ -7,8 +7,8 @@ import java.util.Objects;
 
 public class FunctionClassVariableValue implements FunctionValue {
 
-  private Variable classExpVariable;
-  private Function function;
+  private final Variable classExpVariable;
+  private final Function function;
 
   public FunctionClassVariableValue(Variable classExpVariable, Function function) {
     this.classExpVariable = classExpVariable;

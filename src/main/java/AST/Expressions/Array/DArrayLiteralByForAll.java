@@ -19,130 +19,118 @@ import java.util.stream.Collectors;
 
 public class DArrayLiteralByForAll extends BaseExpression {
 
-    private SymbolTable symbolTable;
-    private Type type;
-    private int length;
-    private Function func;
-    private Variable variable;
-    private List<List<Statement>> expanded;
-    private Statement arrStatAssign;
-    private Statement forAllAssign;
+  private final SymbolTable symbolTable;
+  private final Type type;
+  private final int length;
+  private final Function func;
+  private final Variable variable;
+  private final List<List<Statement>> expanded;
+  private final Statement arrStatAssign;
+  private final Statement forAllAssign;
 
-    public DArrayLiteralByForAll(SymbolTable symbolTable, Type type, int length,
-        Function func) {
-        super();
-        this.symbolTable = symbolTable;
-        this.type = type;
-        this.length = length;
-        this.func = func;
-        func.incrementUse();
+  public DArrayLiteralByForAll(SymbolTable symbolTable, Type type, int length,
+    Function func) {
+    super();
+    this.symbolTable = symbolTable;
+    this.type = type;
+    this.length = length;
+    this.func = func;
+    func.incrementUse();
 
-        DCollection t = type.asDCollection();
-        Type innerType = t.getInnerType();
-        this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable), type);
-        this.variable.setConstant();
-        this.arrStatAssign = new AssignmentStatement(symbolTable, List.of(variable), new ArrayInitValues());
-        this.forAllAssign = new ForAllStatement(symbolTable, innerType, length, func, variable);
+    DCollection t = type.asDCollection();
+    Type innerType = t.getInnerType();
+    this.variable = new Variable(VariableNameGenerator.generateVariableValueName(type, symbolTable),
+      type);
+    this.variable.setConstant();
+    this.arrStatAssign = new AssignmentStatement(symbolTable, List.of(variable),
+      new ArrayInitValues());
+    this.forAllAssign = new ForAllStatement(symbolTable, innerType, length, func, variable);
 
-        this.expanded = new ArrayList<>();
-        expanded.add(arrStatAssign.expand());
-        expanded.add(forAllAssign.expand());
-        generateAssignments();
+    this.expanded = new ArrayList<>();
+    expanded.add(arrStatAssign.expand());
+    expanded.add(forAllAssign.expand());
+    generateAssignments();
+  }
+
+  private void generateAssignments() {
+    DCollection t = this.type.asDCollection();
+    Type valType = t.getInnerType();
+
+    for (int i = 0; i < length; i++) {
+      VariableArrayIndex v = new VariableArrayIndex(variable, valType, i);
+      v.setDeclared();
+      symbolTable.addVariable(v);
     }
+  }
 
-    private void generateAssignments() {
-        DCollection t = this.type.asDCollection();
-        Type valType = t.getInnerType();
+  @Override
+  public String toString() {
+    return variable.getName();
+  }
 
-        for (int i = 0; i < length; i++) {
-            VariableArrayIndex v = new VariableArrayIndex(variable, valType, i);
-            v.setDeclared();
-            symbolTable.addVariable(v);
-        }
+  @Override
+  protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+    boolean unused) {
+    return variable.getValue(paramsMap);
+  }
+
+  @Override
+  public boolean validForFunctionBody() {
+    return false;
+  }
+
+
+  @Override
+  public List<Type> getTypes() {
+    return List.of(type);
+  }
+
+  @Override
+  public List<Statement> expand() {
+    expanded.set(0, arrStatAssign.expand());
+    expanded.set(1, forAllAssign.expand());
+    return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+  }
+
+  private class ArrayInitValues extends BaseExpression {
+
+    public ArrayInitValues() {
+      super();
     }
-
-    @Override
-    public boolean requireUpdate() {
-        return arrStatAssign.requireUpdate();
-    }
-
-    @Override
-    public String toString() {
-        return variable.getName();
-    }
-
-    @Override
-    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
-        boolean unused) {
-        return variable.getValue(paramsMap);
-    }
-
-    @Override
-    public boolean validForFunctionBody() {
-        return false;
-    }
-
 
     @Override
     public List<Type> getTypes() {
-        return List.of(type);
+      return List.of(type);
     }
 
     @Override
     public List<Statement> expand() {
-        if (arrStatAssign.requireUpdate()) {
-            expanded.set(0, arrStatAssign.expand());
-        }
-        if (forAllAssign.requireUpdate()) {
-            expanded.set(1, forAllAssign.expand());
-        }
-        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+      return new ArrayList<>();
     }
 
-    private class ArrayInitValues extends BaseExpression {
+    @Override
+    public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+      boolean unused) {
+      List<Object> r = new ArrayList<>();
 
-        public ArrayInitValues() {
-            super();
-        }
-
-        @Override
-        public List<Type> getTypes() {
-            return List.of(type);
-        }
-
-        @Override
-        public List<Statement> expand() {
-            return new ArrayList<>();
-        }
-
-        @Override
-        public List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
-            boolean unused) {
-            List<Object> r = new ArrayList<>();
-
-            List<Object> l = new ArrayList<>();
-            for (int i = 0; i < length; i++) {
-                l.add(null);
-            }
-            r.add(new ArrayValue(variable, l));
-            return r;
-        }
-
-        @Override
-        public String toString() {
-            DCollection t = type.asDCollection();
-            return String.format("new %s[%d]", t.getInnerType().getVariableType(),
-                length, func.getName());
-        }
-
-        @Override
-        public boolean requireUpdate() {
-            return false;
-        }
-
-        @Override
-        public boolean validForFunctionBody() {
-            return false;
-        }
+      List<Object> l = new ArrayList<>();
+      for (int i = 0; i < length; i++) {
+        l.add(null);
+      }
+      r.add(new ArrayValue(variable, l));
+      return r;
     }
+
+    @Override
+    public String toString() {
+      DCollection t = type.asDCollection();
+      return String.format("new %s[%d]", t.getInnerType().getVariableType(),
+        length, func.getName());
+    }
+
+    @Override
+    public boolean validForFunctionBody() {
+      return false;
+    }
+  }
 }

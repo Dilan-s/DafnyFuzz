@@ -8,48 +8,48 @@ import java.util.Objects;
 
 public class VariableThis extends Variable {
 
-    private Variable variable;
+  private Variable variable;
 
-    public VariableThis(DClass dClass) {
-        super("this", dClass);
-    }
+  public VariableThis(DClass dClass) {
+    super("this", dClass);
+  }
 
-    @Override
-    public String getName() {
-        return "this";
-    }
+  @Override
+  public String getName() {
+    return "this";
+  }
 
-    @Override
-    public boolean isDeclared() {
-        return true;
-    }
+  @Override
+  public boolean isDeclared() {
+    return true;
+  }
 
-    @Override
-    public boolean isConstant() {
-        return true;
-    }
+  @Override
+  public boolean isConstant() {
+    return true;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash("this");
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash("this");
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof VariableThis;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof VariableThis;
+  }
 
-    @Override
-    public List<Object> getValue(Map<Variable, Variable> paramsMap) {
-        return variable.getValue(paramsMap);
-    }
+  @Override
+  public List<Object> getValue(Map<Variable, Variable> paramsMap) {
+    return variable.getValue(paramsMap);
+  }
 
-    @Override
-    public void setValue(SymbolTable symbolTable, Map<Variable, Variable> paramMap, Object value) {
-        variable.setValue(symbolTable, paramMap, value);
-    }
+  @Override
+  public void setValue(SymbolTable symbolTable, Map<Variable, Variable> paramMap, Object value) {
+    variable.setValue(symbolTable, paramMap, value);
+  }
 
-    public void set(Variable variable) {
-        this.variable = variable;
-    }
+  public void set(Variable variable) {
+    this.variable = variable;
+  }
 }

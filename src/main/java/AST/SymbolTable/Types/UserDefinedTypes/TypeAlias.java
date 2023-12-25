@@ -25,255 +25,255 @@ import java.util.Objects;
 
 public class TypeAlias implements Type {
 
-    private Type type;
-    private String name;
+  private Type type;
+  private String name;
 
-    public TypeAlias() {
-        this(null, null);
+  public TypeAlias() {
+    this(null, null);
+  }
+
+  public TypeAlias(Type type, String name) {
+    this.type = type;
+    this.name = name;
+  }
+
+  @Override
+  public Type concrete(SymbolTable symbolTable) {
+    if (type == null) {
+      if (name == null) {
+        name = VariableNameGenerator.generateTypeAliasName();
+      }
+
+      RandomTypeGenerator randomTypeGenerator = new RandomTypeGenerator();
+      this.type = randomTypeGenerator.generateTypeAliasType(symbolTable)
+        .concrete(symbolTable);
     }
 
-    public TypeAlias(Type type, String name) {
-        this.type = type;
-        this.name = name;
+    return new TypeAlias(type, name);
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Type)) {
+      return false;
+    }
+    Type other = (Type) obj;
+
+    if (other instanceof TypeAlias) {
+      TypeAlias o = other.asTypeAlias();
+      return this.name == null || o.name == null || this.name.equals(o.name)
+        || this.type == null || o.type == null;
     }
 
-    @Override
-    public Type concrete(SymbolTable symbolTable) {
-        if (type == null) {
-            if (name == null) {
-                name = VariableNameGenerator.generateTypeAliasName();
-            }
-
-            RandomTypeGenerator randomTypeGenerator = new RandomTypeGenerator();
-            this.type = randomTypeGenerator.generateTypeAliasType(symbolTable)
-                .concrete(symbolTable);
-        }
-
-        return new TypeAlias(type, name);
+    if (this.type == null) {
+      return true;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    return other.equals(this.type);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
+  @Override
+  public Expression generateLiteral(SymbolTable symbolTable) {
+    return type.generateLiteral(symbolTable);
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Type)) {
-            return false;
-        }
-        Type other = (Type) obj;
+  @Override
+  public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+    return type.generateExpressionFromValue(symbolTable, value);
+  }
 
-        if (other instanceof TypeAlias) {
-            TypeAlias o = other.asTypeAlias();
-            return this.name == null || o.name == null || this.name.equals(o.name)
-                || this.type == null || o.type == null;
-        }
+  @Override
+  public boolean operatorExists() {
+    return type.operatorExists();
+  }
 
-        if (this.type == null) {
-            return true;
-        }
+  @Override
+  public boolean isPrintable() {
+    return type.isPrintable();
+  }
 
-        return other.equals(this.type);
-    }
+  @Override
+  public boolean isCollection() {
+    return type.isCollection();
+  }
 
-    @Override
-    public Expression generateLiteral(SymbolTable symbolTable) {
-        return type.generateLiteral(symbolTable);
-    }
+  @Override
+  public Boolean lessThan(Object lhsV, Object rhsV) {
+    return type.lessThan(lhsV, rhsV);
+  }
 
-    @Override
-    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
-        return type.generateExpressionFromValue(symbolTable, value);
-    }
+  @Override
+  public Boolean equal(Object lhsV, Object rhsV) {
+    return type.equal(lhsV, rhsV);
+  }
 
-    @Override
-    public boolean operatorExists() {
-        return type.operatorExists();
-    }
+  @Override
+  public Boolean lessThanOrEqual(Object lhsV, Object rhsV) {
+    return type.lessThanOrEqual(lhsV, rhsV);
+  }
 
-    @Override
-    public boolean isPrintable() {
-        return type.isPrintable();
-    }
+  @Override
+  public Boolean greaterThan(Object lhsV, Object rhsV) {
+    return type.greaterThan(lhsV, rhsV);
+  }
 
-    @Override
-    public boolean isCollection() {
-        return type.isCollection();
-    }
+  @Override
+  public Boolean greaterThanOrEqual(Object lhsV, Object rhsV) {
+    return type.greaterThanOrEqual(lhsV, rhsV);
+  }
 
-    @Override
-    public Boolean lessThan(Object lhsV, Object rhsV) {
-        return type.lessThan(lhsV, rhsV);
-    }
+  @Override
+  public BigInteger cardinality(Object value) {
+    return type.cardinality(value);
+  }
 
-    @Override
-    public Boolean equal(Object lhsV, Object rhsV) {
-        return type.equal(lhsV, rhsV);
-    }
+  @Override
+  public String concatenate(Object lhsV, Object rhsV) {
+    return type.concatenate(lhsV, rhsV);
+  }
 
-    @Override
-    public Boolean lessThanOrEqual(Object lhsV, Object rhsV) {
-        return type.lessThanOrEqual(lhsV, rhsV);
-    }
+  @Override
+  public String formatPrint(Object object) {
+    return type.formatPrint(object);
+  }
 
-    @Override
-    public Boolean greaterThan(Object lhsV, Object rhsV) {
-        return type.greaterThan(lhsV, rhsV);
-    }
+  @Override
+  public String formatEnsures(String variableName, Object object) {
+    return type.formatEnsures(variableName, object);
+  }
 
-    @Override
-    public Boolean greaterThanOrEqual(Object lhsV, Object rhsV) {
-        return type.greaterThanOrEqual(lhsV, rhsV);
-    }
-
-    @Override
-    public BigInteger cardinality(Object value) {
-        return type.cardinality(value);
-    }
-
-    @Override
-    public String concatenate(Object lhsV, Object rhsV) {
-        return type.concatenate(lhsV, rhsV);
-    }
-
-    @Override
-    public String formatPrint(Object object) {
-        return type.formatPrint(object);
-    }
-
-    @Override
-    public String formatEnsures(String variableName, Object object) {
-        return type.formatEnsures(variableName, object);
-    }
-
-    @Override
-    public boolean validMethodType() {
-        return type.validMethodType();
-    }
+  @Override
+  public boolean validMethodType() {
+    return type.validMethodType();
+  }
 
 
-    @Override
-    public Object of(Object value) {
-        return type.of(value);
-    }
+  @Override
+  public Object of(Object value) {
+    return type.of(value);
+  }
 
-    @Override
-    public boolean isOrdered() {
-        return type.isOrdered();
-    }
+  @Override
+  public boolean isOrdered() {
+    return type.isOrdered();
+  }
 
-    public String declaration() {
-        return String.format("type %s = %s", name, type.getVariableType());
-    }
+  public String declaration() {
+    return String.format("type %s = %s", name, type.getVariableType());
+  }
 
-    @Override
-    public UserDefinedType asUserDefinedType() {
-        return this.type.asUserDefinedType();
-    }
+  @Override
+  public UserDefinedType asUserDefinedType() {
+    return this.type.asUserDefinedType();
+  }
 
-    @Override
-    public Tuple asTuple() {
-        return this.type.asTuple();
-    }
+  @Override
+  public Tuple asTuple() {
+    return this.type.asTuple();
+  }
 
-    @Override
-    public DataType asDataType() {
-        return this.type.asDataType();
-    }
+  @Override
+  public DataType asDataType() {
+    return this.type.asDataType();
+  }
 
-    @Override
-    public DataTypeRule asDataTypeRule() {
-        return this.type.asDataTypeRule();
-    }
+  @Override
+  public DataTypeRule asDataTypeRule() {
+    return this.type.asDataTypeRule();
+  }
 
-    @Override
-    public BaseType asBaseType() {
-        return this.type.asBaseType();
-    }
+  @Override
+  public BaseType asBaseType() {
+    return this.type.asBaseType();
+  }
 
-    @Override
-    public Real asReal() {
-        return this.type.asReal();
-    }
+  @Override
+  public Real asReal() {
+    return this.type.asReal();
+  }
 
-    @Override
-    public Int asInt() {
-        return this.type.asInt();
-    }
+  @Override
+  public Int asInt() {
+    return this.type.asInt();
+  }
 
-    @Override
-    public DString asDString() {
-        return this.type.asDString();
-    }
+  @Override
+  public DString asDString() {
+    return this.type.asDString();
+  }
 
-    @Override
-    public Char asChar() {
-        return this.type.asChar();
-    }
+  @Override
+  public Char asChar() {
+    return this.type.asChar();
+  }
 
-    @Override
-    public Bool asBool() {
-        return this.type.asBool();
-    }
+  @Override
+  public Bool asBool() {
+    return this.type.asBool();
+  }
 
-    @Override
-    public GenericType asGenericType() {
-        return this.type.asGenericType();
-    }
+  @Override
+  public GenericType asGenericType() {
+    return this.type.asGenericType();
+  }
 
-    @Override
-    public DMap asDMap() {
-        return this.type.asDMap();
-    }
+  @Override
+  public DMap asDMap() {
+    return this.type.asDMap();
+  }
 
-    @Override
-    public DCollection asDCollection() {
-        return this.type.asDCollection();
-    }
+  @Override
+  public DCollection asDCollection() {
+    return this.type.asDCollection();
+  }
 
-    @Override
-    public DArray asDArray() {
-        return this.type.asDArray();
-    }
+  @Override
+  public DArray asDArray() {
+    return this.type.asDArray();
+  }
 
-    @Override
-    public DSet asDSet() {
-        return this.type.asDSet();
-    }
+  @Override
+  public DSet asDSet() {
+    return this.type.asDSet();
+  }
 
-    @Override
-    public Multiset asMultiset() {
-        return this.type.asMultiset();
-    }
+  @Override
+  public Multiset asMultiset() {
+    return this.type.asMultiset();
+  }
 
-    @Override
-    public Seq asSeq() {
-        return this.type.asSeq();
-    }
+  @Override
+  public Seq asSeq() {
+    return this.type.asSeq();
+  }
 
-    @Override
-    public DClass asDClass() {
-        return this.type.asDClass();
-    }
+  @Override
+  public DClass asDClass() {
+    return this.type.asDClass();
+  }
 
-    @Override
-    public String formatEnsures(Object object) {
-        return type.formatEnsures(object);
-    }
+  @Override
+  public String formatEnsures(Object object) {
+    return type.formatEnsures(object);
+  }
 
-    @Override
-    public ArrowType asArrowType() {
-        return type.asArrowType();
-    }
+  @Override
+  public ArrowType asArrowType() {
+    return type.asArrowType();
+  }
 
-    @Override
-    public boolean validForFunctionBody() {
-        return type.validForFunctionBody();
-    }
+  @Override
+  public boolean validForFunctionBody() {
+    return type.validForFunctionBody();
+  }
 }

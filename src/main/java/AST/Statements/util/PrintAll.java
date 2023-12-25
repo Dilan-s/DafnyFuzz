@@ -11,41 +11,36 @@ import java.util.Map;
 
 public class PrintAll extends BaseStatement {
 
-    private PrintStatement printStat;
-    private SymbolTable symbolTable;
+  private final PrintStatement printStat;
+  private final SymbolTable symbolTable;
 
-    public PrintAll(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
-        this.printStat = new PrintStatement(symbolTable);
-    }
+  public PrintAll(SymbolTable symbolTable) {
+    this.symbolTable = symbolTable;
+    this.printStat = new PrintStatement(symbolTable);
+  }
 
-    @Override
-    public String toString() {
-        return "";
-    }
+  @Override
+  public String toString() {
+    return "";
+  }
 
-    @Override
-    public List<String> toOutput() {
-        return Collections.emptyList();
-    }
+  @Override
+  public List<String> toOutput() {
+    return Collections.emptyList();
+  }
 
-    @Override
-    public ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
-        return ReturnStatus.UNKNOWN;
-    }
+  @Override
+  public ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
+    return ReturnStatus.UNKNOWN;
+  }
 
-    @Override
-    public boolean requireUpdate() {
-        return printStat.requireUpdate();
-    }
+  @Override
+  public List<Statement> expand() {
+    return printStat.expand();
+  }
 
-    @Override
-    public List<Statement> expand() {
-        return printStat.expand();
-    }
-
-    @Override
-    public String minimizedTestCase() {
-        return null;
-    }
+  @Override
+  public String minimizedTestCase() {
+    return null;
+  }
 }

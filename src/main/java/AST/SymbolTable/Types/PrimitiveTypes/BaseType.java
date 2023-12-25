@@ -4,11 +4,11 @@ import AST.SymbolTable.Types.Type;
 
 public interface BaseType extends Type {
 
-    default String getVariableType() {
-        return getName();
-    }
+  default String getVariableType() {
+    return getName();
+  }
 
-    default boolean isCollection() {
-        return false;
-    }
+  default boolean isCollection() {
+    return false;
+  }
 }

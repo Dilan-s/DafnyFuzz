@@ -11,95 +11,95 @@ import java.util.List;
 
 public class RandomMethodGenerator {
 
-    public static final double PROB_REUSE_METHOD = 0.75;
-    public static final double PROB_CLASS_METHOD = 0.25;
-    public static final int MAX_METHOD_DEPTH = 5;
-    public static final int MAX_NO_OF_ARGS = 5;
+  public static final double PROB_REUSE_METHOD = 0.75;
+  public static final double PROB_CLASS_METHOD = 0.25;
+  public static final int MAX_METHOD_DEPTH = 5;
+  public static final int MAX_NO_OF_ARGS = 5;
 
-    private static int methodDepth = 0;
+  private static int methodDepth = 0;
 
-    public Method generateMethod(List<Type> returnTypes, SymbolTable symbolTable) {
-        if (methodDepth > MAX_METHOD_DEPTH) {
-            return null;
-        }
-
-        List<Method> methodWithSameType = symbolTable.getMethodWithTypes(returnTypes);
-
-        double probReuseMethod = GeneratorConfig.getRandom().nextDouble();
-
-        if (!methodWithSameType.isEmpty() && probReuseMethod < PROB_REUSE_METHOD) {
-            int i = GeneratorConfig.getRandom().nextInt(methodWithSameType.size());
-            return methodWithSameType.get(i);
-        }
-
-        double probClassMethod = GeneratorConfig.getRandom().nextDouble();
-        if (probClassMethod < PROB_CLASS_METHOD) {
-            return generateClassMethod(returnTypes, symbolTable);
-        }
-
-        return generateBaseMethod(returnTypes, symbolTable);
+  public Method generateMethod(List<Type> returnTypes, SymbolTable symbolTable) {
+    if (methodDepth > MAX_METHOD_DEPTH) {
+      return null;
     }
 
-    private Method generateBaseMethod(List<Type> returnTypes, SymbolTable symbolTable) {
-        String methodName = VariableNameGenerator.generateMethodName();
-        Method m = new Method(returnTypes, methodName);
+    List<Method> methodWithSameType = symbolTable.getMethodWithTypes(returnTypes);
 
-        List<Type> args = generateArgTypes(symbolTable);
-        for (Type t : args) {
-            Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
-            m.addArgument(var);
-        }
+    double probReuseMethod = GeneratorConfig.getRandom().nextDouble();
 
-        methodDepth++;
-        RandomStatementGenerator statementGenerator = new RandomStatementGenerator();
-        Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
-        methodDepth--;
-        m.setBody(statement);
-
-        symbolTable.addMethod(m);
-
-        return m;
+    if (!methodWithSameType.isEmpty() && probReuseMethod < PROB_REUSE_METHOD) {
+      int i = GeneratorConfig.getRandom().nextInt(methodWithSameType.size());
+      return methodWithSameType.get(i);
     }
 
-    private List<Type> generateArgTypes(SymbolTable symbolTable) {
-        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-        int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
-        List<Type> args = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
-        return args;
+    double probClassMethod = GeneratorConfig.getRandom().nextDouble();
+    if (probClassMethod < PROB_CLASS_METHOD) {
+      return generateClassMethod(returnTypes, symbolTable);
     }
 
-    private Method generateClassMethod(List<Type> returnTypes, SymbolTable symbolTable) {
-        RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+    return generateBaseMethod(returnTypes, symbolTable);
+  }
 
-        DClass dClass = typeGenerator.generateClass().concrete(symbolTable).asDClass();
+  private Method generateBaseMethod(List<Type> returnTypes, SymbolTable symbolTable) {
+    String methodName = VariableNameGenerator.generateMethodName();
+    Method m = new Method(returnTypes, methodName);
 
-        String methodName = VariableNameGenerator.generateMethodName();
-        ClassMethod m = new ClassMethod(returnTypes, methodName, dClass);
-
-        List<Type> args = generateArgTypes(symbolTable);
-        for (Type t : args) {
-            Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
-            m.addArgument(var);
-        }
-
-        methodDepth++;
-        RandomStatementGenerator statementGenerator = new RandomStatementGenerator();
-        Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
-        methodDepth--;
-        m.setBody(statement);
-
-        symbolTable.addClassMethod(m);
-        dClass.addMethod(m);
-
-        return m;
+    List<Type> args = generateArgTypes(symbolTable);
+    for (Type t : args) {
+      Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
+      m.addArgument(var);
     }
 
+    methodDepth++;
+    RandomStatementGenerator statementGenerator = new RandomStatementGenerator();
+    Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
+    methodDepth--;
+    m.setBody(statement);
 
-    public void enableMethods() {
-        methodDepth -= MAX_METHOD_DEPTH;
+    symbolTable.addMethod(m);
+
+    return m;
+  }
+
+  private List<Type> generateArgTypes(SymbolTable symbolTable) {
+    RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+    int noOfArgs = GeneratorConfig.getRandom().nextInt(MAX_NO_OF_ARGS);
+    List<Type> args = typeGenerator.generateMethodTypes(noOfArgs, symbolTable);
+    return args;
+  }
+
+  private Method generateClassMethod(List<Type> returnTypes, SymbolTable symbolTable) {
+    RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+
+    DClass dClass = typeGenerator.generateClass().concrete(symbolTable).asDClass();
+
+    String methodName = VariableNameGenerator.generateMethodName();
+    ClassMethod m = new ClassMethod(returnTypes, methodName, dClass);
+
+    List<Type> args = generateArgTypes(symbolTable);
+    for (Type t : args) {
+      Variable var = new Variable(VariableNameGenerator.generateArgumentName(m), t);
+      m.addArgument(var);
     }
 
-    public void disableMethods() {
-        methodDepth += MAX_METHOD_DEPTH;
-    }
+    methodDepth++;
+    RandomStatementGenerator statementGenerator = new RandomStatementGenerator();
+    Statement statement = statementGenerator.generateBody(m, m.getSymbolTable());
+    methodDepth--;
+    m.setBody(statement);
+
+    symbolTable.addClassMethod(m);
+    dClass.addMethod(m);
+
+    return m;
+  }
+
+
+  public void enableMethods() {
+    methodDepth -= MAX_METHOD_DEPTH;
+  }
+
+  public void disableMethods() {
+    methodDepth += MAX_METHOD_DEPTH;
+  }
 }

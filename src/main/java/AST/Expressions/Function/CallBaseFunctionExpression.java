@@ -14,46 +14,46 @@ import java.util.stream.Collectors;
 
 public class CallBaseFunctionExpression extends CallFunctionExpression {
 
-    public CallBaseFunctionExpression(SymbolTable symbolTable, Function function,
-        List<Expression> args) {
-        super(symbolTable, function, args);
+  public CallBaseFunctionExpression(SymbolTable symbolTable, Function function,
+    List<Expression> args) {
+    super(symbolTable, function, args);
 
-        args.forEach(e -> {
-            Type type = e.getTypes().get(0);
-            String var = VariableNameGenerator.generateVariableValueName(type, symbolTable);
-            Variable variable = new Variable(var, type);
-            variables.add(variable);
+    args.forEach(e -> {
+      Type type = e.getTypes().get(0);
+      String var = VariableNameGenerator.generateVariableValueName(type, symbolTable);
+      Variable variable = new Variable(var, type);
+      variables.add(variable);
 
-            AssignmentStatement stat = new AssignmentStatement(symbolTable, List.of(variable), e);
-            assignments.add(stat);
-        });
-        assignments.forEach(s -> expanded.add(s.expand()));
-    }
+      AssignmentStatement stat = new AssignmentStatement(symbolTable, List.of(variable), e);
+      assignments.add(stat);
+    });
+    assignments.forEach(s -> expanded.add(s.expand()));
+  }
 
 
-    @Override
-    public String toString() {
-        return String.format("%s(%s)", function.getName(), variables.stream()
-            .map(Variable::getName)
-            .collect(Collectors.joining(", ")));
-    }
+  @Override
+  public String toString() {
+    return String.format("%s(%s)", function.getName(), variables.stream()
+      .map(Variable::getName)
+      .collect(Collectors.joining(", ")));
+  }
 
-    @Override
-    protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
-        boolean unused) {
-        List<Object> r = new ArrayList<>();
+  @Override
+  protected List<Object> getValue(Map<Variable, Variable> paramsMap, StringBuilder s,
+    boolean unused) {
+    List<Object> r = new ArrayList<>();
 
-        List<Object> l = new ArrayList<>();
-        for (Variable arg : variables) {
-            List<Object> value = arg.getValue(paramsMap);
-            for (Object v : value) {
-                if (v == null) {
-                    r.add(null);
-                    return r;
-                }
-                l.add(v);
-            }
+    List<Object> l = new ArrayList<>();
+    for (Variable arg : variables) {
+      List<Object> value = arg.getValue(paramsMap);
+      for (Object v : value) {
+        if (v == null) {
+          r.add(null);
+          return r;
         }
-        return function.execute(variables, s);
+        l.add(v);
+      }
     }
+    return function.execute(variables, s);
+  }
 }

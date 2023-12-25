@@ -14,192 +14,185 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BlockStatement extends BaseStatement {
 
-    private final SymbolTable symbolTable;
-    private final List<Statement> body;
+  private final SymbolTable symbolTable;
+  private final List<Statement> body;
 
-    private List<List<Statement>> expanded;
+  private final List<List<Statement>> expanded;
 
-    public BlockStatement(SymbolTable symbolTable) {
-        super();
-        this.symbolTable = new SymbolTable(symbolTable);
-        this.body = new ArrayList<>();
-        this.expanded = new ArrayList<>();
+  public BlockStatement(SymbolTable symbolTable) {
+    super();
+    this.symbolTable = new SymbolTable(symbolTable);
+    this.body = new ArrayList<>();
+    this.expanded = new ArrayList<>();
+  }
+
+  public SymbolTable getSymbolTable() {
+    return symbolTable;
+  }
+
+  public void addStatementFirst(Statement statement) {
+    body.add(0, statement);
+    expanded.add(0, statement.expand());
+  }
+
+  public void addStatement(Statement statement) {
+    body.add(statement);
+    expanded.add(statement.expand());
+  }
+
+  public void addStatement(List<Statement> statement) {
+    for (Statement s : statement) {
+      addStatement(s);
     }
+  }
 
-    public SymbolTable getSymbolTable() {
-        return symbolTable;
-    }
+  @Override
+  public boolean isReturn() {
+    return body.stream().anyMatch(Statement::isReturn);
+  }
 
-    public void addStatementFirst(Statement statement) {
-        body.add(0, statement);
-        expanded.add(0, statement.expand());
-    }
+  @Override
+  public boolean minimizedReturn() {
+    return body.stream().anyMatch(Statement::minimizedReturn);
+  }
 
-    public void addStatement(Statement statement) {
-        body.add(statement);
-        expanded.add(statement.expand());
-    }
-
-    public void addStatement(List<Statement> statement) {
-        for (Statement s : statement) {
-            addStatement(s);
+  @Override
+  protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s,
+    boolean unused) {
+    for (int i = 0, bodySize = body.size(); i < bodySize; i++) {
+      Statement statement = body.get(i);
+      List<Statement> ss = statement.expand();
+      for (Statement stat : ss) {
+        ReturnStatus retValues = stat.execute(paramMap, s);
+        if (retValues != ReturnStatus.UNKNOWN) {
+          return retValues;
         }
+      }
     }
+    return ReturnStatus.UNKNOWN;
+  }
 
-    @Override
-    public boolean isReturn() {
-        return body.stream().anyMatch(Statement::isReturn);
+  @Override
+  public Set<Variable> getModifies() {
+    return body.stream()
+      .map(Statement::expand)
+      .flatMap(Collection::stream)
+      .map(Statement::getModifies)
+      .flatMap(Collection::stream)
+      .collect(Collectors.toSet());
+  }
+
+  @Override
+  public List<Statement> expand() {
+    for (int i = 0, bodySize = body.size(); i < bodySize; i++) {
+      Statement statement = body.get(i);
+      expanded.set(i, statement.expand());
     }
+    return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
+  }
 
-    @Override
-    public boolean minimizedReturn() {
-        return body.stream().anyMatch(Statement::minimizedReturn);
+  @Override
+  public String toString() {
+    List<String> code = new ArrayList<>();
+    for (Statement b : body) {
+      for (Statement s : b.expand()) {
+        String val = s.toString();
+        code.add(val);
+      }
     }
+    return StringUtils.intersperse("\n", code);
+  }
 
-    @Override
-    protected ReturnStatus execute(Map<Variable, Variable> paramMap, StringBuilder s, boolean unused) {
-        for (int i = 0, bodySize = body.size(); i < bodySize; i++) {
-            Statement statement = body.get(i);
-            List<Statement> ss = statement.expand();
-            for (Statement stat : ss) {
-                ReturnStatus retValues = stat.execute(paramMap, s);
-                if (retValues != ReturnStatus.UNKNOWN) {
-                    return retValues;
-                }
+  @Override
+  public String minimizedTestCase() {
+    List<String> code = new ArrayList<>();
+    boolean goToNext = true;
+    for (int i = 0; goToNext && i < body.size(); i++) {
+      Statement b = body.get(i);
+      if (b.getNoOfUses() > 0) {
+        List<Statement> expand = b.expand();
+        for (int j = 0; j < expand.size(); j++) {
+          Statement s = expand.get(j);
+          String val = s.minimizedTestCase();
+          if (!val.isEmpty()) {
+            code.add(val);
+          }
+
+          if (s.minimizedReturn()) {
+            goToNext = false;
+            break;
+          }
+        }
+      }
+    }
+    return StringUtils.intersperse("\n", code);
+  }
+
+
+  @Override
+  public Map<String, String> invalidValidationTests() {
+    Map<String, String> code = new HashMap<>();
+    boolean goToNext = true;
+    for (int i = 0; goToNext && i < body.size(); i++) {
+      Statement b = body.get(i);
+      if (b.getNoOfUses() > 0) {
+        List<Statement> expand = b.expand();
+        for (int j = 0; j < expand.size(); j++) {
+          Statement s = expand.get(j);
+
+          Map<String, String> val = s.invalidValidationTests();
+          code.putAll(val);
+
+          if (s.minimizedReturn()) {
+            goToNext = false;
+            break;
+          }
+        }
+      }
+    }
+    return code;
+  }
+
+  @Override
+  public List<String> toOutput() {
+    Set<String> res = new HashSet<>();
+    List<String> temp = new ArrayList<>();
+
+    res.add("");
+
+    boolean first = true;
+    for (Statement b : body) {
+      List<Statement> expand = b.expand();
+      for (Statement stat : expand) {
+        List<String> statOptions = stat.toOutput();
+        temp = new ArrayList<>();
+        for (String f : res) {
+          for (String statOption : statOptions) {
+            if (!first) {
+              statOption = "\n" + statOption;
             }
+            String curr = f + statOption;
+            temp.add(curr);
+          }
+
         }
-        return ReturnStatus.UNKNOWN;
-    }
-
-    @Override
-    public Set<Variable> getModifies() {
-        return body.stream()
-            .map(Statement::expand)
-            .flatMap(Collection::stream)
-            .map(Statement::getModifies)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toSet());
-    }
-
-    @Override
-    public boolean requireUpdate() {
-        return body.stream().anyMatch(Statement::requireUpdate);
-    }
-
-    @Override
-    public List<Statement> expand() {
-        for (int i = 0, bodySize = body.size(); i < bodySize; i++) {
-            Statement statement = body.get(i);
-            if (statement.requireUpdate()) {
-                expanded.set(i, statement.expand());
-            }
+        if (statOptions.isEmpty()) {
+          temp.addAll(res);
         }
-        return expanded.stream().flatMap(Collection::stream).collect(Collectors.toList());
-    }
-
-    @Override
-    public String toString() {
-        List<String> code = new ArrayList<>();
-        for (Statement b : body) {
-            for (Statement s : b.expand()) {
-                String val = s.toString();
-                code.add(val);
-            }
-        }
-        return StringUtils.intersperse("\n", code);
-    }
-
-    @Override
-    public String minimizedTestCase() {
-        List<String> code = new ArrayList<>();
-        boolean goToNext = true;
-        for (int i = 0; goToNext && i < body.size(); i++) {
-            Statement b = body.get(i);
-            if (b.getNoOfUses() > 0) {
-                List<Statement> expand = b.expand();
-                for (int j = 0; j < expand.size(); j++) {
-                    Statement s = expand.get(j);
-                    String val = s.minimizedTestCase();
-                    if (!val.isEmpty()) {
-                        code.add(val);
-                    }
-
-                    if (s.minimizedReturn()) {
-                        goToNext = false;
-                        break;
-                    }
-                }
-            }
-        }
-        return StringUtils.intersperse("\n", code);
-    }
-
-
-    @Override
-    public Map<String, String> invalidValidationTests() {
-        Map<String, String> code = new HashMap<>();
-        boolean goToNext = true;
-        for (int i = 0; goToNext && i < body.size(); i++) {
-            Statement b = body.get(i);
-            if (b.getNoOfUses() > 0) {
-                List<Statement> expand = b.expand();
-                for (int j = 0; j < expand.size(); j++) {
-                    Statement s = expand.get(j);
-
-                    Map<String, String> val = s.invalidValidationTests();
-                    code.putAll(val);
-
-                    if (s.minimizedReturn()) {
-                        goToNext = false;
-                        break;
-                    }
-                }
-            }
-        }
-        return code;
-    }
-
-    @Override
-    public List<String> toOutput() {
-        Set<String> res = new HashSet<>();
-        List<String> temp = new ArrayList<>();
-
-        res.add("");
-
-        boolean first = true;
-        for (Statement b : body) {
-            List<Statement> expand = b.expand();
-            for (Statement stat : expand) {
-                List<String> statOptions = stat.toOutput();
-                temp = new ArrayList<>();
-                for (String f : res) {
-                    for (String statOption : statOptions) {
-                        if (!first) {
-                            statOption = "\n" + statOption;
-                        }
-                        String curr = f + statOption;
-                        temp.add(curr);
-                    }
-
-                }
-                if (statOptions.isEmpty()) {
-                    temp.addAll(res);
-                }
-                first = false;
-                res = new HashSet<>(temp);
-
-                List<String> r = new ArrayList<>(res);
-                Collections.shuffle(r, GeneratorConfig.getRandom());
-                res = new HashSet<>(r.subList(0, Math.min(5, r.size())));
-            }
-        }
+        first = false;
+        res = new HashSet<>(temp);
 
         List<String> r = new ArrayList<>(res);
         Collections.shuffle(r, GeneratorConfig.getRandom());
-        return r.subList(0, Math.min(5, res.size()));
+        res = new HashSet<>(r.subList(0, Math.min(5, r.size())));
+      }
     }
+
+    List<String> r = new ArrayList<>(res);
+    Collections.shuffle(r, GeneratorConfig.getRandom());
+    return r.subList(0, Math.min(5, res.size()));
+  }
 }

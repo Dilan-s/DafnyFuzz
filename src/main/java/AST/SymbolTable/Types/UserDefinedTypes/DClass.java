@@ -31,8 +31,8 @@ public class DClass implements UserDefinedType {
   private List<Type> typeList;
   private List<String> fieldNames;
   private List<Boolean> isConst;
-  private List<Method> methods;
-  private List<Function> functions;
+  private final List<Method> methods;
+  private final List<Function> functions;
 
   public DClass() {
     this(null, null, null, null);
@@ -75,6 +75,9 @@ public class DClass implements UserDefinedType {
       isConst.addAll(IntStream.range(0, noConstTypes)
         .mapToObj(x -> true)
         .collect(Collectors.toList()));
+    }
+    if (!RandomTypeGenerator.DEFINED_DCLASS.contains(this)) {
+      RandomTypeGenerator.DEFINED_DCLASS.add(this);
     }
     return this;
   }

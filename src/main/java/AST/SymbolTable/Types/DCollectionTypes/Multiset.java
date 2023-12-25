@@ -1,10 +1,10 @@
 package AST.SymbolTable.Types.DCollectionTypes;
 
+import AST.Expressions.Expression;
+import AST.Expressions.MultisetLiteral;
 import AST.Generator.GeneratorConfig;
 import AST.Generator.RandomExpressionGenerator;
 import AST.Generator.RandomTypeGenerator;
-import AST.Expressions.Expression;
-import AST.Expressions.MultisetLiteral;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.math.BigInteger;
@@ -13,353 +13,356 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class Multiset implements DCollection {
 
-    public static final int MAX_SIZE_OF_MULTISET = 5;
-    public static int MIN_SIZE_OF_MULTISET = 0;
-    public static final double PROB_USE_DSET = 0.3;
-    public static final double PROB_USE_SEQ = PROB_USE_DSET + 0.3;
-    private Type type;
+  public static final int MAX_SIZE_OF_MULTISET = 5;
+  public static final double PROB_USE_DSET = 0.3;
+  public static final double PROB_USE_SEQ = PROB_USE_DSET + 0.3;
+  public static int MIN_SIZE_OF_MULTISET = 0;
+  private final Type type;
 
-    public Multiset(Type type) {
-        this.type = type;
+  public Multiset(Type type) {
+    this.type = type;
+  }
+
+  public Multiset() {
+    this(null);
+  }
+
+  @Override
+  public boolean validMethodType() {
+    return false;
+  }
+
+  @Override
+  public String getName() {
+    return "multiset";
+  }
+
+  @Override
+  public Type setInnerType(Type type) {
+    return new Multiset(type);
+  }
+
+  @Override
+  public Type getInnerType() {
+    return type;
+  }
+
+  @Override
+  public int hashCode() {
+    return getName().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Type)) {
+      return false;
+    }
+    Type other = (Type) obj;
+    if (!(other instanceof Multiset)) {
+      return false;
     }
 
-    public Multiset() {
-        this(null);
+    Multiset dsetOther = other.asMultiset();
+
+    if (type == null || dsetOther.type == null) {
+      return true;
     }
 
-    @Override
-    public boolean validMethodType() {
+    return dsetOther.type.equals(type);
+  }
+
+  @Override
+  public Expression generateLiteral(SymbolTable symbolTable) {
+
+    RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
+    double probType = GeneratorConfig.getRandom().nextDouble();
+
+    if (!type.equals(new DArray()) && probType < PROB_USE_DSET) {
+      DSet t = new DSet(this.type.concrete(symbolTable));
+      Expression exp = expressionGenerator.generateExpression(t, symbolTable);
+
+      MultisetLiteral expression = new MultisetLiteral(symbolTable, this, exp);
+      return expression;
+    }
+    if (type.equals(new DArray()) && probType < PROB_USE_SEQ) {
+      Seq t = new Seq(this.type.concrete(symbolTable));
+      Expression exp = expressionGenerator.generateExpression(t, symbolTable);
+
+      MultisetLiteral expression = new MultisetLiteral(symbolTable, this, exp);
+      return expression;
+    }
+
+    int noOfElems =
+      MIN_SIZE_OF_MULTISET + GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
+    if (type.equals(new DArray())) {
+      while (noOfElems == 1) {
+        noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
+      }
+    }
+    List<Expression> values = new ArrayList<>();
+    for (int i = 0; i < noOfElems; i++) {
+      Type t = type.concrete(symbolTable);
+
+      Expression exp = expressionGenerator.generateExpression(t, symbolTable);
+      values.add(exp);
+    }
+    MultisetLiteral expression = new MultisetLiteral(symbolTable, this, values);
+    return expression;
+  }
+
+
+  @Override
+  public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
+    Map<Object, BigInteger> vs = (Map<Object, BigInteger>) value;
+    List<Expression> values = new ArrayList<>();
+    for (Map.Entry<Object, BigInteger> v : vs.entrySet()) {
+      for (BigInteger i = BigInteger.ZERO; i.compareTo(v.getValue()) < 0;
+        i = i.add(BigInteger.ONE)) {
+        Expression exp = type.generateExpressionFromValue(symbolTable, v.getKey());
+        if (exp == null) {
+          return null;
+        }
+        values.add(exp);
+      }
+    }
+    return new MultisetLiteral(symbolTable, this, values);
+  }
+
+
+  @Override
+  public String getVariableType() {
+    if (type == null) {
+      return "multiset";
+    }
+    return String.format("multiset<%s>", type.getVariableType());
+  }
+
+  @Override
+  public Type concrete(SymbolTable symbolTable) {
+    if (type == null) {
+      RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
+      Type t = typeGenerator.generateEqualTypes(1, symbolTable).get(0);
+      return new Multiset(t);
+    }
+    return new Multiset(type.concrete(symbolTable));
+  }
+
+  @Override
+  public boolean isPrintable() {
+    return false;
+  }
+
+  @Override
+  public String formatPrint(Object object) {
+    String res;
+    Map<Object, BigInteger> value = (Map<Object, BigInteger>) object;
+    res = "multiset([";
+
+    boolean first = true;
+    for (Map.Entry<Object, BigInteger> entry : value.entrySet()) {
+
+      for (BigInteger i = BigInteger.ZERO; i.compareTo(entry.getValue()) < 0;
+        i = i.add(BigInteger.ONE)) {
+        if (!first) {
+          res = res + ", ";
+        }
+        first = false;
+        res = res + type.formatPrint(entry.getKey());
+      }
+    }
+
+    res = res + "])";
+    return res;
+  }
+
+  @Override
+  public boolean operatorExists() {
+    return true;
+  }
+
+  @Override
+  public Boolean contains(Object lhsV, Object rhsV) {
+    Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
+    return rhsVM.containsKey(lhsV);
+  }
+
+  @Override
+  public Boolean disjoint(Object lhsV, Object rhsV) {
+    Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+    Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
+
+    for (Object k : lhsVM.keySet()) {
+      if (rhsVM.containsKey(k)) {
         return false;
+      }
     }
+    return true;
+  }
 
-    @Override
-    public String getName() {
-        return "multiset";
+  @Override
+  public Object intersection(Object lhsV, Object rhsV) {
+    Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+    Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
+
+    Map<Object, BigInteger> res = new HashMap<>();
+    for (Object k : lhsVM.keySet()) {
+      if (rhsVM.containsKey(k)) {
+        res.put(k, lhsVM.get(k).min(rhsVM.get(k)));
+      }
     }
+    return res;
+  }
 
-    @Override
-    public Type setInnerType(Type type) {
-        return new Multiset(type);
+  @Override
+  public Object difference(Object lhsV, Object rhsV) {
+    Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+    Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
+
+    Map<Object, BigInteger> res = new HashMap<>();
+    for (Object k : lhsVM.keySet()) {
+      BigInteger freq = lhsVM.get(k).subtract(rhsVM.getOrDefault(k, BigInteger.ZERO));
+      if (freq.compareTo(BigInteger.ZERO) > 0) {
+        res.put(k, freq);
+      }
     }
+    return res;
+  }
 
-    @Override
-    public Type getInnerType() {
-        return type;
+  @Override
+  public Object union(Object lhsV, Object rhsV) {
+    Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+    Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
+
+    Map<Object, BigInteger> res = new HashMap<>();
+    for (Object k : lhsVM.keySet()) {
+      res.put(k, lhsVM.get(k));
     }
-
-    @Override
-    public int hashCode() {
-        return getName().hashCode();
+    for (Object k : rhsVM.keySet()) {
+      res.put(k, rhsVM.get(k).add(res.getOrDefault(k, BigInteger.ZERO)));
     }
+    return res;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Type)) {
-            return false;
-        }
-        Type other = (Type) obj;
-        if (!(other instanceof Multiset)) {
-            return false;
-        }
+  @Override
+  public Boolean lessThan(Object lhsV, Object rhsV) {
+    Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+    Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
 
-        Multiset dsetOther = other.asMultiset();
-
-        if (type == null || dsetOther.type == null) {
-            return true;
-        }
-
-        return dsetOther.type.equals(type);
-    }
-
-    @Override
-    public Expression generateLiteral(SymbolTable symbolTable) {
-
-        RandomExpressionGenerator expressionGenerator = new RandomExpressionGenerator();
-        double probType = GeneratorConfig.getRandom().nextDouble();
-
-        if (!type.equals(new DArray()) && probType < PROB_USE_DSET) {
-            DSet t = new DSet(this.type.concrete(symbolTable));
-            Expression exp = expressionGenerator.generateExpression(t, symbolTable);
-
-            MultisetLiteral expression = new MultisetLiteral(symbolTable, this, exp);
-            return expression;
-        }
-        if (type.equals(new DArray()) && probType < PROB_USE_SEQ) {
-            Seq t = new Seq(this.type.concrete(symbolTable));
-            Expression exp = expressionGenerator.generateExpression(t, symbolTable);
-
-            MultisetLiteral expression = new MultisetLiteral(symbolTable, this, exp);
-            return expression;
-        }
-
-        int noOfElems = MIN_SIZE_OF_MULTISET + GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
-        if (type.equals(new DArray())) {
-            while (noOfElems == 1) {
-                noOfElems = GeneratorConfig.getRandom().nextInt(MAX_SIZE_OF_MULTISET);
-            }
-        }
-        List<Expression> values = new ArrayList<>();
-        for (int i = 0; i < noOfElems; i++) {
-            Type t = type.concrete(symbolTable);
-
-            Expression exp = expressionGenerator.generateExpression(t, symbolTable);
-            values.add(exp);
-        }
-        MultisetLiteral expression = new MultisetLiteral(symbolTable, this, values);
-        return expression;
-    }
-
-
-    @Override
-    public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
-        Map<Object, BigInteger> vs = (Map<Object, BigInteger>) value;
-        List<Expression> values = new ArrayList<>();
-        for (Map.Entry<Object, BigInteger> v : vs.entrySet()) {
-            for (BigInteger i = BigInteger.ZERO; i.compareTo(v.getValue()) < 0; i = i.add(BigInteger.ONE)) {
-                Expression exp = type.generateExpressionFromValue(symbolTable, v.getKey());
-                if (exp == null) {
-                    return null;
-                }
-                values.add(exp);
-            }
-        }
-        return new MultisetLiteral(symbolTable, this, values);
-    }
-
-
-    @Override
-    public String getVariableType() {
-        if (type == null) {
-            return "multiset";
-        }
-        return String.format("multiset<%s>", type.getVariableType());
-    }
-
-    @Override
-    public Type concrete(SymbolTable symbolTable) {
-        if (type == null) {
-            RandomTypeGenerator typeGenerator = new RandomTypeGenerator();
-            Type t = typeGenerator.generateEqualTypes(1, symbolTable).get(0);
-            return new Multiset(t);
-        }
-        return new Multiset(type.concrete(symbolTable));
-    }
-
-    @Override
-    public boolean isPrintable() {
+    boolean atLeastOneSmaller = false;
+    for (Object k : lhsVM.keySet()) {
+      if (!rhsVM.containsKey(k)) {
         return false;
+      }
+      if (lhsVM.get(k).compareTo(rhsVM.get(k)) > 0) {
+        return false;
+      }
+      if (lhsVM.get(k).compareTo(rhsVM.get(k)) < 0) {
+        atLeastOneSmaller = true;
+      }
+    }
+    return atLeastOneSmaller || rhsVM.keySet().size() > lhsVM.keySet().size();
+  }
+
+  @Override
+  public Boolean lessThanOrEqual(Object lhsV, Object rhsV) {
+    Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+    Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
+
+    for (Object k : lhsVM.keySet()) {
+      if (!rhsVM.containsKey(k)) {
+        return false;
+      }
+      if (lhsVM.get(k).compareTo(rhsVM.get(k)) > 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public Boolean equal(Object lhsV, Object rhsV) {
+    Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
+    Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
+
+    Set<Object> lhsKeys = lhsVM.keySet();
+    Set<Object> rhsKeys = rhsVM.keySet();
+
+    if (lhsKeys.size() != rhsKeys.size()) {
+      return false;
     }
 
-    @Override
-    public String formatPrint(Object object) {
-        String res;
-        Map<Object, BigInteger> value = (Map<Object, BigInteger>) object;
-        res = "multiset([";
-
-        boolean first = true;
-        for (Map.Entry<Object, BigInteger> entry : value.entrySet()) {
-
-            for (BigInteger i = BigInteger.ZERO; i.compareTo(entry.getValue()) < 0; i = i.add(BigInteger.ONE)) {
-                if (!first) {
-                    res = res + ", ";
-                }
-                first = false;
-                res = res + type.formatPrint(entry.getKey());
-            }
-        }
-
-        res = res + "])";
-        return res;
-    }
-
-    @Override
-    public boolean operatorExists() {
-        return true;
-    }
-
-    @Override
-    public Boolean contains(Object lhsV, Object rhsV) {
-        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
-        return rhsVM.containsKey(lhsV);
-    }
-
-    @Override
-    public Boolean disjoint(Object lhsV, Object rhsV) {
-        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
-        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
-
-        for (Object k : lhsVM.keySet()) {
-            if (rhsVM.containsKey(k)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public Object intersection(Object lhsV, Object rhsV) {
-        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
-        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
-
-        Map<Object, BigInteger> res = new HashMap<>();
-        for (Object k : lhsVM.keySet()) {
-            if (rhsVM.containsKey(k)) {
-                res.put(k, lhsVM.get(k).min(rhsVM.get(k)));
-            }
-        }
-        return res;
-    }
-
-    @Override
-    public Object difference(Object lhsV, Object rhsV) {
-        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
-        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
-
-        Map<Object, BigInteger> res = new HashMap<>();
-        for (Object k : lhsVM.keySet()) {
-            BigInteger freq = lhsVM.get(k).subtract(rhsVM.getOrDefault(k, BigInteger.ZERO));
-            if (freq.compareTo(BigInteger.ZERO) > 0) {
-                res.put(k, freq);
-            }
-        }
-        return res;
-    }
-
-    @Override
-    public Object union(Object lhsV, Object rhsV) {
-        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
-        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
-
-        Map<Object, BigInteger> res = new HashMap<>();
-        for (Object k : lhsVM.keySet()) {
-            res.put(k, lhsVM.get(k));
-        }
-        for (Object k : rhsVM.keySet()) {
-            res.put(k, rhsVM.get(k).add(res.getOrDefault(k, BigInteger.ZERO)));
-        }
-        return res;
-    }
-
-    @Override
-    public Boolean lessThan(Object lhsV, Object rhsV) {
-        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
-        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
-
-        boolean atLeastOneSmaller = false;
-        for (Object k : lhsVM.keySet()) {
-            if (!rhsVM.containsKey(k)) {
-                return false;
-            }
-            if (lhsVM.get(k).compareTo(rhsVM.get(k)) > 0) {
-                return false;
-            }
-            if (lhsVM.get(k).compareTo(rhsVM.get(k)) < 0) {
-                atLeastOneSmaller = true;
-            }
-        }
-        return atLeastOneSmaller || rhsVM.keySet().size() > lhsVM.keySet().size();
-    }
-
-    @Override
-    public Boolean lessThanOrEqual(Object lhsV, Object rhsV) {
-        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
-        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
-
-        for (Object k : lhsVM.keySet()) {
-            if (!rhsVM.containsKey(k)) {
-                return false;
-            }
-            if (lhsVM.get(k).compareTo(rhsVM.get(k)) > 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public Boolean equal(Object lhsV, Object rhsV) {
-        Map<Object, BigInteger> lhsVM = (Map<Object, BigInteger>) lhsV;
-        Map<Object, BigInteger> rhsVM = (Map<Object, BigInteger>) rhsV;
-
-        Set<Object> lhsKeys = lhsVM.keySet();
-        Set<Object> rhsKeys = rhsVM.keySet();
-
-        if (lhsKeys.size() != rhsKeys.size()) {
+    for (Object lhsK : lhsKeys) {
+      boolean inBoth = false;
+      for (Iterator<Object> iterator = rhsKeys.iterator(); !inBoth && iterator.hasNext(); ) {
+        Object rhsK = iterator.next();
+        if (type.equal(lhsK, rhsK)) {
+          inBoth = true;
+          if (!lhsVM.get(lhsK).equals(rhsVM.get(rhsK))) {
             return false;
+          }
         }
-
-        for (Object lhsK : lhsKeys) {
-            boolean inBoth = false;
-            for (Iterator<Object> iterator = rhsKeys.iterator(); !inBoth && iterator.hasNext(); ) {
-                Object rhsK = iterator.next();
-                if (type.equal(lhsK, rhsK)) {
-                    inBoth = true;
-                    if (!lhsVM.get(lhsK).equals(rhsVM.get(rhsK))) {
-                        return false;
-                    }
-                }
-            }
-            if (!inBoth) {
-                return false;
-            }
-        }
-        return true;
+      }
+      if (!inBoth) {
+        return false;
+      }
+    }
+    return true;
 
 
+  }
+
+  @Override
+  public BigInteger cardinality(Object value) {
+    Map<Object, BigInteger> valM = (Map<Object, BigInteger>) value;
+    return valM.values().stream()
+      .reduce(BigInteger.ZERO, BigInteger::add);
+  }
+
+  @Override
+  public String formatEnsures(String variableName, Object object) {
+    if (type == null) {
+      return null;
     }
 
-    @Override
-    public BigInteger cardinality(Object value) {
-        Map<Object, BigInteger> valM = (Map<Object, BigInteger>) value;
-        return valM.values().stream()
-            .reduce(BigInteger.ZERO, BigInteger::add);
-    }
+    String res;
+    Map<Object, BigInteger> value = (Map<Object, BigInteger>) object;
+    res = "multiset([";
 
-    @Override
-    public String formatEnsures(String variableName, Object object) {
-        if (type == null) {
-            return null;
+    boolean first = true;
+    for (Map.Entry<Object, BigInteger> entry : value.entrySet()) {
+
+      for (BigInteger i = BigInteger.ZERO; i.compareTo(entry.getValue()) < 0;
+        i = i.add(BigInteger.ONE)) {
+        if (!first) {
+          res = res + ", ";
         }
-
-        String res;
-        Map<Object, BigInteger> value = (Map<Object, BigInteger>) object;
-        res = "multiset([";
-
-        boolean first = true;
-        for (Map.Entry<Object, BigInteger> entry : value.entrySet()) {
-
-            for (BigInteger i = BigInteger.ZERO; i.compareTo(entry.getValue()) < 0; i = i.add(BigInteger.ONE)) {
-                if (!first) {
-                    res = res + ", ";
-                }
-                first = false;
-                res = res + type.formatEnsures(entry.getKey());
-            }
-        }
-
-        res = res + "])";
-        return variableName + " == " + res;
+        first = false;
+        res = res + type.formatEnsures(entry.getKey());
+      }
     }
 
-    @Override
-    public Object of(Object value) {
-        Map<Object, BigInteger> r = new HashMap<>();
+    res = res + "])";
+    return variableName + " == " + res;
+  }
 
-        Map<Object, BigInteger> multi = (Map<Object, BigInteger>) value;
-        for (Map.Entry<Object, BigInteger> entry : multi.entrySet()) {
-            r.put(type != null ? type.of(entry.getKey()) : entry.getKey(), entry.getValue());
-        }
+  @Override
+  public Object of(Object value) {
+    Map<Object, BigInteger> r = new HashMap<>();
 
-        return r;
+    Map<Object, BigInteger> multi = (Map<Object, BigInteger>) value;
+    for (Map.Entry<Object, BigInteger> entry : multi.entrySet()) {
+      r.put(type != null ? type.of(entry.getKey()) : entry.getKey(), entry.getValue());
     }
 
-    @Override
-    public boolean validForFunctionBody() {
-        return type.validForFunctionBody();
-    }
+    return r;
+  }
+
+  @Override
+  public boolean validForFunctionBody() {
+    return type.validForFunctionBody();
+  }
 }
