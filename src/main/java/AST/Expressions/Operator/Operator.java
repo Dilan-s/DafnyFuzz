@@ -13,6 +13,7 @@ import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
+import AST.SymbolTable.Types.UserDefinedTypes.TypeAlias;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,10 +45,16 @@ public interface Operator {
     Type datatype = new DataType();
     datatype = datatype.concrete(symbolTable);
     Type map = new DMap().concrete(symbolTable);
+    Type typeAlias = null;
 
     List<Type> ret = new ArrayList<>();
     for (Type type : types) {
-      if (type.isCollection()) {
+      if (type.isTypeAlias()) {
+        if (typeAlias == null) {
+           typeAlias = typeGenerator.generateTypeAlias().concrete(symbolTable);
+        }
+        ret.add(typeAlias);
+      } else if (type.isCollection()) {
         DCollection collection = type.asDCollection();
         ret.add(collection.setInnerType(collectionInnerType.concrete(symbolTable))
           .concrete(symbolTable));

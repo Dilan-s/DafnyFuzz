@@ -7,6 +7,7 @@ import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -56,6 +57,7 @@ public class DafnyProgram {
     String baseTestCase = main.toString();
     try {
       Path path = Paths.get("./tests");
+      Files.createDirectories(path);
       FileWriter p = new FileWriter(String.format("%s/test.dfy", path.toAbsolutePath()));
       p.write(baseTestCase);
       p.close();
@@ -68,6 +70,7 @@ public class DafnyProgram {
     List<String> programOptions = main.toOutput();
     try {
       Path path = Paths.get("./tests");
+      Files.createDirectories(path);
       for (int i = 0; i < programOptions.size(); i++) {
         FileWriter p = new FileWriter(String.format("%s/test%d.dfy", path.toAbsolutePath(), i));
         p.write(programOptions.get(i));
@@ -83,6 +86,7 @@ public class DafnyProgram {
     main.executeWithOutput(s);
     try {
       Path path = Paths.get("./outputs");
+      Files.createDirectories(path);
       FileWriter p = new FileWriter(String.format("%s/expected.txt", path.toAbsolutePath()));
       p.write(s.toString());
       p.close();
@@ -95,6 +99,7 @@ public class DafnyProgram {
     String minimizedTestCase = main.minimizedTestCase();
     try {
       Path path = Paths.get("./tests-minimized");
+      Files.createDirectories(path);
       FileWriter p = new FileWriter(String.format("%s/test-minimized.dfy", path.toAbsolutePath()));
       p.write(minimizedTestCase);
       p.close();
@@ -114,6 +119,7 @@ public class DafnyProgram {
         if (!minimizedTestCase.equals(incorrectTest)) {
           try {
             Path path = Paths.get("./tests-incorrect");
+            Files.createDirectories(path);
             FileWriter p = new FileWriter(
               String.format("%s/test-incorrect-%d.dfy", path.toAbsolutePath(), i));
             p.write(incorrectTest);

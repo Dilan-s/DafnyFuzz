@@ -276,4 +276,9 @@ public class TypeAlias implements Type {
   public boolean validForFunctionBody() {
     return type.validForFunctionBody();
   }
+
+  @Override
+  public boolean isTypeAlias() {
+    return type == null || type.isTypeAlias();
+  }
 }

@@ -33,9 +33,9 @@ public class RandomTypeGenerator {
   public static final List<DClass> DEFINED_DCLASS = new ArrayList<>();
   private static final double PROB_REUSE = 0.75;
 
-  public static double PROB_INT = 40.0;
-  public static double PROB_BOOL = 40.0;
-  public static double PROB_CHAR = 40.0;
+  public static double PROB_INT = 50.0;
+  public static double PROB_BOOL = 50.0;
+  public static double PROB_CHAR = 50.0;
   public static double PROB_DSTRING = 20.0;
   public static double PROB_REAL = 10.0;
   public static double PROB_DMAP = 10.0;
@@ -177,15 +177,7 @@ public class RandomTypeGenerator {
           }
         } else if ((probType -= PROB_TYPE_ALIAS) < 0) {
           PROB_TYPE_ALIAS *= GeneratorConfig.OPTION_DECAY_FACTOR;
-          double prob_reuse = GeneratorConfig.getRandom().nextDouble();
-          if (!DEFINED_TYPE_ALIAS.isEmpty() && prob_reuse < PROB_REUSE) {
-            int ind = GeneratorConfig.getRandom().nextInt(DEFINED_TYPE_ALIAS.size());
-            t = DEFINED_TYPE_ALIAS.get(ind);
-          } else {
-            TypeAlias typeAlias = new TypeAlias();
-            t = typeAlias;
-            DEFINED_TYPE_ALIAS.add(typeAlias);
-          }
+          t = generateTypeAlias();
 
           if (swarm) {
             PROB_TYPE_ALIAS *= GeneratorConfig.SWARM_MULTIPLIER_SMALL;
@@ -211,9 +203,9 @@ public class RandomTypeGenerator {
   }
 
   private void reset() {
-    PROB_INT = 40.0;
-    PROB_BOOL = 40.0;
-    PROB_CHAR = 40.0;
+    PROB_INT = 50.0;
+    PROB_BOOL = 50.0;
+    PROB_CHAR = 50.0;
     PROB_DSTRING = 20.0;
     PROB_REAL = 10.0;
     PROB_DMAP = 10.0;
@@ -369,6 +361,18 @@ public class RandomTypeGenerator {
       DClass dClass = new DClass();
       DEFINED_DCLASS.add(dClass);
       return dClass;
+    }
+  }
+
+  public Type generateTypeAlias() {
+    double prob_reuse = GeneratorConfig.getRandom().nextDouble();
+    if (!DEFINED_TYPE_ALIAS.isEmpty() && prob_reuse < PROB_REUSE) {
+      int ind = GeneratorConfig.getRandom().nextInt(DEFINED_TYPE_ALIAS.size());
+      return DEFINED_TYPE_ALIAS.get(ind);
+    } else {
+      TypeAlias typeAlias = new TypeAlias();
+      DEFINED_TYPE_ALIAS.add(typeAlias);
+      return typeAlias;
     }
   }
 }

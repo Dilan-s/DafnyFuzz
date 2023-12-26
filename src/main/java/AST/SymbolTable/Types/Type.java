@@ -305,4 +305,7 @@ public interface Type extends Identifier {
   }
 
 
+  default boolean isTypeAlias() {
+    return false;
+  }
 }

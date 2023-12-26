@@ -42,7 +42,7 @@ public class RandomExpressionGenerator {
   public static final double PROB_HI_AND_LO_SUBSEQUENCE = 0.7;
   public static final int MAX_EXPRESSION_DEPTH = 3;
   private static final int MAX_MATCH_CASES_VALUES = 2;
-  public static double PROB_LITERAL_EXPRESSION = 30.0;
+  public static double PROB_LITERAL_EXPRESSION = 60.0;
   public static double PROB_OPERATOR_EXPRESSION = 30.0;
   public static double PROB_VARIABLE_EXPRESSION = 60.0;
   public static double PROB_SEQ_INDEX_EXPRESSION = 8.0;

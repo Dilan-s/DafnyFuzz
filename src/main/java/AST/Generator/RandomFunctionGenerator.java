@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class RandomFunctionGenerator {
 
-  public static final double PROB_REUSE_FUNCTION = 0.75;
+  public static final double PROB_REUSE_FUNCTION = 0.8;
   public static final double PROB_CLASS_FUNCTION = 0.25;
   public static final int MAX_FUNCTION_DEPTH = 5;
   public static final int MAX_NO_OF_ARGS = 5;

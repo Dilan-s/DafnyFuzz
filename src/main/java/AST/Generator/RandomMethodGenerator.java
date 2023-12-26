@@ -11,7 +11,7 @@ import java.util.List;
 
 public class RandomMethodGenerator {
 
-  public static final double PROB_REUSE_METHOD = 0.75;
+  public static final double PROB_REUSE_METHOD = 0.8;
   public static final double PROB_CLASS_METHOD = 0.25;
   public static final int MAX_METHOD_DEPTH = 5;
   public static final int MAX_NO_OF_ARGS = 5;
