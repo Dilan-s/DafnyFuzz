@@ -9,7 +9,7 @@ import AST.Generator.RandomFunctionGenerator;
 import AST.Generator.RandomTypeGenerator;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.Type;
 import java.math.BigInteger;
 import java.util.ArrayList;

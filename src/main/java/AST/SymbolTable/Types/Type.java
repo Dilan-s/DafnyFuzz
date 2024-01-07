@@ -11,10 +11,11 @@ import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.GenericType.GenericType;
 import AST.SymbolTable.Types.PrimitiveTypes.BaseType;
+import AST.SymbolTable.Types.PrimitiveTypes.BitVector;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.Types.UserDefinedTypes.ArrowType;
 import AST.SymbolTable.Types.UserDefinedTypes.DClass;
@@ -304,7 +305,7 @@ public interface Type extends Identifier {
     return (ArrowType) this;
   }
 
-
+  default BitVector asBitVector() { return (BitVector) this; }
   default boolean isTypeAlias() {
     return false;
   }

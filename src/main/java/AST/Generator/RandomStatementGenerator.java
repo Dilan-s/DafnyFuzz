@@ -23,7 +23,7 @@ import AST.Statements.util.ReturnStatus;
 import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.PrimitiveTypes.Void;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;

@@ -1,34 +1,41 @@
 package AST.SymbolTable.Types.PrimitiveTypes;
 
+import AST.Expressions.BitVectorLiteral;
 import AST.Expressions.Expression;
-import AST.Expressions.IntLiteral;
 import AST.Generator.GeneratorConfig;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.Type;
 import java.math.BigInteger;
+import java.util.Objects;
 
-public class Int implements BaseType {
+public class BitVector implements BaseType {
 
-  public static final double PROB_NEGATION = 0.1;
-  private static final int MAX_INT = 30;
-  private final int max;
+  private Integer size;
 
-  public Int(int max) {
-    this.max = max;
+  public BitVector(Integer size) {
+    this.size = size;
   }
 
-  public Int() {
-    this(MAX_INT);
+  public BitVector() {
+    this(null);
   }
 
   @Override
   public String getName() {
-    return "int";
+    return String.format("bv%d", size);
+  }
+
+  @Override
+  public Type concrete(SymbolTable symbolTable) {
+    if (size == null) {
+      return new BitVector(GeneratorConfig.getRandom().nextInt(32));
+    }
+    return new BitVector(size);
   }
 
   @Override
   public int hashCode() {
-    return getName().hashCode();
+    return Objects.hash(size, "bv");
   }
 
   @Override
@@ -37,21 +44,27 @@ public class Int implements BaseType {
       return false;
     }
     Type other = (Type) obj;
-    return other instanceof Int;
+
+    if (!(other instanceof BitVector)) {
+      return false;
+    }
+
+    BitVector bitVectorOther = other.asBitVector();
+
+    return size == null || bitVectorOther.size == null || size.equals(bitVectorOther.size);
   }
 
   @Override
   public Expression generateLiteral(SymbolTable symbolTable) {
-    Integer intValue = GeneratorConfig.getRandom().nextInt(max);
-    intValue *= GeneratorConfig.getRandom().nextDouble() < PROB_NEGATION ? -1 : 1;
-    BigInteger value = BigInteger.valueOf(intValue);
-    return new IntLiteral(this, symbolTable, value);
+    Long longValue = GeneratorConfig.getRandom().nextLong(1L << size);
+    BigInteger value = BigInteger.valueOf(longValue);
+    return new BitVectorLiteral(this, symbolTable, value);
   }
 
   @Override
   public Expression generateExpressionFromValue(SymbolTable symbolTable, Object value) {
     BigInteger v = new BigInteger(value.toString());
-    return new IntLiteral(this, symbolTable, v);
+    return new BitVectorLiteral(this, symbolTable, v);
   }
 
   @Override
@@ -71,6 +84,10 @@ public class Int implements BaseType {
     BigInteger lhs = (BigInteger) lhsV;
     BigInteger rhs = (BigInteger) rhsV;
     return lhs.compareTo(rhs) == 0;
+  }
+
+  public Integer getSize() {
+    return size;
   }
 
   @Override

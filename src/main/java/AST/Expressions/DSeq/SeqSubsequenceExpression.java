@@ -9,7 +9,7 @@ import AST.Statements.AssignmentStatement;
 import AST.Statements.Statement;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.DCollection;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.math.BigInteger;

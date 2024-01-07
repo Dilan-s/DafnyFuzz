@@ -5,10 +5,12 @@ import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
+import AST.SymbolTable.Types.PrimitiveTypes.BitVector;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.LimitedInt;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DClass;
@@ -26,6 +28,7 @@ public class Args {
   public static final List<Type> REAL_REAL = List.of(new Real(), new Real());
   public static final List<Type> DSET_DSET = List.of(new DSet(), new DSet());
   public static final List<Type> DSTRING_DSTRING = List.of(new DString(), new DString());
+  public static final List<Type> BV_BV = List.of(new BitVector(), new BitVector());
   public static final List<Type> SEQ_SEQ = List.of(new Seq(), new Seq());
   public static final List<Type> MULTISET_MULTISET = List.of(new Multiset(), new Multiset());
   public static final List<Type> DMAP_DMAP = List.of(new DMap(), new DMap());
@@ -33,6 +36,7 @@ public class Args {
   public static final List<Type> DATATYPE_DATATYPE = List.of(new DataType(), new DataType());
 
   public static final List<Type> DMAP_DSET = List.of(new DMap(), new DSet());
+  public static final List<Type> BV_INT = List.of(new BitVector(), new LimitedInt());
 
   public static final List<Type> INT = List.of(new Int());
   public static final List<Type> CHAR = List.of(new Char());
@@ -48,6 +52,7 @@ public class Args {
   public static final List<Type> DATATYPE = List.of(new DataType());
   public static final List<Type> DCLASS = List.of(new DClass());
   public static final List<Type> TYPE_ALIAS = List.of(new TypeAlias());
+  public static final List<Type> BV = List.of(new BitVector());
 
   public static List<Type> PAIR_NULL;
 

@@ -7,10 +7,11 @@ import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.PrimitiveTypes.BaseType;
+import AST.SymbolTable.Types.PrimitiveTypes.BitVector;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.ArrowType;
@@ -37,6 +38,7 @@ public class RandomTypeGenerator {
   public static double PROB_BOOL = 50.0;
   public static double PROB_CHAR = 50.0;
   public static double PROB_DSTRING = 20.0;
+  public static double PROB_BIT_VECTOR = 20.0;
   public static double PROB_REAL = 10.0;
   public static double PROB_DMAP = 10.0;
   public static double PROB_DARRAY = 10.0;
@@ -64,9 +66,10 @@ public class RandomTypeGenerator {
         t = PRIMITIVE_TYPES.get(index);
 
       } else {
-        double ratioSum = PROB_INT + PROB_BOOL + PROB_CHAR + PROB_REAL + PROB_DSTRING +
-          PROB_DMAP + PROB_DARRAY + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE +
-          PROB_DATATYPE + PROB_TYPE_ALIAS + PROB_DCLASS + PROB_ARROW_TYPE;
+        double ratioSum =
+          PROB_INT + PROB_BOOL + PROB_CHAR + PROB_REAL + PROB_DSTRING + PROB_BIT_VECTOR +
+            PROB_DMAP + PROB_DARRAY + PROB_DSET + PROB_SEQ + PROB_MULTISET + PROB_TUPLE +
+            PROB_DATATYPE + PROB_TYPE_ALIAS + PROB_DCLASS + PROB_ARROW_TYPE;
         double probType = GeneratorConfig.getRandom().nextDouble() * ratioSum;
 
         if (swarm) {
@@ -111,6 +114,14 @@ public class RandomTypeGenerator {
           t = new DString();
           if (swarm) {
             PROB_DSTRING *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
+          }
+
+        } else if ((probType -= PROB_BIT_VECTOR) < 0) {
+          // string
+          PROB_BIT_VECTOR *= GeneratorConfig.OPTION_DECAY_FACTOR;
+          t = new BitVector();
+          if (swarm) {
+            PROB_BIT_VECTOR *= GeneratorConfig.SWARM_MULTIPLIER_LARGE;
           }
 
         } else if ((probType -= PROB_DMAP) < 0) {
@@ -207,6 +218,7 @@ public class RandomTypeGenerator {
     PROB_BOOL = 50.0;
     PROB_CHAR = 50.0;
     PROB_DSTRING = 20.0;
+    PROB_BIT_VECTOR = 20.0;
     PROB_REAL = 10.0;
     PROB_DMAP = 10.0;
     PROB_DARRAY = 10.0;
@@ -327,7 +339,7 @@ public class RandomTypeGenerator {
 
       if (t.isCollection() || t.equals(new Tuple()) || t.equals(new DMap()) || t.equals(
         new DataType()) || t.equals(new DataTypeRule()) || t.equals(new DString()) || t.equals(
-        new DClass()) || t.equals(new ArrowType())) {
+        new DClass()) || t.equals(new ArrowType()) || t.equals(new BitVector())) {
         t = null;
       }
     }

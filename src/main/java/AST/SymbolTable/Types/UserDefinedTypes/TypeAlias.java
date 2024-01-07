@@ -12,10 +12,11 @@ import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
 import AST.SymbolTable.Types.GenericType.GenericType;
 import AST.SymbolTable.Types.PrimitiveTypes.BaseType;
+import AST.SymbolTable.Types.PrimitiveTypes.BitVector;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
 import AST.SymbolTable.Types.PrimitiveTypes.Char;
 import AST.SymbolTable.Types.PrimitiveTypes.DString;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.PrimitiveTypes.Real;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
@@ -270,6 +271,11 @@ public class TypeAlias implements Type {
   @Override
   public ArrowType asArrowType() {
     return type.asArrowType();
+  }
+
+  @Override
+  public BitVector asBitVector() {
+    return type.asBitVector();
   }
 
   @Override

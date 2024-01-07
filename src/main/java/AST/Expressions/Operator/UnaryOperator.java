@@ -10,8 +10,9 @@ import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
+import AST.SymbolTable.Types.PrimitiveTypes.BitVector;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import AST.SymbolTable.Types.Variables.Variable;
@@ -381,6 +382,43 @@ public enum UnaryOperator implements Operator {
       List<String> r = new ArrayList<>(res);
       Collections.shuffle(r, GeneratorConfig.getRandom());
       return r.subList(0, Math.min(5, res.size()));
+    }
+  },
+  NegateBV("!", List.of(Args.BV), new BitVector()) {
+    @Override
+    public String formExpression(List<Expression> args) {
+      return String.format("!(%s)", args.get(0).toString());
+    }
+
+    @Override
+    public String formMinimizedExpression(List<Expression> args) {
+      return String.format("!(%s)", args.get(0).minimizedTestCase());
+    }
+
+    @Override
+    public List<String> formOutput(List<Expression> args) {
+      Set<String> res = new HashSet<>();
+      for (String arg : args.get(0).toOutput()) {
+        res.add(String.format("!(%s)", arg));
+      }
+      List<String> r = new ArrayList<>(res);
+      Collections.shuffle(r, GeneratorConfig.getRandom());
+      return r.subList(0, Math.min(5, res.size()));
+    }
+
+    @Override
+    public Object apply(List<Expression> args, Map<Variable, Variable> paramsMap) {
+      BitVector type = args.get(0).getTypes().get(0).asBitVector();
+      Expression exp = args.get(0);
+      Object val = exp.getValue(paramsMap).get(0);
+      if (val != null) {
+        BigInteger bv = (BigInteger) val;
+        for (int i = 0; i < type.getSize(); i++) {
+          bv = bv.flipBit(i);
+        }
+        return bv;
+      }
+      return null;
     }
   };
 

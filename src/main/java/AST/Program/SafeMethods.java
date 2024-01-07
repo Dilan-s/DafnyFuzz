@@ -17,7 +17,7 @@ import AST.SymbolTable.Method.Method;
 import AST.SymbolTable.SymbolTable.SymbolTable;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.PrimitiveTypes.Bool;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.util.List;
 

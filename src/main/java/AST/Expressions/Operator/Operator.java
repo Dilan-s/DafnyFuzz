@@ -10,11 +10,13 @@ import AST.SymbolTable.Types.DCollectionTypes.DSet;
 import AST.SymbolTable.Types.DCollectionTypes.Multiset;
 import AST.SymbolTable.Types.DCollectionTypes.Seq;
 import AST.SymbolTable.Types.DMap.DMap;
+import AST.SymbolTable.Types.PrimitiveTypes.BitVector;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.UserDefinedTypes.DataType.DataType;
 import AST.SymbolTable.Types.UserDefinedTypes.Tuple;
 import AST.SymbolTable.Types.UserDefinedTypes.TypeAlias;
 import AST.SymbolTable.Types.Variables.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ public interface Operator {
     datatype = datatype.concrete(symbolTable);
     Type map = new DMap().concrete(symbolTable);
     Type typeAlias = null;
+    BitVector bv = expected.equals(new BitVector()) ? expected.asBitVector() : new BitVector().concrete(symbolTable).asBitVector();
 
     List<Type> ret = new ArrayList<>();
     for (Type type : types) {
@@ -64,6 +67,8 @@ public interface Operator {
         ret.add(datatype.concrete(symbolTable));
       } else if (type.equals(new DMap())) {
         ret.add(map.concrete(symbolTable));
+      } else if (type.equals(new BitVector())) {
+        ret.add(bv);
       } else {
         ret.add(type.concrete(symbolTable));
       }
@@ -101,5 +106,9 @@ public interface Operator {
     Seq.MIN_SIZE_OF_SEQ = v;
     DSet.MIN_SIZE_OF_SET = v;
     Multiset.MIN_SIZE_OF_MULTISET = v;
+  }
+
+  static BigInteger mask(BigInteger v, int maskSize) {
+    return v.and(BigInteger.valueOf(1L << maskSize).subtract(BigInteger.ONE));
   }
 }

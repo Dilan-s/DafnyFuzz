@@ -4,7 +4,7 @@ import AST.Expressions.BaseExpression;
 import AST.Statements.Statement;
 import AST.SymbolTable.Function.Function;
 import AST.SymbolTable.SymbolTable.SymbolTable;
-import AST.SymbolTable.Types.PrimitiveTypes.Int;
+import AST.SymbolTable.Types.PrimitiveTypes.Int.Int;
 import AST.SymbolTable.Types.Type;
 import AST.SymbolTable.Types.Variables.Variable;
 import java.math.BigInteger;
